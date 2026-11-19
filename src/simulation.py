@@ -1309,7 +1309,7 @@ def stage_credit_loop_bound_sensitivity(ctx):
         rec.check("final: case coverage recount by case_id (exact full sequence)",
                   sum(1 for cid in clean_ids if tuple(traces[cid]) in S) == fr["clean_case_covered"])
         write_json(out / "credit_loop_bound_final.json", {
-            "dataset": "Credit (credit-card; identity not yet confirmed)",
+            "dataset": "Credit (credit-card)",
             "final_loop_num": fn, "final_loop_total": ft,
             "criterion": ('coverage-complexity elbow: keep clean case coverage as high as possible, choose the bound before generated trace count starts to grow sharply'),
             "evidence": {f"({r['loop_num']},{r['loop_total']})": {"case_coverage": r["case_coverage"],

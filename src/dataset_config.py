@@ -117,7 +117,7 @@ DATASETS = {
     },
     "Credit": {
         "file_stem": "credit-card",
-        "identity_confirmed": False,
+        "identity_confirmed": True,
         "identity_note": "credit-card from P-BEAR-RL Full_input; named Credit in the paper (P-BEAR-RL README: 'credit-card, mccloud (named as Credit, Pub in our paper)')",
         # loop model: bounded generation with the official loop bound (5,7)
         "trace_generation": {
