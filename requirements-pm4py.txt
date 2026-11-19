@@ -1,0 +1,32 @@
+# Method B / discovery / generation environment: .venv (pm4py)
+# Python 3.13.9. Frozen 2026-11-12 from the environment used for all .venv stages.
+# Install: .venv\Scripts\python -m pip install -r requirements-pm4py.txt
+# Note: on the experiment PC, Windows Smart App Control blocks the cvxopt / lxml.objectify DLLs,
+# so .venv stages ran through outputs/multi_dataset_experiment/scripts/shim_simulation.py (LP solver = scipy).
+colorama==0.4.6
+contourpy==1.3.3
+cvxopt==1.3.3
+cycler==0.12.1
+fonttools==4.63.0
+graphviz==0.21
+kiwisolver==1.5.0
+lxml==6.1.2
+matplotlib==3.11.1
+narwhals==2.25.0
+networkx==3.6.1
+numpy==2.5.2
+packaging==26.3
+pandas==3.0.5
+pillow==12.3.0
+plotly==6.9.0
+pm4py==2.7.23.6
+psutil==7.2.2
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+scipy==1.18.0
+setuptools==84.0.0
+six==1.17.0
+tqdm==4.70.0
+tzdata==2026.3
+wheel==0.48.0

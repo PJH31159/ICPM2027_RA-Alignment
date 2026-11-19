@@ -1,0 +1,79 @@
+{
+  "name": "Original NBG (observed clean log)",
+  "graphs": 14,
+  "nodes": 3750,
+  "edges": 4107,
+  "digest": "ffe91bf916897aa6",
+  "per_graph": [
+    {
+      "activity": "Start",
+      "nodes": 245,
+      "edges": 285
+    },
+    {
+      "activity": "a",
+      "nodes": 245,
+      "edges": 285
+    },
+    {
+      "activity": "b",
+      "nodes": 463,
+      "edges": 519
+    },
+    {
+      "activity": "j",
+      "nodes": 378,
+      "edges": 419
+    },
+    {
+      "activity": "k",
+      "nodes": 378,
+      "edges": 419
+    },
+    {
+      "activity": "c",
+      "nodes": 337,
+      "edges": 363
+    },
+    {
+      "activity": "d",
+      "nodes": 337,
+      "edges": 363
+    },
+    {
+      "activity": "h",
+      "nodes": 155,
+      "edges": 163
+    },
+    {
+      "activity": "i",
+      "nodes": 155,
+      "edges": 163
+    },
+    {
+      "activity": "f",
+      "nodes": 206,
+      "edges": 221
+    },
+    {
+      "activity": "End",
+      "nodes": 176,
+      "edges": 187
+    },
+    {
+      "activity": "e",
+      "nodes": 296,
+      "edges": 318
+    },
+    {
+      "activity": "g",
+      "nodes": 135,
+      "edges": 142
+    },
+    {
+      "activity": "l",
+      "nodes": 244,
+      "edges": 260
+    }
+  ]
+}

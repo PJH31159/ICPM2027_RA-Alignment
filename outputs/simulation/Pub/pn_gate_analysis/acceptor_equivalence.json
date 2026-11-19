@@ -1,0 +1,37 @@
+{
+  "pnml": "outputs\\simulation\\Pub\\discover\\petri_net.pnml",
+  "results": {
+    "case traces": {
+      "n": 626,
+      "accepted_ref": 186,
+      "mismatch": 0
+    },
+    "generated (4,4)": {
+      "n": 6339,
+      "accepted_ref": 6339,
+      "mismatch": 0
+    },
+    "official A/B/C repaired traces": {
+      "n": 103,
+      "accepted_ref": 103,
+      "mismatch": 0
+    }
+  },
+  "checks": [
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on case traces",
+      "passed": true,
+      "detail": "{'n': 626, 'accepted_ref': 186, 'mismatch': 0}"
+    },
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on generated (4,4)",
+      "passed": true,
+      "detail": "{'n': 6339, 'accepted_ref': 6339, 'mismatch': 0}"
+    },
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on official A/B/C repaired traces",
+      "passed": true,
+      "detail": "{'n': 103, 'accepted_ref': 103, 'mismatch': 0}"
+    }
+  ]
+}

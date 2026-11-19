@@ -1,0 +1,100 @@
+{
+ "cases": 269,
+ "lp_solver_in_process": "scipy",
+ "b_dir": "outputs/simulation/Pub/runs/methodB_run1",
+ "c_log": "outputs/simulation/Pub/runs/methodC_run1/mccloud_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv",
+ "cpn_log": "outputs/simulation/Pub/C_PN_Gate/run1/mccloud_1000_ppm0.0_valratio0.5_seed42_methodCPN_run1_repaired_log_cpn.csv",
+ "total_sec": 3.16,
+ "checks": {
+  "exact_cost_eq_B": 269,
+  "B_in_native_set": 269,
+  "B_in_tau_excl_set": 269,
+  "native_subset_of_tau_excl": 269,
+  "state_limit_hit": 0,
+  "gen_less_memory_eq_native": 268
+ },
+ "multiple_optimal_cases": {
+  "native": 46,
+  "tau_excluded": 46,
+  "native_set_size_dist": {
+   "1": 223,
+   "2": 8,
+   "3": 13,
+   "4": 14,
+   "5": 9,
+   "7": 1,
+   "15": 1
+  },
+  "tau_excl_set_size_dist": {
+   "1": 223,
+   "2": 8,
+   "3": 13,
+   "4": 14,
+   "5": 9,
+   "7": 1,
+   "15": 1
+  }
+ },
+ "agreement": {
+  "B-C": {
+   "exact": "203/269 = 0.7546",
+   "native_all_optimal": "210/269 = 0.7807",
+   "tau_excluded_all_optimal": "210/269 = 0.7807",
+   "counts": {
+    "exact": 203,
+    "native": 210,
+    "tau_excluded": 210,
+    "n": 269
+   }
+  },
+  "B-CPN": {
+   "exact": "226/269 = 0.8401",
+   "native_all_optimal": "240/269 = 0.8922",
+   "tau_excluded_all_optimal": "240/269 = 0.8922",
+   "counts": {
+    "exact": 226,
+    "native": 240,
+    "tau_excluded": 240,
+    "n": 269
+   }
+  }
+ },
+ "accuracy_aux": {
+  "B": "219/269",
+  "C": "190/269",
+  "CPN": "214/269"
+ },
+ "runtime_ms": {
+  "ms_native_search": {
+   "mean": 2.13,
+   "median": 0.85,
+   "max": 66.06
+  },
+  "ms_tau_excl_search": {
+   "mean": 2.41,
+   "median": 1.02,
+   "max": 25.5
+  },
+  "ms_gen_less_memory": {
+   "mean": 7.04,
+   "median": 3.16,
+   "max": 94.09
+  },
+  "native_pops": {
+   "mean": 268.56,
+   "median": 114.0,
+   "max": 3219.0
+  },
+  "tau_excl_pops": {
+   "mean": 343.38,
+   "median": 140.0,
+   "max": 3694.0
+  },
+  "peak_kb_gen": {
+   "mean": 45.09,
+   "median": 25.0,
+   "max": 639.7
+  }
+ },
+ "definition": "all-optimal agreement = X repaired trace ∈ B optimal repaired trace set (official exact metric unchanged)"
+}

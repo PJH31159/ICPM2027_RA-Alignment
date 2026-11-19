@@ -1,0 +1,113 @@
+{
+  "data": "mccloud",
+  "num_epi": 1000,
+  "alpha": 0.0,
+  "val_ratio": 0.5,
+  "seed": 42,
+  "max_step": 8,
+  "use_multiprocessing": true,
+  "num_cores": 15,
+  "n_val_cases": 268,
+  "val_rl_runs": 249,
+  "n_test_cases": 269,
+  "test_inference_runs": 212,
+  "nbg_ms": 0.0,
+  "val_total_ms": 2342414.71,
+  "val_per_case_ms": 8740.35,
+  "test_total_ms": 38271.12,
+  "test_per_case_ms": 142.27,
+  "total_sec": 2413.396,
+  "training_time_sec": 2342.4147,
+  "total_repair_time_sec": 38.2711,
+  "total_run_time_sec": 2413.396,
+  "val_case_ms_all_n": 268,
+  "val_case_ms_all_mean": 126197.2156,
+  "val_case_ms_all_median": 132796.2988,
+  "val_case_ms_all_std": 69743.6488,
+  "val_case_ms_all_min": 2.2508,
+  "val_case_ms_all_max": 316236.1556,
+  "val_case_ms_rl_n": 249,
+  "val_case_ms_rl_mean": 135826.2291,
+  "val_case_ms_rl_median": 139420.1169,
+  "val_case_ms_rl_std": 62639.8547,
+  "val_case_ms_rl_min": 8721.012,
+  "val_case_ms_rl_max": 316236.1556,
+  "val_case_ms_mem_n": 19,
+  "val_case_ms_mem_mean": 6.4594,
+  "val_case_ms_mem_median": 2.5435,
+  "val_case_ms_mem_std": 15.8295,
+  "val_case_ms_mem_min": 2.2508,
+  "val_case_ms_mem_max": 71.7903,
+  "test_case_ms_all_n": 269,
+  "test_case_ms_all_mean": 1698.518,
+  "test_case_ms_all_median": 341.6311,
+  "test_case_ms_all_std": 3237.266,
+  "test_case_ms_all_min": 1.9371,
+  "test_case_ms_all_max": 20719.2534,
+  "test_case_ms_rl_n": 212,
+  "test_case_ms_rl_mean": 2154.5754,
+  "test_case_ms_rl_median": 627.6114,
+  "test_case_ms_rl_std": 3510.661,
+  "test_case_ms_rl_min": 19.2462,
+  "test_case_ms_rl_max": 20719.2534,
+  "test_case_ms_mem_n": 57,
+  "test_case_ms_mem_mean": 2.3048,
+  "test_case_ms_mem_median": 2.226,
+  "test_case_ms_mem_std": 0.3957,
+  "test_case_ms_mem_min": 1.9371,
+  "test_case_ms_mem_max": 4.8683,
+  "q_table_size": 695774,
+  "nbg_source": "override",
+  "pn_gate": "outputs\\simulation\\Pub\\discover\\petri_net.pnml",
+  "limit": null,
+  "note": "val/test p_anomaly omitted (invalid for Credit numeric case ids; use evaluate)",
+  "method": "C+PN (W2 Expanded New NBG + Petri Net conformance gate)",
+  "run_id": 1,
+  "nbg_edge_set_digest": "d17b1134b27a3e39",
+  "new_nbg_input": "original_plus_model_only",
+  "loop_bound": [
+    4,
+    4
+  ],
+  "started_at": "2026-11-10T22:35:19",
+  "wall_sec": 2414.79,
+  "cases_with_gate_rejection": 257,
+  "gate_rejected_episodes_total": 34470,
+  "checks": [
+    {
+      "check": "input files exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "input checksums unchanged since first use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "official conditions (num_epi 1000 / alpha 0 / val_ratio 0.5 / seed 42 / max_step 8 / multiprocessing)",
+      "passed": true,
+      "detail": "{'num_epi': 1000, 'alpha': 0.0, 'val_ratio': 0.5, 'seed': 42, 'max_step': 8, 'use_multiprocessing': True, 'num_cores': 15}"
+    },
+    {
+      "check": "loop bound == (4, 4)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "W2 Expanded New NBG digest == nbg stage (official Method C input)",
+      "passed": true,
+      "detail": "d17b1134b27a3e39"
+    },
+    {
+      "check": "gate Petri Net == official discovered model (places / transitions / invisible / arcs)",
+      "passed": true,
+      "detail": "{'places': 15, 'transitions': 14, 'invisible': 2, 'arcs': 32}"
+    },
+    {
+      "check": "split == nbg stage split (same as official A / B / C)",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "exact": {
+    "exact_agreement": "133/210 = 0.6333",
+    "all_optimal_agreement": "133/210 = 0.6333",
+    "recovered": 0,
+    "reaches_80pct (168)": false,
+    "shortfall_to_80pct": 35
+  },
+  "dev": {
+    "exact_agreement": "133/210 = 0.6333",
+    "all_optimal_agreement": "144/210 = 0.6857",
+    "recovered": 11,
+    "reaches_80pct (168)": false,
+    "shortfall_to_80pct": 24
+  },
+  "definition": "all-optimal agreement = C repaired trace ∈ B optimal repaired trace set (official exact metric unchanged)"
+}

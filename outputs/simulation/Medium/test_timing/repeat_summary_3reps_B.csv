@@ -1,0 +1,2 @@
+condition,reps,n,mean_avg,mean_sd,mean_min,mean_max,mean_cv_pct,median_avg,median_sd,median_min,median_max,seq_wall_per_case_avg,repaired_traces_identical_across_reps,trace_agreement_official_run1,per_rep_mean,per_rep_median,per_rep_std,per_rep_min,per_rep_max
+B_alignment,3,333,1.623,0.021,1.603,1.646,1.32,1.463,0.019,1.445,1.484,1.638,False,329/333; 331/333; 330/333,1.6210; 1.6035; 1.6460,1.4611; 1.4451; 1.4835,0.4798; 0.4832; 0.4943,0.9451; 0.9258; 0.9381,3.8736; 3.9168; 4.2063

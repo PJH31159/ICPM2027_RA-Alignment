@@ -1,0 +1,77 @@
+{
+  "name": "Expanded New NBG (W2, D039)",
+  "graphs": 13,
+  "nodes": 1761,
+  "edges": 6915,
+  "digest": "a970a9e3d2840e9c",
+  "per_graph": [
+    {
+      "activity": "Start",
+      "nodes": 112,
+      "edges": 532
+    },
+    {
+      "activity": "a",
+      "nodes": 112,
+      "edges": 532
+    },
+    {
+      "activity": "b",
+      "nodes": 169,
+      "edges": 697
+    },
+    {
+      "activity": "End",
+      "nodes": 149,
+      "edges": 589
+    },
+    {
+      "activity": "c",
+      "nodes": 122,
+      "edges": 451
+    },
+    {
+      "activity": "d",
+      "nodes": 131,
+      "edges": 489
+    },
+    {
+      "activity": "f",
+      "nodes": 101,
+      "edges": 426
+    },
+    {
+      "activity": "e",
+      "nodes": 248,
+      "edges": 968
+    },
+    {
+      "activity": "g",
+      "nodes": 133,
+      "edges": 529
+    },
+    {
+      "activity": "h",
+      "nodes": 152,
+      "edges": 664
+    },
+    {
+      "activity": "i",
+      "nodes": 100,
+      "edges": 294
+    },
+    {
+      "activity": "j",
+      "nodes": 99,
+      "edges": 283
+    },
+    {
+      "activity": "k",
+      "nodes": 133,
+      "edges": 461
+    }
+  ],
+  "model_only_edges_added": 3961,
+  "original_edges_kept": 2954,
+  "edge_set_equals_original_union_generated": true
+}

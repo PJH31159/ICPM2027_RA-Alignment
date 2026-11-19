@@ -1,0 +1,56 @@
+{
+ "date": "2026-11-10",
+ "purpose": "Credit Method B scipy(shim) vs official cvxopt equivalence",
+ "lp_solver_used": "scipy",
+ "cvxopt_hidden": true,
+ "pm4py": "2.7.23.6",
+ "official_run": "outputs\\simulation\\Credit\\runs\\methodB_run1",
+ "official_solver": "cvxopt (cvxopt_solver_custom_align, pm4py default when cvxopt importable)",
+ "anomaly_log": "<DATA_ROOT>\\encoded_anomaly\\credit-card_1.00.csv",
+ "model_same_as_official": true,
+ "only_in_one_side": 0,
+ "alignment_sec": 59.2738,
+ "repaired_log_b_rows_identical": true,
+ "split": {
+  "test": {
+   "cases": 210,
+   "same_alignment_cost": 210,
+   "same_repaired_trace": 210,
+   "same_fitness": 210,
+   "same_alignment_failed": 210,
+   "same_n_sync_moves": 210,
+   "same_n_log_moves": 210,
+   "same_n_model_moves_visible": 210,
+   "same_n_tau_moves": 210,
+   "same_visited_states": 111,
+   "same_queued_states": 56
+  },
+  "val": {
+   "cases": 210,
+   "same_alignment_cost": 210,
+   "same_repaired_trace": 210,
+   "same_fitness": 210,
+   "same_alignment_failed": 210,
+   "same_n_sync_moves": 210,
+   "same_n_log_moves": 210,
+   "same_n_model_moves_visible": 210,
+   "same_n_tau_moves": 210,
+   "same_visited_states": 98,
+   "same_queued_states": 52
+  }
+ },
+ "verdict_rule": "test 210/210 repaired trace AND 210/210 alignment cost",
+ "official_equivalent": true,
+ "environment": {
+  "python": "3.13.9",
+  "executable": ".venv\\Scripts\\python.exe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages_loaded": {
+   "pandas": "3.0.5",
+   "numpy": "2.5.2",
+   "networkx": "3.6.1",
+   "pm4py": "2.7.23.6"
+  },
+  "git_commit": "325b705"
+ }
+}

@@ -1,0 +1,37 @@
+{
+  "pnml": "outputs\\simulation\\RoadTraffic\\threshold_0p20\\discover\\petri_net.pnml",
+  "results": {
+    "case traces": {
+      "n": 1434,
+      "accepted_ref": 232,
+      "mismatch": 0
+    },
+    "generated (2,2)": {
+      "n": 36174,
+      "accepted_ref": 36174,
+      "mismatch": 0
+    },
+    "official A/B/C repaired traces": {
+      "n": 308,
+      "accepted_ref": 308,
+      "mismatch": 0
+    }
+  },
+  "checks": [
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on case traces",
+      "passed": true,
+      "detail": "{'n': 1434, 'accepted_ref': 232, 'mismatch': 0}"
+    },
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on generated (2,2)",
+      "passed": true,
+      "detail": "{'n': 36174, 'accepted_ref': 36174, 'mismatch': 0}"
+    },
+    {
+      "check": "PNMLAcceptor == pm4py acceptor on official A/B/C repaired traces",
+      "passed": true,
+      "detail": "{'n': 308, 'accepted_ref': 308, 'mismatch': 0}"
+    }
+  ]
+}

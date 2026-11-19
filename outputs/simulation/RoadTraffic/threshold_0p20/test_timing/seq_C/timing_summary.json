@@ -1,0 +1,133 @@
+{
+  "label": "seq_C",
+  "method": "C",
+  "purpose": "timing only (not an accuracy experiment)",
+  "mode": "sequential Test-only replay with the official trained agent",
+  "official_run": {
+    "repaired_log": "outputs\\simulation\\RoadTraffic\\threshold_0p20\\runs\\methodC_run1\\Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv",
+    "agent": "outputs/simulation/RoadTraffic/threshold_0p20/runs/methodC_run1/Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodC_run1_agent.pkl",
+    "alpha": 0.0,
+    "num_epi": 1000,
+    "seed": 42,
+    "max_step": 8,
+    "val_ratio": 0.5,
+    "num_cores": 15,
+    "use_multiprocessing": true,
+    "test_per_case_ms": 49.62,
+    "test_total_ms": 136567.45,
+    "test_inference_runs": 434,
+    "test_p_anomaly": 0.44949127906976744
+  },
+  "main_metric_candidates": {
+    "test_rl_mean_ms": 638.4493,
+    "test_rl_median_ms": 45.0033
+  },
+  "supplementary_paper_metric": {
+    "official_test_phase_wall_per_case_ms (multiprocessing)": 49.62,
+    "replay_test_phase_wall_per_case_ms (sequential)": 100.7629
+  },
+  "timing_summary": {
+    "test_case_ms_all_n": 2752,
+    "test_case_ms_all_mean": 100.7598,
+    "test_case_ms_all_median": 0.0844,
+    "test_case_ms_all_std": 1165.5613,
+    "test_case_ms_all_min": 0.0677,
+    "test_case_ms_all_max": 22667.4323,
+    "test_case_ms_rl_n": 434,
+    "test_case_ms_rl_mean": 638.4493,
+    "test_case_ms_rl_median": 45.0033,
+    "test_case_ms_rl_std": 2878.7501,
+    "test_case_ms_rl_min": 3.758,
+    "test_case_ms_rl_max": 22667.4323,
+    "test_case_ms_mem_n": 2318,
+    "test_case_ms_mem_mean": 0.088,
+    "test_case_ms_mem_median": 0.0819,
+    "test_case_ms_mem_std": 0.0177,
+    "test_case_ms_mem_min": 0.0677,
+    "test_case_ms_mem_max": 0.3057,
+    "test_phase_wall_ms": 277299.3682,
+    "test_phase_wall_ms_per_case": 100.7629,
+    "rl_share": 0.1577
+  },
+  "repair_memory": {
+    "validation_cases": 2751,
+    "memory_traces": 812,
+    "conflicting_traces": 0,
+    "note": "rebuilt from official repaired log validation rows (first occurrence per trace)"
+  },
+  "agreement_with_official": {
+    "all": {
+      "n": 2752,
+      "rows_identical": 2323,
+      "trace_identical": 2473
+    },
+    "RL": {
+      "n": 434,
+      "rows_identical": 117,
+      "trace_identical": 192
+    },
+    "Mem": {
+      "n": 2318,
+      "rows_identical": 2206,
+      "trace_identical": 2281
+    }
+  },
+  "replay_exact_match_test (timing replay, not an accuracy result)": "1237/2752",
+  "checks": [
+    {
+      "check": "input files exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "input checksums unchanged since first use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "official stats.json found",
+      "passed": true,
+      "detail": "['outputs\\\\simulation\\\\RoadTraffic\\\\threshold_0p20\\\\runs\\\\methodC_run1\\\\Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodC_run1_stats.json']"
+    },
+    {
+      "check": "method matches official nbg_source",
+      "passed": true,
+      "detail": "override"
+    },
+    {
+      "check": "split == official run split",
+      "passed": true,
+      "detail": "(val 2751, test 2752)"
+    },
+    {
+      "check": "repair memory rebuilt from official validation rows",
+      "passed": null,
+      "detail": "{'validation_cases': 2751, 'memory_traces': 812, 'conflicting_traces': 0, 'note': 'rebuilt from official repaired log validation rows (first occurrence per trace)'}"
+    },
+    {
+      "check": "agent",
+      "passed": null,
+      "detail": "{'q_table_size': 923866, 'exploration_rate': 0.5}"
+    },
+    {
+      "check": "Q-table unchanged by Test replay (no Q-value update)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "exploration_rate unchanged by Test replay",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "agreement with official test output (rows identical / trace identical)",
+      "passed": null,
+      "detail": "{'all': {'n': 2752, 'rows_identical': 2323, 'trace_identical': 2473}, 'RL': {'n': 434, 'rows_identical': 117, 'trace_identical': 192}, 'Mem': {'n': 2318, 'rows_identical': 2206, 'trace_identical': 2281}}"
+    },
+    {
+      "check": "RL-path count: replay vs official",
+      "passed": null,
+      "detail": "{'replay': 434, 'official': 434}"
+    }
+  ]
+}

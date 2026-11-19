@@ -1,0 +1,30 @@
+# Method A (RP-BEAR) dedicated environment: .venv-rpbear (D031)
+#
+# Python: 3.13.9 (python -m venv .venv-rpbear)
+# Versions are pinned to the environment that passed VAL-A01
+# (anaconda base, 2026-10-08). pandas must stay 2.x: the RP-BEAR
+# preprocessing fails on pandas 3.x (category dtype assignment).
+#
+# Install:
+#   .venv-rpbear\Scripts\python -m pip install -r requirements-rpbear.txt
+
+# direct imports of src/sim.py and src/rpbear/func_rpbear_final.py
+pandas==2.3.3
+numpy==2.3.5
+networkx==3.5
+matplotlib==3.10.6
+plotly==6.3.0
+
+# transitive dependencies (same versions as the VAL-A01 environment)
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+six==1.17.0
+contourpy==1.3.3
+cycler==0.11.0
+fonttools==4.60.1
+kiwisolver==1.4.9
+packaging==25.0
+pillow==12.0.0
+pyparsing==3.2.5
+narwhals==2.7.0

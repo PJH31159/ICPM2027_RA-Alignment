@@ -1,0 +1,80 @@
+{
+  "new_nbg_info": {
+    "generated_cases": 6,
+    "generated_rows_with_start_end": 68,
+    "generated_activity_first_seen_order_equals_actset": false,
+    "anchor_match": "22/22",
+    "weighting": "each unique generated trace once (model language as a set; observed frequencies NOT restored)"
+  },
+  "comparison": {
+    "n_graphs": {
+      "original": 22,
+      "new": 22
+    },
+    "total_nodes": {
+      "original": 416,
+      "new": 416
+    },
+    "total_edges": {
+      "original": 422,
+      "new": 422
+    },
+    "structure_equal (all node sets incl. activity/level)": true,
+    "edge_set_equal (all graphs)": true,
+    "likelihood_equal (all edges)": false,
+    "graphs_with_likelihood_difference": 10,
+    "edges_with_likelihood_difference": 64,
+    "max_abs_likelihood_diff": 0.3356767031874108,
+    "min_likelihood": {
+      "original": 0.2398754596936128,
+      "new": 0.1323529411764706
+    },
+    "smallest_alpha_where_edge_validity_differs": 0.1323529411764706,
+    "edge_set_digest": {
+      "original": "c2a535271bbdec62",
+      "new": "c2a535271bbdec62"
+    }
+  },
+  "adm_functional_equality": {
+    "alpha=0.0": {
+      "test": {
+        "n_cases": 524,
+        "adm_matrix_equal": 524,
+        "anomaly_locations_equal": 524
+      },
+      "val": {
+        "n_cases": 523,
+        "adm_matrix_equal": 523,
+        "anomaly_locations_equal": 523
+      }
+    },
+    "alpha=0.01": {
+      "test": {
+        "n_cases": 524,
+        "adm_matrix_equal": 524,
+        "anomaly_locations_equal": 524
+      },
+      "val": {
+        "n_cases": 523,
+        "adm_matrix_equal": 523,
+        "anomaly_locations_equal": 523
+      }
+    },
+    "alpha=0.05": {
+      "test": {
+        "n_cases": 524,
+        "adm_matrix_equal": 524,
+        "anomaly_locations_equal": 524
+      },
+      "val": {
+        "n_cases": 523,
+        "adm_matrix_equal": 523,
+        "anomaly_locations_equal": 523
+      }
+    }
+  },
+  "split_sizes": {
+    "val": 523,
+    "test": 524
+  }
+}

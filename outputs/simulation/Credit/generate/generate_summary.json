@@ -1,0 +1,27 @@
+{
+  "strategy": "bounded_loop",
+  "loop_num": 5,
+  "loop_total": 7,
+  "generated_unique_trace_count": 5000,
+  "reference_traces": "outputs/credit_loop_bound_sensitivity/credit_loop_bound_final_traces.csv",
+  "equals_reference": true,
+  "generation_time_sec": 0.0061,
+  "observed_clean_variant_count": 64,
+  "observed_in_generated": 19,
+  "model_only_count": 4981,
+  "clean_cases": 4580,
+  "clean_cases_covered": 4490,
+  "clean_case_coverage": 0.980349,
+  "max_trace_length": 21,
+  "safety_bounds": {
+    "safety_max_firings_per_transition": 5,
+    "safety_max_trace_length": 100,
+    "safety_max_traces": 1000000
+  },
+  "new_nbg_input": "original_plus_model_only",
+  "files": {
+    "model_only_log (Method C NBG input, D039)": "model_only_generated_log.csv",
+    "all generated traces (record)": "generated_bounded_traces.csv",
+    "generated_normal_log.csv": "NOT written (generated-only W1 is not official, D039)"
+  }
+}

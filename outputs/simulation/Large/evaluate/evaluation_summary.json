@@ -1,0 +1,58 @@
+{
+  "runs": {
+    "methodA_run1": "outputs\\simulation\\Large\\runs\\methodA_run1\\Large_1000_ppm0.0_valratio0.5_seed42_methodA_run1_repaired_log_a.csv",
+    "methodB_run1": "outputs\\simulation\\Large\\runs\\methodB_run1\\Large_IM_noise0_alignment_run1_repaired_log_b.csv",
+    "methodC_run1": "outputs\\simulation\\Large\\runs\\methodC_run1\\Large_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv"
+  },
+  "official": [
+    {
+      "run": "methodA_run1",
+      "n_cases": 643,
+      "n_exact_match": 564,
+      "exact_match_rate": 0.8771384136858476,
+      "recon_err_before": 1.6702954898911353,
+      "recon_err_after": 0.17884914463452567,
+      "normal_variant_rate": 0.9642301710730948,
+      "changed_only_emr": 0.8751974723538705,
+      "n_wrong_normal_variant": 54,
+      "n_non_normal": 0,
+      "n_unrepaired_wrong": 25
+    },
+    {
+      "run": "methodB_run1",
+      "n_cases": 643,
+      "n_exact_match": 608,
+      "exact_match_rate": 0.9455676516329704,
+      "recon_err_before": 1.6702954898911353,
+      "recon_err_after": 0.05443234836702955,
+      "normal_variant_rate": 1.0,
+      "changed_only_emr": 0.9447077409162717,
+      "n_wrong_normal_variant": 33,
+      "n_non_normal": 0,
+      "n_unrepaired_wrong": 2
+    },
+    {
+      "run": "methodC_run1",
+      "n_cases": 643,
+      "n_exact_match": 553,
+      "exact_match_rate": 0.8600311041990669,
+      "recon_err_before": 1.6702954898911353,
+      "recon_err_after": 0.18818040435458788,
+      "normal_variant_rate": 0.9611197511664075,
+      "changed_only_emr": 0.8578199052132701,
+      "n_wrong_normal_variant": 63,
+      "n_non_normal": 0,
+      "n_unrepaired_wrong": 27
+    }
+  ],
+  "contingency": {
+    "methodA_run1 vs methodC_run1": {
+      "both_correct": 519,
+      "methodA_run1_only_correct": 45,
+      "methodC_run1_only_correct": 34,
+      "both_wrong": 45,
+      "mcnemar_exact_p (supplementary)": 0.26042552589724327,
+      "n_different_repairs": 93
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "label": "rep2_B",
+  "method": "B (Alignment)",
+  "purpose": "timing only (not an accuracy experiment)",
+  "boundary": "per case: align_case (PM4Py alignment) + repair_from_alignment; excludes loading, discovery, Petri Net creation (PNML read), trace object build, CSV save, evaluation",
+  "pnml": "outputs/simulation/Credit/runs/methodB_run1/credit-card_IM_noise0_alignment_run1_petri_net.pnml",
+  "net": {
+    "n_places": 16,
+    "n_transitions": 20,
+    "n_arcs": 42,
+    "alignment_variant": "Variants.VERSION_STATE_EQUATION_A_STAR",
+    "pm4py": "2.7.23.6"
+  },
+  "test_case_ms": {
+    "n": 210,
+    "mean": 3.5286,
+    "median": 2.5915,
+    "std": 2.668,
+    "min": 1.2804,
+    "max": 17.0153
+  },
+  "test_phase_wall_ms": 744.5714,
+  "test_phase_wall_ms_per_case": 3.5456,
+  "trace_agreement_with_official_run1": "209/210",
+  "checks": [
+    {
+      "check": "official run files found (test ids, per-case, model_check)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "test cases == 210",
+      "passed": true,
+      "detail": "(210)"
+    },
+    {
+      "check": "Petri Net (PNML) == official model_check (places / transitions)",
+      "passed": true,
+      "detail": "{'n_places': 16, 'n_transitions': 20, 'n_arcs': 42, 'alignment_variant': 'Variants.VERSION_STATE_EQUATION_A_STAR', 'pm4py': '2.7.23.6'}"
+    },
+    {
+      "check": "no alignment failure",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "repaired trace agreement with official Run 1 (timing replay, not an accuracy result)",
+      "passed": null,
+      "detail": "209/210"
+    }
+  ]
+}

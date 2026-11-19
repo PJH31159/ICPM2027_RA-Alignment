@@ -1,0 +1,22 @@
+{
+  "dataset": "Wide",
+  "method": "B",
+  "run_id": 1,
+  "official": true,
+  "smoke_limit": null,
+  "noise_threshold": 0.0,
+  "alignment_variant": "VERSION_STATE_EQUATION_A_STAR",
+  "n_test": 337,
+  "n_val": 337,
+  "n_alignment_failed_test": 0,
+  "n_alignment_failed_val": 0,
+  "test_align_ms_mean": 1.7876608308605344,
+  "test_align_ms_median": 1.5639,
+  "discovery_sec": 0.0147,
+  "alignment_sec": 1.1745,
+  "wall_sec": 1.6416,
+  "started_at": "2026-10-14T12:52:08",
+  "pm4py": "2.7.23.6",
+  "repair_rule": "sync keep / log move delete / visible model move insert / tau skip",
+  "code": "utils.alignment_utils (EXP-061 align_case + repair_from_alignment)"
+}

@@ -1,0 +1,64 @@
+# virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+
+# caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+
+# raw / derived datasets (license and redistribution not confirmed)
+data/
+*.xes
+*.xes.gz
+outputs/simulation/RoadTraffic/exploratory_dedup/derived_data/
+
+# trained models and large binaries
+*.pkl
+models/
+outputs/models/
+
+# logs, checkpoints, stage state
+*.log
+log.txt
+*_execution_log.txt
+logs/
+checkpoint/
+chain_done/
+stage_status.json
+memory_watchdog.csv
+memory_driver.csv
+
+# large per-case / intermediate outputs (regenerate locally)
+*_repaired_log_*.csv
+*_case_timing.csv
+generated_normal_log.csv
+smoke/
+smoke_b/
+outputs/simulation/**/runs/**/*.pnml
+outputs/simulation/**/optimal_repaired_traces.csv
+outputs/simulation/**/case_summary.csv
+
+# in-progress run outputs (BPIC 2017 C+PN)
+outputs/simulation/BPIC2017/threshold_0p10/C_PN_Gate/
+outputs/simulation/BPIC2017/threshold_0p10/pn_gate_analysis/
+
+# private / internal notes
+CLAUDE.md
+STATE.md
+TASK.md
+DECISIONS.md
+RESEARCH_LOG.md
+RESEARCH_STORY_BEGINNER.md
+meeting_materials/
+docs/internal/
+Professor_*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

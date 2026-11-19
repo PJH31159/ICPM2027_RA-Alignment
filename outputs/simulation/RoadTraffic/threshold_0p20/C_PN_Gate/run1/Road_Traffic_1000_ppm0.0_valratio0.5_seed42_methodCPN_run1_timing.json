@@ -1,0 +1,34 @@
+{
+  "dataset": "RoadTraffic",
+  "method": "C+PN",
+  "run_id": 1,
+  "timing_scope": {
+    "training_ms": "RP-BEAR validation(학습) phase wall-clock = sim.py val_total_ms (data load / NBG 생성 / agent 저장 / test / 평가 제외). Method B = N/A",
+    "test_repair_mean_ms_per_case / median": "A / C / C+PN: case별 timer (worker 안 perf_counter, multiprocessing CPU 공유 포함; C+PN은 Petri Net gate 포함). B: case별 align_case + repair_from_alignment (순차)",
+    "test_wall_ms_per_case": "test phase wall-clock / test cases (A / C / C+PN은 multiprocessing throughput)",
+    "preprocessing": "discovery_ms / generation_ms / nbg_build_ms = discover / generate / nbg stage 기록값 (있을 때만)"
+  },
+  "train_cases": 2751,
+  "test_cases": 2752,
+  "training_ms": 5622976.89,
+  "test_repair_total_ms": 180502.3,
+  "test_repair_mean_ms_per_case": 520.4532,
+  "test_repair_median_ms_per_case": 34.8587,
+  "test_wall_ms_per_case": 65.5895,
+  "test_rl_path_cases": 434,
+  "test_rl_path_mean_ms": 3115.604,
+  "test_rl_path_median_ms": 787.7716,
+  "num_cores": 15,
+  "use_multiprocessing": true,
+  "preprocessing": {
+    "discovery_ms": 355.4,
+    "generation_ms": 70.3,
+    "nbg_build_ms": {
+      "original_nbg_build_ms": 14481.21,
+      "new_nbg_build_ms": 1197761.39
+    }
+  },
+  "source": {
+    "stats": "Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodCPN_run1_stats.json"
+  }
+}

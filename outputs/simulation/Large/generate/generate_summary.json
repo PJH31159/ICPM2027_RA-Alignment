@@ -1,0 +1,27 @@
+{
+  "generated_trace_count (accepted firing sequences)": 28,
+  "generated_unique_trace_count": 28,
+  "observed_clean_variant_count": 28,
+  "process_tree_language_size": 28,
+  "generated_equals_observed": true,
+  "generated_equals_process_tree_language": true,
+  "generated_only_count": 0,
+  "observed_only_count": 0,
+  "generated_only": [],
+  "observed_only": [],
+  "enumeration_stats": {
+    "states_visited": 162,
+    "truncated_max_traces": 0,
+    "dead_end_markings": 0,
+    "pruned_by_firing_bound": 0,
+    "pruned_by_length_bound": 0
+  },
+  "strategy": "exhaustive_acyclic",
+  "safety_bounds": {
+    "safety_max_firings_per_transition": 5,
+    "safety_max_trace_length": 100,
+    "safety_max_traces": 1000000
+  },
+  "safety_bounds_note": "safety bounds only; not loop_num / loop_total",
+  "weighting": "each unique generated trace used once (model language treated as a set; observed frequencies are NOT restored)"
+}

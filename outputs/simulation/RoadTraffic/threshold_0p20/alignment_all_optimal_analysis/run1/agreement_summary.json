@@ -1,0 +1,104 @@
+{
+ "cases": 2752,
+ "lp_solver_in_process": "scipy",
+ "b_dir": "outputs/simulation/RoadTraffic/threshold_0p20/runs/methodB_run1",
+ "c_log": "outputs/simulation/RoadTraffic/threshold_0p20/runs/methodC_run1/Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv",
+ "cpn_log": "outputs/simulation/RoadTraffic/threshold_0p20/C_PN_Gate/run1/Road_Traffic_1000_ppm0.0_valratio0.5_seed42_methodCPN_run1_repaired_log_cpn.csv",
+ "total_sec": 26549.87,
+ "total_sec_note": "checkpoint case 시간의 합 + 이번 실행 시간 (shard 병렬 실행이면 wall time이 아니라 CPU 순차 합에 가까움)",
+ "checks": {
+  "exact_cost_eq_B": 2741,
+  "B_in_native_set": 2741,
+  "B_in_tau_excl_set": 2741,
+  "native_subset_of_tau_excl": 2752,
+  "state_limit_hit": 11,
+  "gen_less_memory_eq_native": 2741
+ },
+ "multiple_optimal_cases": {
+  "native": 55,
+  "tau_excluded": 483,
+  "native_set_size_dist": {
+   "0": 11,
+   "1": 2686,
+   "2": 31,
+   "3": 22,
+   "4": 2
+  },
+  "tau_excl_set_size_dist": {
+   "0": 11,
+   "1": 2258,
+   "2": 161,
+   "3": 193,
+   "4": 73,
+   "5": 22,
+   "6": 23,
+   "7": 2,
+   "8": 4,
+   "9": 3,
+   "10": 1,
+   "12": 1
+  }
+ },
+ "agreement": {
+  "B-C": {
+   "exact": "2029/2752 = 0.7373",
+   "native_all_optimal": "2029/2752 = 0.7373",
+   "tau_excluded_all_optimal": "2073/2752 = 0.7533",
+   "counts": {
+    "exact": 2029,
+    "native": 2029,
+    "tau_excluded": 2073,
+    "n": 2752
+   }
+  },
+  "B-CPN": {
+   "exact": "2293/2752 = 0.8332",
+   "native_all_optimal": "2297/2752 = 0.8347",
+   "tau_excluded_all_optimal": "2354/2752 = 0.8554",
+   "counts": {
+    "exact": 2293,
+    "native": 2297,
+    "tau_excluded": 2354,
+    "n": 2752
+   }
+  }
+ },
+ "accuracy_aux": {
+  "B": "1372/2752",
+  "C": "1237/2752",
+  "CPN": "1314/2752"
+ },
+ "runtime_ms": {
+  "ms_native_search": {
+   "mean": 924.44,
+   "median": 10.39,
+   "max": 220161.0
+  },
+  "ms_tau_excl_search": {
+   "mean": 859.23,
+   "median": 9.56,
+   "max": 211997.47
+  },
+  "ms_gen_less_memory": {
+   "mean": 7857.12,
+   "median": 1403.19,
+   "max": 2122636.66
+  },
+  "native_pops": {
+   "mean": 26927.55,
+   "median": 567.0,
+   "max": 5000001.0
+  },
+  "tau_excl_pops": {
+   "mean": 27354.72,
+   "median": 570.0,
+   "max": 5000001.0
+  },
+  "peak_kb_gen": {
+   "mean": 33239.39,
+   "median": 8550.7,
+   "max": 9776579.4
+  }
+ },
+ "definition": "all-optimal agreement = X repaired trace ∈ B optimal repaired trace set (official exact metric unchanged)"
+}

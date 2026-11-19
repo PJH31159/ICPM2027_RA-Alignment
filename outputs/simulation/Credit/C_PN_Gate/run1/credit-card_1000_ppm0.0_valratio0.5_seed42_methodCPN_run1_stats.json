@@ -1,0 +1,113 @@
+{
+  "data": "credit-card",
+  "num_epi": 1000,
+  "alpha": 0.0,
+  "val_ratio": 0.5,
+  "seed": 42,
+  "max_step": 8,
+  "use_multiprocessing": true,
+  "num_cores": 15,
+  "n_val_cases": 210,
+  "val_rl_runs": 188,
+  "n_test_cases": 210,
+  "test_inference_runs": 154,
+  "nbg_ms": 0.0,
+  "val_total_ms": 1996337.35,
+  "val_per_case_ms": 9506.37,
+  "test_total_ms": 10646.21,
+  "test_per_case_ms": 50.7,
+  "total_sec": 2025.876,
+  "training_time_sec": 1996.3373,
+  "total_repair_time_sec": 10.6462,
+  "total_run_time_sec": 2025.876,
+  "val_case_ms_all_n": 210,
+  "val_case_ms_all_mean": 136411.7391,
+  "val_case_ms_all_median": 118685.2983,
+  "val_case_ms_all_std": 105727.9077,
+  "val_case_ms_all_min": 2.1368,
+  "val_case_ms_all_max": 584705.5106,
+  "val_case_ms_rl_n": 188,
+  "val_case_ms_rl_mean": 152374.4898,
+  "val_case_ms_rl_median": 124725.4084,
+  "val_case_ms_rl_std": 100240.7939,
+  "val_case_ms_rl_min": 11114.7413,
+  "val_case_ms_rl_max": 584705.5106,
+  "val_case_ms_mem_n": 22,
+  "val_case_ms_mem_mean": 2.7783,
+  "val_case_ms_mem_median": 2.5588,
+  "val_case_ms_mem_std": 0.5047,
+  "val_case_ms_mem_min": 2.1368,
+  "val_case_ms_mem_max": 3.9656,
+  "test_case_ms_all_n": 210,
+  "test_case_ms_all_mean": 567.8943,
+  "test_case_ms_all_median": 186.3476,
+  "test_case_ms_all_std": 975.4578,
+  "test_case_ms_all_min": 1.7135,
+  "test_case_ms_all_max": 6007.1854,
+  "test_case_ms_rl_n": 154,
+  "test_case_ms_rl_mean": 773.5065,
+  "test_case_ms_rl_median": 343.7673,
+  "test_case_ms_rl_std": 1067.8076,
+  "test_case_ms_rl_min": 20.2343,
+  "test_case_ms_rl_max": 6007.1854,
+  "test_case_ms_mem_n": 56,
+  "test_case_ms_mem_mean": 2.4605,
+  "test_case_ms_mem_median": 2.3639,
+  "test_case_ms_mem_std": 0.5275,
+  "test_case_ms_mem_min": 1.7135,
+  "test_case_ms_mem_max": 5.1405,
+  "q_table_size": 481405,
+  "nbg_source": "override",
+  "pn_gate": "outputs\\simulation\\Credit\\discover\\petri_net.pnml",
+  "limit": null,
+  "note": "val/test p_anomaly omitted (invalid for Credit numeric case ids; use evaluate)",
+  "method": "C+PN (W2 Expanded New NBG + Petri Net conformance gate)",
+  "run_id": 1,
+  "nbg_edge_set_digest": "657d7b11b2126d50",
+  "new_nbg_input": "original_plus_model_only",
+  "loop_bound": [
+    5,
+    7
+  ],
+  "started_at": "2026-11-02T21:17:18",
+  "wall_sec": 2026.8,
+  "cases_with_gate_rejection": 220,
+  "gate_rejected_episodes_total": 15436,
+  "checks": [
+    {
+      "check": "input files exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "input checksums unchanged since first use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "official conditions (num_epi 1000 / alpha 0 / val_ratio 0.5 / seed 42 / max_step 8 / multiprocessing)",
+      "passed": true,
+      "detail": "{'num_epi': 1000, 'alpha': 0.0, 'val_ratio': 0.5, 'seed': 42, 'max_step': 8, 'use_multiprocessing': True, 'num_cores': 15}"
+    },
+    {
+      "check": "loop bound == (5,7)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "W2 Expanded New NBG digest == nbg stage (official Method C input)",
+      "passed": true,
+      "detail": "657d7b11b2126d50"
+    },
+    {
+      "check": "gate Petri Net == official discovered model (places / transitions / invisible / arcs)",
+      "passed": true,
+      "detail": "{'places': 16, 'transitions': 20, 'invisible': 8, 'arcs': 42}"
+    },
+    {
+      "check": "split == nbg stage split (same as official A / B / C)",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

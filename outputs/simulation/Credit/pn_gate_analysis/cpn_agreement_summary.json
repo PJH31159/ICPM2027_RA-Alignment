@@ -1,0 +1,59 @@
+{
+  "pairs_exact": {
+    "A-B": "156/210 = 0.7429",
+    "A-C": "114/210 = 0.5429",
+    "A-CPN": "126/210 = 0.6000",
+    "B-C": "133/210 = 0.6333",
+    "B-CPN": "148/210 = 0.7048",
+    "C-CPN": "131/210 = 0.6238"
+  },
+  "A_B_CPN_categories": {
+    "B=CPN only": {
+      "n": 31,
+      "all_correct": 0,
+      "some_correct": 31,
+      "all_wrong": 0
+    },
+    "A=B=CPN": {
+      "n": 117,
+      "all_correct": 117,
+      "some_correct": 0,
+      "all_wrong": 0
+    },
+    "A=B only": {
+      "n": 39,
+      "all_correct": 0,
+      "some_correct": 39,
+      "all_wrong": 0
+    },
+    "all different": {
+      "n": 14,
+      "all_correct": 0,
+      "some_correct": 10,
+      "all_wrong": 4
+    },
+    "A=CPN only": {
+      "n": 9,
+      "all_correct": 0,
+      "some_correct": 9,
+      "all_wrong": 0
+    }
+  },
+  "target_80pct": 168,
+  "B-CPN": 148,
+  "B-C baseline": 133,
+  "B-CPN_reaches_80pct": false,
+  "shortfall_to_80pct": 20,
+  "reclassification_B_CPN": {
+    "disagreements": 62,
+    "previous": 77,
+    "causes": {
+      "model-only behavior": 33,
+      "observed normal variant difference": 15,
+      "alignment tie candidate": 12,
+      "concurrency-related (ordering only)": 2
+    },
+    "still_in_previous_D40": 19,
+    "new_disagreements_not_in_previous_77": 19
+  }
+}

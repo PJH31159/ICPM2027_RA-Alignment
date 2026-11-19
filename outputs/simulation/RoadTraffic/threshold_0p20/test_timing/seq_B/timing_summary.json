@@ -1,0 +1,52 @@
+{
+  "label": "seq_B",
+  "method": "B (Alignment)",
+  "purpose": "timing only (not an accuracy experiment)",
+  "boundary": "per case: align_case (PM4Py alignment) + repair_from_alignment; excludes loading, discovery, Petri Net creation (PNML read), trace object build, CSV save, evaluation",
+  "pnml": "outputs/simulation/RoadTraffic/threshold_0p20/runs/methodB_run1/Road_Traffic_IM_noise0.2_alignment_run1_petri_net.pnml",
+  "net": {
+    "n_places": 25,
+    "n_transitions": 27,
+    "n_arcs": 66,
+    "alignment_variant": "Variants.VERSION_STATE_EQUATION_A_STAR",
+    "pm4py": "2.7.23.6"
+  },
+  "test_case_ms": {
+    "n": 2752,
+    "mean": 48.8304,
+    "median": 12.6757,
+    "std": 181.6049,
+    "min": 5.2832,
+    "max": 3845.6183
+  },
+  "test_phase_wall_ms": 134437.2028,
+  "test_phase_wall_ms_per_case": 48.8507,
+  "trace_agreement_with_official_run1": "2745/2752",
+  "checks": [
+    {
+      "check": "official run files found (test ids, per-case, model_check)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "test cases == 2752",
+      "passed": true,
+      "detail": "(2752)"
+    },
+    {
+      "check": "Petri Net (PNML) == official model_check (places / transitions)",
+      "passed": true,
+      "detail": "{'n_places': 25, 'n_transitions': 27, 'n_arcs': 66, 'alignment_variant': 'Variants.VERSION_STATE_EQUATION_A_STAR', 'pm4py': '2.7.23.6'}"
+    },
+    {
+      "check": "no alignment failure",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "repaired trace agreement with official Run 1 (timing replay, not an accuracy result)",
+      "passed": null,
+      "detail": "2745/2752"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "new_nbg_info": {
+    "nbg_input": "original_plus_model_only (W2, D039)",
+    "observed_clean_cases": 4580,
+    "observed_clean_variants": 64,
+    "model_only_traces": 4981,
+    "anchor_match": "14/14",
+    "weighting": "observed clean log with observed frequencies + each model-only generated trace once"
+  },
+  "comparison": {
+    "n_graphs": {
+      "original": 14,
+      "new": 14
+    },
+    "total_nodes": {
+      "original": 3750,
+      "new": 4824
+    },
+    "total_edges": {
+      "original": 4107,
+      "new": 7815
+    },
+    "structure_equal (all node sets incl. activity/level)": false,
+    "edge_set_equal (all graphs)": false,
+    "likelihood_equal (all edges)": false,
+    "graphs_with_likelihood_difference": 14,
+    "edges_with_likelihood_difference": 1352,
+    "max_abs_likelihood_diff": 0.9842066601371204,
+    "min_likelihood": {
+      "original": 0.04198473282442748,
+      "new": 0.0003757985719654265
+    },
+    "smallest_alpha_where_edge_validity_differs": 0.0,
+    "edge_set_digest": {
+      "original": "ffe91bf916897aa6",
+      "new": "657d7b11b2126d50"
+    }
+  },
+  "adm_functional_equality": {
+    "alpha=0.0": {
+      "test": {
+        "n_cases": 210,
+        "adm_matrix_equal": 176,
+        "anomaly_locations_equal": 184
+      },
+      "val": {
+        "n_cases": 210,
+        "adm_matrix_equal": 173,
+        "anomaly_locations_equal": 181
+      }
+    }
+  },
+  "split_sizes": {
+    "val": 210,
+    "test": 210
+  }
+}

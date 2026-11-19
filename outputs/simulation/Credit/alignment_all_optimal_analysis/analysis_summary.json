@@ -1,0 +1,143 @@
+{
+  "astar_rerun_eq_official (this process, scipy)": 210,
+  "astar_rerun_separate_processes_eq_official": {
+    "astar_p1": 210,
+    "astar_p2": 210
+  },
+  "exact_cost_eq_official": 210,
+  "official_in_exact_set": 210,
+  "exact_subset_of_dev": 210,
+  "pm4py_generator": {
+    "subset_of_exact": 210,
+    "complete (== exact)": 201,
+    "official_B_in_generator_set": 202,
+    "alignments_per_case_max": 24,
+    "duplicate_alignments_total": 241
+  },
+  "tie_cases": {
+    "exact (PM4Py cost)": 9,
+    "deviation_only": 26
+  },
+  "optimal_repaired_per_case_distribution": {
+    "exact": {
+      "1": 201,
+      "2": 9
+    },
+    "dev": {
+      "1": 184,
+      "2": 26
+    }
+  },
+  "dev_tie_alternatives_excluded_by_tau_cost": 17,
+  "B_C": {
+    "exact": {
+      "exact_agreement": "133/210 = 0.6333",
+      "all_optimal_agreement": "133/210 = 0.6333",
+      "recovered": 0,
+      "reaches_80pct (168)": false,
+      "shortfall_to_80pct": 35
+    },
+    "dev": {
+      "exact_agreement": "133/210 = 0.6333",
+      "all_optimal_agreement": "144/210 = 0.6857",
+      "recovered": 11,
+      "reaches_80pct (168)": false,
+      "shortfall_to_80pct": 24
+    },
+    "definition": "all-optimal agreement = C repaired trace ∈ B optimal repaired trace set (official exact metric unchanged)"
+  },
+  "B_CPN": {
+    "exact": {
+      "exact_agreement": "148/210 = 0.7048",
+      "all_optimal_agreement": "150/210 = 0.7143",
+      "recovered": 2,
+      "reaches_80pct (168)": false,
+      "shortfall_to_80pct": 18
+    },
+    "dev": {
+      "exact_agreement": "148/210 = 0.7048",
+      "all_optimal_agreement": "162/210 = 0.7714",
+      "recovered": 14,
+      "reaches_80pct (168)": false,
+      "shortfall_to_80pct": 6
+    },
+    "definition": "all-optimal agreement = C+PN repaired trace ∈ B optimal repaired trace set (official exact metric unchanged)"
+  },
+  "recovered_gt_relation": {
+    "C/exact": {},
+    "C/dev": {
+      "B correct, X is other optimal (X wrong)": 10,
+      "X correct, B chose other optimal (GT in set)": 1
+    },
+    "C+PN/exact": {
+      "B correct, X is other optimal (X wrong)": 2
+    },
+    "C+PN/dev": {
+      "B correct, X is other optimal (X wrong)": 12,
+      "X correct, B chose other optimal (GT in set)": 1,
+      "both wrong (GT not in set)": 1
+    }
+  },
+  "recovered_by_prev_cause (C+PN)": {
+    "exact": {
+      "concurrency-related (ordering only)": 2
+    },
+    "dev": {
+      "alignment tie candidate": 12,
+      "concurrency-related (ordering only)": 2
+    }
+  },
+  "gt_summary": {
+    "GT_in_exact_set": 179,
+    "GT_in_dev_set": 182,
+    "B_correct": 178,
+    "GT_in_exact_set_but_B_chose_other": 1,
+    "GT_in_dev_set_but_B_chose_other": 4,
+    "B_upper_bound_if_always_picks_GT_when_in_set": {
+      "exact": 179,
+      "dev": 182
+    }
+  },
+  "previous_tie12": {
+    "n": 12,
+    "CPN_in_exact_set": 0,
+    "CPN_in_dev_set": 12
+  },
+  "tie_alternatives_observed": {
+    "dev|end branch choice (h-i vs g, optional)": {
+      "n": 17,
+      "alt_observed": 3,
+      "B_observed": 12
+    },
+    "dev|parallel interleaving (e position, concurrency-equivalent)": {
+      "n": 9,
+      "alt_observed": 1,
+      "B_observed": 7
+    },
+    "exact|parallel interleaving (e position, concurrency-equivalent)": {
+      "n": 9,
+      "alt_observed": 1,
+      "B_observed": 7
+    }
+  },
+  "recovered_observed": {
+    "C|dev": {
+      "n": 11,
+      "X_observed": 1,
+      "X_correct": 1,
+      "B_correct": 10
+    },
+    "C+PN|dev": {
+      "n": 14,
+      "X_observed": 1,
+      "X_correct": 1,
+      "B_correct": 12
+    },
+    "C+PN|exact": {
+      "n": 2,
+      "X_observed": 0,
+      "X_correct": 0,
+      "B_correct": 2
+    }
+  }
+}

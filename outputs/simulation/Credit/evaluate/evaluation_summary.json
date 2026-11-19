@@ -1,0 +1,58 @@
+{
+  "runs": {
+    "methodA_run1": "outputs\\simulation\\Credit\\runs\\methodA_run1\\credit-card_1000_ppm0.0_valratio0.5_seed42_methodA_run1_repaired_log_a.csv",
+    "methodB_run1": "outputs\\simulation\\Credit\\runs\\methodB_run1\\credit-card_IM_noise0_alignment_run1_repaired_log_b.csv",
+    "methodC_run1": "outputs\\simulation\\Credit\\runs\\methodC_run1\\credit-card_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv"
+  },
+  "official": [
+    {
+      "run": "methodA_run1",
+      "n_cases": 210,
+      "n_exact_match": 183,
+      "exact_match_rate": 0.8714285714285714,
+      "recon_err_before": 1.5571428571428572,
+      "recon_err_after": 0.3952380952380952,
+      "normal_variant_rate": 1.0,
+      "changed_only_emr": 0.8622448979591837,
+      "n_wrong_normal_variant": 27,
+      "n_non_normal": 0,
+      "n_unrepaired_wrong": 0
+    },
+    {
+      "run": "methodB_run1",
+      "n_cases": 210,
+      "n_exact_match": 178,
+      "exact_match_rate": 0.8476190476190476,
+      "recon_err_before": 1.5571428571428572,
+      "recon_err_after": 0.18095238095238095,
+      "normal_variant_rate": 0.8476190476190476,
+      "changed_only_emr": 0.8367346938775511,
+      "n_wrong_normal_variant": 0,
+      "n_non_normal": 25,
+      "n_unrepaired_wrong": 7
+    },
+    {
+      "run": "methodC_run1",
+      "n_cases": 210,
+      "n_exact_match": 112,
+      "exact_match_rate": 0.5333333333333333,
+      "recon_err_before": 1.5571428571428572,
+      "recon_err_after": 0.9238095238095239,
+      "normal_variant_rate": 0.5904761904761905,
+      "changed_only_emr": 0.5,
+      "n_wrong_normal_variant": 12,
+      "n_non_normal": 80,
+      "n_unrepaired_wrong": 6
+    }
+  ],
+  "contingency": {
+    "methodA_run1 vs methodC_run1": {
+      "both_correct": 107,
+      "methodA_run1_only_correct": 76,
+      "methodC_run1_only_correct": 5,
+      "both_wrong": 22,
+      "mcnemar_exact_p (supplementary)": 2.2643223890053103e-17,
+      "n_different_repairs": 96
+    }
+  }
+}

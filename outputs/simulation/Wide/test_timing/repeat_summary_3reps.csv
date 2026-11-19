@@ -1,0 +1,3 @@
+condition,reps,rl_n,rl_mean_avg,rl_mean_sd,rl_mean_min,rl_mean_max,rl_median_avg,rl_median_sd,rl_median_min,rl_median_max,seq_wall_per_case_avg,official_mp_test_per_case_ms,repaired_output_identical_across_reps,identical_to_previous_single_run,per_rep_rl_mean,per_rep_rl_median
+A_alpha0,3,240,241.62,17.7,230.93,262.05,71.55,5.29,68.24,77.65,172.11,63.27,True,,262.05; 230.93; 231.89,77.65; 68.24; 68.77
+C_alpha0,3,240,197.42,7.36,189.74,204.42,64.05,3.77,60.95,68.25,140.64,65.78,True,,198.11; 189.74; 204.42,62.95; 60.95; 68.25
