@@ -1,16 +1,14 @@
-"""
-nbg_utils — New NBG 생성, actset 순서 검증, Original/New 비교, ADM 동일성 (REF-001)
+"""New NBG construction, actset-order validation, Original/New comparison, ADM equality.
 
-출처: src/63_generated_nbg_rpbear.py (build_new_nbgs, nbg_anchor, edge_set_digest,
-      stage_nbg의 비교 / ADM 부분)
-
-D034 규칙을 이 모듈 안에서 강제한다 (호출하는 쪽에서 끌 수 없음):
-    - generated unique trace weight = 1 (생성 log의 case마다 서로 다른 trace)
-      (D039 이후: model-only trace가 있는 Credit은 build_expanded_nbgs = clean log + model-only, build_method_c_nbgs로 선택)
-    - New NBG는 observed actset 순서로 재정렬
-    - 모든 index i에서 actset[i] == anchor(NBG[i])가 아니면 예외
-    - structure / edge set / likelihood는 따로 판단
-RP-BEAR core(rpbear/func_rpbear_final.py)는 수정하지 않고 discover_NBG를 그대로 쓴다.
+Rules enforced here (callers cannot disable them):
+    - each generated unique trace has weight 1 (one case per distinct trace);
+      datasets with model-only traces use build_expanded_nbgs (clean log + model-only traces),
+      selected by build_method_c_nbgs;
+    - New NBGs are re-ordered to the observed actset order;
+    - an exception is raised unless actset[i] == anchor(NBG[i]) for every index i
+      (RP-BEAR's ADM looks NBGs up by actset position);
+    - structure, edge set and likelihood are compared separately.
+The RP-BEAR core (rpbear/func_rpbear_final.py) is not modified; discover_NBG is used as is.
 """
 
 import hashlib
@@ -21,7 +19,7 @@ class NBGValidationError(RuntimeError):
 
 
 def nbg_anchor(graph):
-    """NBG의 기준(anchor) activity = level 0 node들의 activity."""
+    """Anchor activity of an NBG = activity of its level-0 nodes."""
     return {d["activity"] for _, d in graph.nodes(data=True) if d.get("level") == 0}
 
 
@@ -31,9 +29,9 @@ def order_mismatches(nbgs, actset):
 
 
 def build_new_nbgs(generated_log_path, actset):
-    """생성 trace log -> (sim과 같은 Start/End) -> discover_NBG -> actset 순서 재정렬 + 검증.
+    """Generated trace log -> (Start/End as in sim) -> discover_NBG -> actset order + validation.
 
-    return: (ordered_nbgs, info dict). 규칙 위반 시 NBGValidationError.
+    Returns (ordered_nbgs, info dict). Raises NBGValidationError if a rule is violated.
     """
     from rpbear.func_rpbear_final import discover_NBG
 
@@ -41,7 +39,7 @@ def build_new_nbgs(generated_log_path, actset):
 
     gen_clean = add_start_end_like_sim(read_log_like_sim(generated_log_path, has_label=False))
 
-    # weight 1: 생성 log의 case마다 서로 다른 trace여야 한다
+    # weight 1: every case of the generated log must be a distinct trace
     body = gen_clean[~gen_clean["concept:name"].isin(["Start", "End"])]
     per_case = body.groupby("case:concept:name", observed=True)["concept:name"].agg(lambda s: ">>".join(map(str, s)))
     if per_case.nunique() != len(per_case):
@@ -85,7 +83,7 @@ def edge_set_digest(nbgs, actset):
 
 
 def compare_nbgs(original, new, actset):
-    """structure / edge set / likelihood를 따로 비교. return: (summary, per_graph df, edges df)"""
+    """Compare structure, edge set and likelihood separately. Returns (summary, per-graph df, edges df)."""
     import pandas as pd
 
     per_graph, edge_rows = [], []
@@ -111,7 +109,7 @@ def compare_nbgs(original, new, actset):
                               "abs_diff": (abs(lik_o[e] - lik_n[e]) if e in common else None)})
     graphs, edges = pd.DataFrame(per_graph), pd.DataFrame(edge_rows)
 
-    # edge validity(likelihood > alpha)가 두 NBG에서 달라지기 시작하는 가장 작은 alpha
+    # smallest alpha at which edge validity (likelihood > alpha) starts to differ between the two NBGs
     cand = sorted(set(edges["orig_likelihood"].dropna()) | set(edges["new_likelihood"].dropna()))
     o = edges["orig_likelihood"].fillna(-1.0)
     n = edges["new_likelihood"].fillna(-1.0)
@@ -136,7 +134,7 @@ def compare_nbgs(original, new, actset):
 
 
 def adm_equality(anomaly, ids_by_split, actset, filtered_actset, original, new, alphas):
-    """같은 trace를 넣었을 때 ADM matrix / anomaly location이 같은지 (P_BEAR_RL.ADM 그대로 사용)."""
+    """Whether the ADM matrix / anomaly locations are identical for the same trace (uses P_BEAR_RL.ADM)."""
     import numpy as np
     import pandas as pd
     from rpbear.func_rpbear_final import P_BEAR_RL
@@ -167,16 +165,16 @@ def adm_equality(anomaly, ids_by_split, actset, filtered_actset, original, new, 
 
 
 # ------------------------------------------------------------
-# D039: Expanded New NBG (W2) = Original clean log + model-only generated traces
+# W2 Expanded New NBG = original clean log + model-only generated traces
 # ------------------------------------------------------------
 
 def build_expanded_nbgs(clean, model_only_log_path, actset):
-    """W2 Expanded New NBG (D039, Credit official Method C).
+    """W2 Expanded New NBG (official Method C input for the loop datasets).
 
-    입력 = 관측 clean log (sim의 `clean`, 관측 빈도 그대로, Start/End 포함)
-         + model-only generated trace log (각 1회, 관측 clean variant와 겹치면 안 됨).
-    discover_NBG는 그대로 호출하고, 결과를 observed actset 순서로 재정렬 + anchor 검증한다.
-    return: (ordered_nbgs, info). 규칙 위반 시 NBGValidationError.
+    Input = observed clean log (sim's `clean`, observed frequencies, with Start/End)
+          + model-only generated trace log (each trace once; must not overlap observed clean variants).
+    discover_NBG is called unchanged; the result is re-ordered to the observed actset order and the anchors are checked.
+    Returns (ordered_nbgs, info). Raises NBGValidationError if a rule is violated.
     """
     import pandas as pd
 
@@ -222,10 +220,10 @@ def build_expanded_nbgs(clean, model_only_log_path, actset):
 
 
 def trace_edge_set(traces):
-    """discover_NBG와 같은 규칙으로 trace들의 NBG edge 집합을 독립 계산한다 (검증용).
+    """Independently compute the NBG edge set of traces with the discover_NBG rule (validation).
 
-    trace는 Start/End 없는 activity tuple. edge = (graph activity, f"{a}_{i-p}", f"{b}_{i+1-p}"),
-    p = graph activity가 trace(Start/End 포함)에서 나타나는 각 위치.
+    Traces are activity tuples without Start/End. edge = (graph activity, f"{a}_{i-p}", f"{b}_{i+1-p}"),
+    where p ranges over the positions of the graph activity in the trace (with Start/End).
     """
     out = set()
     for t in traces:
@@ -241,10 +239,10 @@ def nbg_edge_set(nbgs, actset):
 
 
 def build_method_c_nbgs(nbg_input, generate_dir, clean, actset):
-    """dataset 설정 `new_nbg_input`에 따라 Method C New NBG를 만든다.
+    """Build the Method C New NBGs according to the dataset setting `new_nbg_input`.
 
-    "generated_only"           (D034, Small~Wide): generate/generated_normal_log.csv, 각 1회 (기존 build_new_nbgs 그대로)
-    "original_plus_model_only" (D039, Credit)    : clean log + generate/model_only_generated_log.csv
+    "generated_only"           (Small-Wide): generate/generated_normal_log.csv, each trace once (build_new_nbgs)
+    "original_plus_model_only" (W2)        : clean log + generate/model_only_generated_log.csv
     """
     from pathlib import Path
 

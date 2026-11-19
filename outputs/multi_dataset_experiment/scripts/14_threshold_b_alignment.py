@@ -1,16 +1,16 @@
-"""14_threshold_b_alignment.py — noise_threshold별 Method B (Alignment) test repair 시간 (순차, timing 전용)
+"""Method B (alignment) test repair time per noise_threshold (sequential, timing only).
 
-왜: 교수님 우려 "threshold를 올려 Petri Net을 경량화하면 Alignment도 빨라진다". threshold마다
-    같은 test case에 대해 Method B repair 시간을 같은 조건(순차, 1 process, scipy LP shim)으로 잰다.
-    측정 구간 = 공식 run-b와 같다: trace 객체 생성 후 align_case(PM4Py state-equation A*) + repair_from_alignment.
-    Process Discovery / PNML 읽기 / 데이터 로딩은 포함하지 않는다.
+A simpler Petri net (higher threshold) may also speed up alignment. For every threshold the Method B repair
+time is measured on the same test cases under the same conditions (sequential, one process, scipy LP shim).
+Timed section = same as the official run-b: after building the trace object, align_case (PM4Py state-equation A*)
++ repair_from_alignment. Discovery, PNML loading and data loading are excluded.
 
-subcommand:
-  split DS            (.venv-rpbear) sim과 같은 split (seed 42, val_ratio 0.5) -> threshold_sweep/split_<DS>.json
-  align DS TH [N] [T] (.venv)        sweep/petri_net.pnml로 test case alignment.
-                                      N = 고정 random sample 크기 (seed 42; 생략하면 test 전체)
-                                      T = case당 alignment 시간 상한 초 (PM4Py PARAM_MAX_ALIGN_TIME_TRACE; 생략하면 없음)
-출력: outputs/simulation/<DS>/threshold_0pXX/b_alignment_timing/{case_timing.csv, summary.json}
+Subcommands:
+  split DS            (.venv-rpbear) same split as sim (seed 42, val_ratio 0.5) -> threshold_sweep/split_<DS>.json
+  align DS TH [N] [T] (.venv)        align the test cases with sweep/petri_net.pnml.
+                                     N = fixed random sample size (seed 42; omitted = all test cases)
+                                     T = per-case alignment time limit in seconds (PM4Py PARAM_MAX_ALIGN_TIME_TRACE; omitted = none)
+Output: outputs/simulation/<DS>/threshold_0pXX/b_alignment_timing/{case_timing.csv, summary.json}
 """
 import json
 import random
@@ -24,8 +24,10 @@ PROJECT_ROOT = HERE.parents[2]
 
 
 def _data_root(cli_root=None):
-    """data root: --data-root 인자 > 환경변수 ICPM2027_DATA_ROOT > <repo>/data/raw
-    (src/utils/data_utils.resolve_data_root와 같은 우선순위). P-BEAR-RL Full_input 폴더를 가리켜야 한다."""
+    """Data root: --data-root argument > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw.
+
+    Same priority as src/utils/data_utils.resolve_data_root; it must point to the P-BEAR-RL Full_input folder.
+    """
     import os
     if cli_root is None and "--data-root" in sys.argv:
         cli_root = sys.argv[sys.argv.index("--data-root") + 1]
@@ -36,7 +38,7 @@ def _data_root(cli_root=None):
 
 
 def _strip_data_root(argv):
-    """positional 인자를 읽기 전에 '--data-root X'를 argv에서 뺀다 (기존 인자 처리는 그대로)."""
+    """Remove '--data-root X' from argv before positional arguments are read (existing argument handling unchanged)."""
     if "--data-root" in argv:
         i = argv.index("--data-root")
         del argv[i:i + 2]
@@ -67,7 +69,7 @@ def split(ds):
 
 
 def align(ds, th, n_sample=None, timeout=None):
-    sys.modules["cvxopt"] = None  # scipy LP shim (shim_simulation.py와 같음)
+    sys.modules["cvxopt"] = None  # scipy LP shim (same as shim_simulation.py)
     import lxml
     from lxml import etree as _etree
 
@@ -104,7 +106,7 @@ def align(ds, th, n_sample=None, timeout=None):
                 raise RuntimeError("alignment returned None")
             repaired, _mv = m.repair_from_alignment(res["alignment"])
             cost = res["cost"]
-        except Exception as e:  # noqa: BLE001  공식 run과 같은 fallback (원래 trace 보존)
+        except Exception as e:  # noqa: BLE001  same fallback as the official run (keep the original trace)
             repaired, cost = list(traces[cid]), None
             status = "timeout_or_failed: " + repr(e)[:80]
         ms = (time.perf_counter() - t0) * 1000

@@ -1,15 +1,11 @@
-"""
-run_utils — sim.run_rpbear 호출을 감싸는 공통 실행 관리 (REF-001)
+"""Execution management around sim.run_rpbear.
 
-출처: src/60 execute_run, src/63 stage_run / stage_smoke (같은 방식)
-
-- Method A: nbgs_override=None (Original NBG, 기존 RP-BEAR 동작 그대로)
-- Method C: nbgs_override=New NBG (D034)
-- 공식 run은 sim.run_rpbear(save_outputs=True)로 실행하고(Method A와 같은 코드 경로),
-  sim이 고정 경로에 저장한 3개 파일을 run 디렉터리로 옮긴다. run 디렉터리가 이미 있거나
-  고정 경로 파일이 남아 있으면 실행하지 않는다 (덮어쓰기 금지).
-- continual / cumulative Q-table learning은 구현하지 않는다 (dataset_config.CONTINUAL_LEARNING).
-  나중에 시작 Q-table을 넘기게 되면 execute_official_run에 인자를 추가하는 방식으로 확장한다.
+- Method A: nbgs_override=None (Original NBG, unchanged RP-BEAR behaviour).
+- Method C: nbgs_override=New NBG.
+- Official runs call sim.run_rpbear(save_outputs=True) (same code path as Method A) and move the
+  three files that sim writes to fixed paths into the run directory. Nothing is run if the run
+  directory already exists or fixed-path files are left over (no overwriting).
+- Continual / cumulative Q-table learning is not implemented; each dataset is trained independently.
 """
 
 import random
@@ -26,8 +22,10 @@ METHOD_FILE_SUFFIX = {"A": "repaired_log_a.csv", "C": "repaired_log_c.csv"}
 
 
 def expected_split(data_name, input_paths, val_ratio, seed):
-    """run_rpbear와 같은 순서(seed -> 데이터 로드 -> split)로 val/test case id를 계산한다.
-    (데이터 로드와 NBG 생성은 python random을 쓰지 않는다: VAL-A01 V0)"""
+    """Compute the val/test case ids in the same order as run_rpbear (seed -> data load -> split).
+
+    Data loading and NBG construction do not consume Python's random state, so the split depends only on the seed.
+    """
     import numpy as np
     from sim import _load_and_prepare_data, _prepare_case_split
 
@@ -46,9 +44,9 @@ def split_ids_from_repaired(df):
 
 def quick_run(data_name, input_paths, params, num_epi, use_multiprocessing, nbgs_override,
               return_case_timing=False):
-    """smoke 용: save_outputs=False (고정 경로 파일을 만들지 않음).
+    """Smoke run: save_outputs=False (no fixed-path files are written).
 
-    return_case_timing=True이면 (df, stats, case_timing)을 반환한다 (기본은 기존과 같이 (df, stats)).
+    With return_case_timing=True returns (df, stats, case_timing); otherwise (df, stats).
     """
     from sim import run_rpbear
 
@@ -63,7 +61,7 @@ def quick_run(data_name, input_paths, params, num_epi, use_multiprocessing, nbgs
 
 
 def fixed_output_paths(data_name, params):
-    """sim.run_rpbear(save_outputs=True)가 저장하는 고정 경로 (sim.py 규칙과 같음)."""
+    """Fixed output paths written by sim.run_rpbear(save_outputs=True)."""
     base = f"{data_name}_{params['num_epi']}_ppm{params['alpha']}_valratio{params['val_ratio']}"
     return {
         "repaired_log.csv": PROJECT_ROOT / "outputs" / "tables" / f"{base}_repaired_log_a.csv",
@@ -74,7 +72,7 @@ def fixed_output_paths(data_name, params):
 
 def execute_official_run(data_name, input_paths, params, method, run_dir, file_prefix, nbgs_override,
                          extra_stats=None):
-    """공식 run 1회. return: exit code (0 = 성공)."""
+    """One official run. Returns an exit code (0 = success)."""
     import pandas as pd
     from multiprocessing import cpu_count
 
@@ -146,7 +144,7 @@ def execute_official_run(data_name, input_paths, params, method, run_dir, file_p
                           "finished_at": datetime.now().isoformat(timespec="seconds")})
         stats_out.update(extra_stats or {})
         write_json(f("stats.json"), stats_out)
-        # timing instrumentation: case별 처리 시간 (case_id, phase, path = RL / Mem, repair_time_ms)
+        # per-case processing time (case_id, phase, path = RL / Mem, repair_time_ms)
         case_timing.to_csv(f("case_timing.csv"), index=False)
         val_ids, test_ids = split_ids_from_repaired(df)
         f("val_case_ids.txt").write_text("\n".join(val_ids) + "\n", encoding="utf-8")

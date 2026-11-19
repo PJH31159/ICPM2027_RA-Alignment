@@ -1,18 +1,16 @@
-"""20_agreement_driver.py — 07 all-optimal agreement를 1 process로 실행하며 메모리를 감시하고, 위험 시 resume (운영 도구)
+"""Run the 07 all-optimal agreement as a single process with a memory guard and automatic resume (operational tool).
 
-왜 (BPIC 2017, 2026-11-16):
-  - 4 shard 동시 실행 -> PC 가상 메모리 부족 (Windows Event 2004).
-  - 2 shard -> 두 shard가 동시에 무거운 case에 걸려 watchdog 종료.
-  - 1 process -> case 하나가 단독으로 RSS ~10 GB 이상 (state 상한 5M에 닿기 전) -> watchdog 종료.
-  같은 case에서 계속 멈추지 않도록, 메모리 위험 수준에 닿은 case는 resource-limit case로 기록하고
-  (07 --resource-skip, all-optimal에서 불일치 = 하한) 나머지를 이어서 계산한다.
-  state-limit 정의(--max-states)는 바꾸지 않는다.
+Some cases need more than about 10 GB RSS on their own before reaching the state limit (5M). So that the run does
+not stop repeatedly at the same case, a case that reaches the memory guard is recorded as a resource-limit case
+(07 --resource-skip; counted as disagreement in all-optimal agreement, i.e. lower bound) and the remaining cases
+continue. The state-limit definition (--max-states) is unchanged.
 
-동작:
-  1. 07을 --skip-gen-check --resource-skip <file> 로 실행 (checkpoint의 완료 case는 07이 건너뜀)
-  2. --interval 초마다 시스템 available, 07 process tree RSS / peak working set을 csv에 기록
-  3. available < --min-avail-gb 이면 07 종료 -> 진행 중이던 case(완료도 skip도 아닌 첫 case)를 skip 파일에 기록 -> 1부터 다시
-  4. 07이 rc 0으로 끝나면 (전체 case 완료 + agreement_summary.json 작성) 종료
+Behaviour:
+  1. run 07 with --skip-gen-check --resource-skip <file> (07 skips cases already in the checkpoint)
+  2. every --interval seconds: log system available memory and the RSS / peak working set of the 07 process tree to a csv
+  3. if available < --min-avail-gb: stop 07 -> record the running case (the first case that is neither finished nor
+     skipped) in the skip file -> go back to 1
+  4. finish when 07 exits with rc 0 (all cases done, agreement_summary.json written)
 """
 import argparse
 import csv

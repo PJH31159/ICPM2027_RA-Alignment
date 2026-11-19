@@ -1,22 +1,22 @@
-"""09_timing_summary.py — Credit / Pub에 이미 저장된 timing 값을 공통 schema로 모은다 (재실행 없음, 추정 없음)
+"""Collect stored timing values of Credit / Pub into a common schema (no re-runs, no estimates).
 
-교수님 요청 (2026-11-11): 모든 dataset / Method 결과에 다음 두 값을 함께 저장한다.
-  A. training_ms                 : 훈련 데이터로 agent를 학습하는 시간 (ms)
-  B. test_repair_mean_ms_per_case: test case repaired trace를 만드는 시간, case당 평균 (ms)
+Every dataset / method reports:
+  A. training_ms                  : time to train the agent on the training data (ms)
+  B. test_repair_mean_ms_per_case : time to produce a repaired test trace, mean per case (ms)
 
-Method별 측정 구간 (src/sim.py, src/simulation.py 코드 기준, D037):
-  A / C / C+PN  training_ms   = validation(학습) phase wall-clock = stats.json `val_total_ms`
-                                 (data load / NBG 생성 / agent 저장 / test / 평가 제외; RP-BEAR의 학습 데이터 = val split)
-                test (official)= test phase wall-clock `test_total_ms` (15 workers multiprocessing) / test cases
-                                 + case별 timer(case_timing.csv, worker 안 perf_counter, CPU 공유 영향 포함)
-                test (D037)    = 학습된 agent로 test만 1 process 순차 재실행한 case별 시간 (timing 전용, Credit만 있음)
-                C+PN의 test 시간에는 NBG 판단 + Petri Net gate가 포함된다 (run_rpbear_gated 그대로 측정).
-  B             training_ms   = N/A (RL 학습 없음. Process Discovery는 preprocessing으로 따로 기록)
-                test          = case별 align_case + repair_from_alignment 시간 (perf_counter, 순차) = alignment_timing.csv
-Preprocessing (training_ms와 섞지 않음): discovery_ms, generation_ms, nbg_build_ms (저장된 값이 있을 때만)
+Timed sections (from src/sim.py and src/simulation.py):
+  A / C / C+PN  training_ms     = wall-clock of the training ("validation") phase = `val_total_ms` in stats.json
+                                  (excludes data loading / NBG construction / agent saving / test / evaluation)
+                test (official) = test phase wall-clock `test_total_ms` (15-worker multiprocessing) / test cases,
+                                  plus per-case timers (case_timing.csv, perf_counter inside the worker, includes CPU sharing)
+                test (sequential) = per-case time of a single-process test-only replay with the trained agent
+                C+PN test time includes the NBG decision and the Petri-net gate.
+  B             training_ms     = N/A (no RL training; discovery is reported as preprocessing)
+                test            = per-case align_case + repair_from_alignment time (perf_counter, sequential)
+Preprocessing (not mixed into training_ms): discovery_ms, generation_ms, nbg_build_ms (if stored).
 
-값이 없으면 빈 칸(None)으로 두고 이유를 note에 쓴다. 반올림: 원 파일에 저장된 자리수 그대로 (sim.py는 val_total_ms를 0.01 ms로 저장).
-출력: outputs/multi_dataset_experiment/timing_summary.{csv,json}
+Missing values stay empty (None) with the reason in the note. Values keep the precision stored in the source files.
+Output: outputs/multi_dataset_experiment/timing_summary.{csv,json}
 """
 import json
 from pathlib import Path

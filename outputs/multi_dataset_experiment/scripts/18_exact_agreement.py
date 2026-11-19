@@ -1,15 +1,14 @@
-"""18_exact_agreement.py — B-C (또는 B-C+PN) exact agreement만 빠르게 계산 (alignment 탐색 없음)
+"""Fast exact agreement B-C (or B-C+PN), without any alignment search.
 
-왜: BPIC 2017 all-optimal 분석(07)은 무겁고 메모리 부족으로 중단된 적이 있다 (2026-11-16).
-    exact agreement는 공식 B repaired trace와 공식 C repaired trace를 비교하기만 하면 되므로,
-    all-optimal 결과와 상관없이 먼저 확보한다.
-정의: 07_pub_all_optimal_agreement.py와 동일
-    - B = --b-dir 의 *_alignment_per_case.csv, type == test 행의 repaired_trace (">>" 구분)
-    - X = repaired log 의 type == test 행, Start / End 제외, case별 activity tuple
-    - exact agreement = X trace == B trace 인 test case 수 / test case 수
-검증: --check-road 를 주면 Road 0.20 에서 07 결과(agreement_summary.json의 B-C exact)와 같은지 확인한다.
+The all-optimal analysis (07) is expensive in time and memory; exact agreement only compares the official B
+repaired trace with the official X repaired trace, so it can be computed independently.
+Definition (same as 07_pub_all_optimal_agreement.py):
+    - B = repaired_trace of the type == test rows of *_alignment_per_case.csv in --b-dir (">>"-separated)
+    - X = type == test rows of the repaired log, Start / End removed, activity tuple per case
+    - exact agreement = number of test cases with X trace == B trace / number of test cases
+Check: --check-road verifies the result against the B-C exact value of 07 for Road 0.20 (agreement_summary.json).
 
-실행: python outputs/multi_dataset_experiment/scripts/18_exact_agreement.py --b-dir ... --x-log ... --label C --out <json>
+Usage: python outputs/multi_dataset_experiment/scripts/18_exact_agreement.py --b-dir <dir> --x-log <csv> --label C --out <json>
 """
 import argparse
 import json

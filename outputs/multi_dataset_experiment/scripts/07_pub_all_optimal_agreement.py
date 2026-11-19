@@ -1,20 +1,21 @@
-"""07_pub_all_optimal_agreement.py — Pub: Method B all-optimal 집합 + B–C / B–C+PN agreement (탐색, .venv)
+"""All-optimal agreement of Method B with C / C+PN (.venv).
 
-왜: Credit에서 정한 main metric(B–C+PN, tau-excluded all-optimal agreement)을 Pub에 같은 정의로 계산한다.
-    정의와 search 코드는 Credit alignment_all_optimal_analysis/scripts/credit_all_optimal.py 와 같다
-    (repair_from_alignment / net_struct / dev_optimal 을 그 파일에서 그대로 실행해 가져온다).
-      exact          : X repaired == B repaired (official metric과 같은 정의)
-      native-cost    : X ∈ B optimal 집합, PM4Py 기본 cost (log / visible model 10000, tau 1, sync 0), 직접 exact search
-                       + PM4Py generator_dijkstra_less_memory 집합과 비교(교차 확인, 판정에는 직접 search 사용)
-      tau-excluded   : X ∈ B optimal 집합, deviation-only cost (log / visible model 1, tau 0, sync 0)  <- main
-    multiple-optimal case = optimal repaired trace 집합 크기 >= 2.
-    accuracy(EMR)는 보조로만 같이 저장한다.
+Definitions (search code shared with credit_all_optimal.py, whose repair_from_alignment / net_struct /
+dev_optimal definitions are executed from that file):
+  exact        : X repaired == B repaired
+  native-cost  : X in the set of optimal B repairs under the PM4Py default cost
+                 (log / visible model move 10000, tau 1, sync 0), own exact search;
+                 optionally cross-checked against PM4Py generator_dijkstra_less_memory (the decision uses the own search)
+  tau-excluded : X in the set of optimal B repairs under the deviation-only cost
+                 (log / visible model move 1, tau 0, sync 0) <- main metric.
+                 tau moves are invisible routing steps of the model and produce no event in the repaired
+                 trace, so they should not decide which repair is optimal.
+A multiple-optimal case has >= 2 optimal repaired traces. Accuracy (EMR) is stored only as an auxiliary value.
+The search is bounded by --max-states; a case that hits it is counted as disagreement (lower bound).
 
-입력: B = --b-dir 의 *_alignment_per_case.csv (test), C / C+PN repaired log (선택)
-출력: --out 폴더 (case_summary.csv, optimal_repaired_traces.csv, agreement_summary.json)
-실행 예:
-  .venv\\Scripts\\python outputs\\multi_dataset_experiment\\scripts\\07_pub_all_optimal_agreement.py \\
-      --b-dir outputs/simulation/Pub/smoke_b --c-log ... --cpn-log ... --out outputs/simulation/Pub/alignment_all_optimal_analysis/smoke
+Input:  B = *_alignment_per_case.csv (test) in --b-dir; C / C+PN repaired logs (optional)
+Output: --out folder (case_summary.csv, optimal_repaired_traces.csv, agreement_summary.json)
+Example: .venv/Scripts/python outputs/multi_dataset_experiment/scripts/07_pub_all_optimal_agreement.py --b-dir <methodB_run1> --c-log <repaired_log_c.csv> --cpn-log <repaired_log_cpn.csv> --out <dir>
 """
 import sys
 import types
@@ -46,8 +47,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _data_root(cli_root=None):
-    """data root: --data-root 인자 > 환경변수 ICPM2027_DATA_ROOT > <repo>/data/raw
-    (src/utils/data_utils.resolve_data_root와 같은 우선순위). P-BEAR-RL Full_input 폴더를 가리켜야 한다."""
+    """Data root: --data-root argument > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw.
+
+    Same priority as src/utils/data_utils.resolve_data_root; it must point to the P-BEAR-RL Full_input folder.
+    """
     import os
     if cli_root is None and "--data-root" in sys.argv:
         cli_root = sys.argv[sys.argv.index("--data-root") + 1]
@@ -58,7 +61,7 @@ def _data_root(cli_root=None):
 
 
 def _strip_data_root(argv):
-    """positional 인자를 읽기 전에 '--data-root X'를 argv에서 뺀다 (기존 인자 처리는 그대로)."""
+    """Remove '--data-root X' from argv before positional arguments are read (existing argument handling unchanged)."""
     if "--data-root" in argv:
         i = argv.index("--data-root")
         del argv[i:i + 2]
@@ -66,7 +69,7 @@ CREDIT_SCRIPT = PROJECT_ROOT / "outputs/simulation/Credit/alignment_all_optimal_
 
 
 def credit_defs():
-    """Credit script의 repair_from_alignment / net_struct / fire / dev_optimal 정의를 그대로 가져온다."""
+    """Load the repair_from_alignment / net_struct / fire / dev_optimal definitions from the Credit script unchanged."""
     src = CREDIT_SCRIPT.read_text(encoding="utf-8")
     ns = {"heapq": heapq, "Counter": Counter, "Event": Event, "Trace": Trace,
           "alignments_algo": None, "VARIANT": None, "gen_lm": gen_lm, "gen_nh": gen_lm}
@@ -97,25 +100,27 @@ def main():
     ap.add_argument("--data-root", dest="data_root", default=None)
     ap.add_argument("--out", required=True)
     ap.add_argument("--max-states", type=int, default=5_000_000)
-    # 실행 방식 옵션 (판정 정의는 그대로): case마다 checkpoint(jsonl)에 저장하고, 다시 실행하면 끝난 case는 건너뛴다.
-    #   --shard K/N : test case 중 ids[K::N]만 계산 (병렬 실행용, 결과는 checkpoint에만 저장)
-    #   --merge     : 모든 checkpoint를 합쳐 최종 파일을 쓴다 (모든 test case가 있어야 함)
+    # Execution options (the decision definition is unchanged): each case is saved to a checkpoint (jsonl);
+    # a re-run skips finished cases.
+    #   --shard K/N : compute only ids[K::N] of the test cases (parallel runs; results go to the checkpoint only)
+    #   --merge     : merge all checkpoints and write the final files (all test cases must be present)
     ap.add_argument("--shard", default=None)
     ap.add_argument("--merge", action="store_true")
-    # --skip-gen-check (2026-11-16, BPIC): PM4Py generator_dijkstra_less_memory 교차검증(gen_less_memory_eq_native)을 건너뛴다.
-    #   이 보조 검증은 state 상한 없이 모든 alignment를 나열해 BPIC에서 process당 ~59 GB까지 올라가 PC가 멈췄다
-    #   (Windows Event 2004). agreement 판정(dev_optimal, --max-states)은 그대로이며, 건너뛴 case는 gen_* 열이 None.
+    # --skip-gen-check: skip the PM4Py generator_dijkstra_less_memory cross-check (gen_less_memory_eq_native).
+    #   That auxiliary check enumerates all alignments without a state limit and can exhaust memory on large models.
+    #   The agreement decision (dev_optimal, --max-states) is unchanged; gen_* columns are None for skipped cases.
     ap.add_argument("--skip-gen-check", action="store_true")
-    # --resource-skip FILE (2026-11-16, BPIC): 첫 열(tab 구분)이 case id인 파일. 이 case들은 1 process 단독 실행에서도
-    #   메모리 위험 수준(watchdog)에 도달해 탐색을 끝내지 못한 case다. 탐색 없이 resource_limit_hit=True로 기록하고
-    #   all-optimal 집합은 비어 있는 것으로 둔다 -> all-optimal agreement에서 불일치 (하한). exact agreement는 trace 비교라 정상 계산.
-    #   state-limit(--max-states) 정의와는 별개 범주이며 state_limit_hit에 섞지 않는다.
+    # --resource-skip FILE: file whose first (tab-separated) column is a case id. These cases reached the
+    #   memory guard even when run alone in a single process. They are recorded with resource_limit_hit=True and an
+    #   empty all-optimal set (no search) -> counted as disagreement in all-optimal agreement (lower bound).
+    #   Exact agreement is a plain trace comparison and is computed normally. This is a separate category from the
+    #   state limit (--max-states) and is not merged into state_limit_hit.
     ap.add_argument("--resource-skip", default=None)
     a = ap.parse_args()
     if a.gt is None:
         a.gt = str(_data_root(a.data_root) / "encoded_normal" / "mccloud.csv")
     ns = credit_defs()
-    import psutil  # noqa: E402  (case별 메모리 기록용)
+    import psutil  # noqa: E402  (per-case memory record)
     _proc = psutil.Process()
     bdir, out = PROJECT_ROOT / a.b_dir, PROJECT_ROOT / a.out
     out.mkdir(parents=True, exist_ok=True)
@@ -209,7 +214,7 @@ def main():
         rows.append(r)
         tr_c = []
         for name, S in (("native", S_ex), ("tau_excluded", S_dev), ("gen_less_memory", S_gen)):
-            for t in sorted(S or ()):  # S_gen = None (--skip-gen-check) -> 행 없음
+            for t in sorted(S or ()):  # S_gen = None (--skip-gen-check) -> no rows
                 tr_c.append({"case_id": c, "set": name, "trace": " ".join(t), "is_B": t == b, "is_GT": t == g,
                              **{f"is_{m}": t == tr.get(c) for m, tr in X.items()}})
         trows.extend(tr_c)

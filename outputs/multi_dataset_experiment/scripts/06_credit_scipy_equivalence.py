@@ -1,16 +1,14 @@
-"""06_credit_scipy_equivalence.py — Credit Method B: scipy LP solver(shim) vs official(cvxopt) case-by-case 비교
+"""Credit Method B: scipy LP solver (shim) vs official run (cvxopt), case by case.
 
-왜: 이 PC에서는 Smart App Control이 cvxopt DLL을 차단한다. Pub 이후 Method B / alignment 실험을
-    process 안 shim(cvxopt 숨김 -> pm4py LP solver = scipy)으로 진행하기 전에,
-    같은 코드(simulation.py run-b와 같은 utils.alignment_utils.alignment_repair)로 Credit을 다시 실행해
-    official Method B run1(cvxopt)과 test 210건(+ val 210건 참고)이 같은지 확인한다.
+Re-runs Credit with the same code as the run-b stage (utils.alignment_utils.alignment_repair) under the
+scipy shim and compares it with the official Method B run 1 (cvxopt) on the test cases (val as a reference).
 
-판정 (사용자 기준): test 210/210 repaired trace 동일 AND 210/210 alignment cost 동일
-    -> "official-equivalent for this experiment". 하나라도 다르면 Pub를 시작하지 않는다.
-    visited / queued states는 LP 값에 따라 달라질 수 있으므로 기록만 한다 (판정에 쓰지 않음).
+Criterion: all test repaired traces identical AND all alignment costs identical
+    -> "official-equivalent for this experiment".
+Visited / queued states may depend on the LP values; they are recorded but not used in the decision.
 
-출력: outputs/simulation/Credit/scipy_equivalence_check/ (official runs/ 폴더는 읽기만 함)
-실행: .venv\\Scripts\\python outputs\\multi_dataset_experiment\\scripts\\06_credit_scipy_equivalence.py
+Output: outputs/simulation/Credit/scipy_equivalence_check/ (official runs/ folders are only read)
+Usage:  .venv/Scripts/python outputs/multi_dataset_experiment/scripts/06_credit_scipy_equivalence.py
 """
 import sys
 import types
@@ -86,7 +84,7 @@ def main():
             m[f"same_{c}"] = a.astype(float) == b.astype(float)
     m.to_csv(OUT / "case_by_case_comparison.csv", index=False)
 
-    # B output: repaired_log_b.csv 행 단위 비교 (case별 activity sequence, order, type, failed flag)
+    # B output: row-level comparison of repaired_log_b.csv (activity sequence per case, order, type, failed flag)
     key = ["case:concept:name", "concept:name", "order", "type", "alignment_failed"]
     nl = new_log.copy()
     nl["case:concept:name"] = nl["case:concept:name"].astype(str)

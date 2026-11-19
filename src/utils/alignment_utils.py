@@ -1,12 +1,9 @@
-"""
-alignment_utils — Method B (Petri Net + Alignment repair)를 모든 dataset에 쓰기 위한 공통 함수 (2026-10-13)
+"""Method B (Petri net + alignment repair) for every dataset.
 
-EXP-061(Small)의 alignment / repair 코드를 그대로 재사용한다 (D032):
-    src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py 의
-    align_case (PM4Py VERSION_STATE_EQUATION_A_STAR) 와 repair_from_alignment
-    (sync 유지 / log move 삭제 / visible model move 삽입 / tau 제외).
-61 script는 수정하지 않는다. dataset별 경로와 split만 pipeline에서 넘긴다.
-case별 시간은 perf_counter로 align_case + repair_from_alignment 구간만 잰다 (Small timing 정의와 같음).
+Re-uses align_case (PM4Py VERSION_STATE_EQUATION_A_STAR) and repair_from_alignment from
+src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py, loaded by path.
+Repair rule: keep synchronous moves, delete log moves, insert visible model moves, skip tau moves.
+Per-case time covers align_case + repair_from_alignment only (perf_counter).
 """
 
 import importlib.util
@@ -25,7 +22,7 @@ def load_exp061():
 
 
 def alignment_repair(traces, labels, ids_by_type, net, im, fm, language_set=None):
-    """ids_by_type: [("test", ids), ("val", ids)] (EXP-061과 같은 순서). return: (rows_log, rows_case)."""
+    """ids_by_type: [("test", ids), ("val", ids)]. Returns (rows_log, rows_case)."""
     from utils.data_utils import build_event_log
 
     m = load_exp061()
@@ -41,7 +38,7 @@ def alignment_repair(traces, labels, ids_by_type, net, im, fm, language_set=None
                 failed, error = False, ""
                 diag = {"alignment_cost": res["cost"], "fitness": res["fitness"],
                         "visited_states": res.get("visited_states"), "queued_states": res.get("queued_states")}
-            except Exception as e:  # noqa: BLE001  (EXP-061과 같은 fallback: 원래 trace 보존 + failure flag)
+            except Exception as e:  # noqa: BLE001  (on failure keep the original trace and set the failure flag)
                 repaired, failed, error = list(original), True, repr(e)
                 moves = {"n_sync_moves": None, "n_log_moves": None, "n_model_moves_visible": None, "n_tau_moves": None}
                 diag = {"alignment_cost": None, "fitness": None, "visited_states": None, "queued_states": None}

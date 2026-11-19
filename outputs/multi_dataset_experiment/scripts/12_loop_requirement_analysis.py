@@ -1,30 +1,31 @@
-"""12_loop_requirement_analysis.py — trace를 enumerate하지 않고 bounded coverage와 trace language 크기를 계산 (탐색, .venv)
+"""Bounded clean coverage and bounded-language size without enumerating traces (.venv).
 
-왜: BPIC 2017은 (1,4)에서 1,360,844 trace를 만들어도 clean coverage가 1.37%다.
-    더 큰 bound는 생성 guard를 넘으므로, 수백만~수억 trace를 실제로 만들지 않고
-    (1) observed clean trace 하나하나가 "최소 어떤 loop bound를 요구하는지"와
-    (2) 그 bound에서 bounded trace language가 몇 개인지
-    를 Process Tree 구조로 직접 계산한다.
+Why: for BPIC 2017 the bound (1,4) already yields 1,360,844 traces but only 1.37 % clean coverage, and larger
+bounds exceed the generation guard. Instead of generating millions of traces, this script computes from the
+process-tree structure (1) the minimal loop bound each observed clean trace requires and (2) the number of
+traces in the bounded language for a given bound.
 
-loop semantics (D004, loop_bound_utils와 같음):
-    loop_num   : loop instance 하나에서 do-part 실행 횟수의 상한 (instance-local, nested loop는 바깥 반복마다 새로 셈)
-    loop_total : 한 trace 안 모든 loop instance의 do-part 실행 횟수 총합의 상한 (첫 실행도 1로 셈)
-    max trace length 100 (generator 안전장치와 같음)
+Loop semantics (same as loop_bound_utils):
+    loop_num   : upper bound on do-part executions per loop instance (instance-local; nested loops restart
+                 for every outer iteration)
+    loop_total : upper bound on the total do-part executions of all loop instances in one trace
+                 (the first execution counts as 1)
+    max trace length 100 (same safety guard as the generator)
 
-방법 1 — requirement (coverage):
-    모든 visible label이 tree에서 한 번씩만 나오면(duplicate label 없음) trace의 각 event는 leaf 하나에만 대응한다.
-    그래서 subtree마다 "자기 alphabet으로 projection한 부분 trace"만 보면 된다.
-      SEQ  : child 순서대로 event가 이어져야 함 / XOR: 한 child만 / PAR: child마다 projection, 자유 interleaving
-      LOOP : do (redo do)^(k-1) 로 쪼개는 모든 방법을 DP로 탐색 (k = do 실행 횟수)
-    결과 = trace별 (필요 loop_num, 필요 loop_total) Pareto front. bound (n, t)에서 covered ⇔ front에 n'<=n, t'<=t 인 점이 있음.
-방법 2 — language size:
-    node마다 (길이, loop_total 사용량) -> trace 수 를 계산한다.
-      SEQ: 합성곱 / XOR: 합 / PAR: 길이 l1, l2 두 trace의 interleaving 수 C(l1+l2, l1) (alphabet이 서로 달라 모두 다른 trace)
-      LOOP: k = 1..n 번 do 실행, 각 반복마다 loop_total 사용량 +1
-    PAR을 SEQ로 바꾼 같은 계산과 비교해 parallel interleaving의 기여를 분리한다.
-검증: 두 방법을 기존 enumeration 결과(Pub, Credit, Road raw/dedup, BPIC (1,4))와 비교해 같을 때만 BPIC 해석에 쓴다.
+Method 1, requirement (coverage): if every visible label occurs once in the tree (no duplicate labels), each event
+maps to exactly one leaf, so each subtree only needs the projection of the trace onto its alphabet.
+    SEQ: children's events must follow in order / XOR: exactly one child / PAR: projection per child, free interleaving
+    LOOP: all ways to split into do (redo do)^(k-1) are explored by dynamic programming (k = do executions)
+  Result: per-trace Pareto front of (required loop_num, required loop_total). A trace is covered by (n, t) iff the
+  front has a point with n' <= n and t' <= t.
+Method 2, language size: per node, (length, loop_total usage) -> number of traces.
+    SEQ: convolution / XOR: sum / PAR: C(l1+l2, l1) interleavings of two traces of lengths l1, l2
+    (disjoint alphabets, so all interleavings are distinct) / LOOP: k = 1..n do executions, +1 loop_total each.
+  The same computation with PAR replaced by SEQ separates the contribution of parallel interleaving.
+Validation: both methods are compared with existing enumeration results (Pub, Credit, Road raw/dedup, BPIC (1,4))
+and are used for BPIC only if they match.
 
-출력: outputs/multi_dataset_experiment/loop_requirement_analysis/
+Output: outputs/multi_dataset_experiment/loop_requirement_analysis/
 """
 import sys
 import types
@@ -53,8 +54,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _data_root(cli_root=None):
-    """data root: --data-root 인자 > 환경변수 ICPM2027_DATA_ROOT > <repo>/data/raw
-    (src/utils/data_utils.resolve_data_root와 같은 우선순위). P-BEAR-RL Full_input 폴더를 가리켜야 한다."""
+    """Data root: --data-root argument > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw.
+
+    Same priority as src/utils/data_utils.resolve_data_root; it must point to the P-BEAR-RL Full_input folder.
+    """
     import os
     if cli_root is None and "--data-root" in sys.argv:
         cli_root = sys.argv[sys.argv.index("--data-root") + 1]
@@ -65,7 +68,7 @@ def _data_root(cli_root=None):
 
 
 def _strip_data_root(argv):
-    """positional 인자를 읽기 전에 '--data-root X'를 argv에서 뺀다 (기존 인자 처리는 그대로)."""
+    """Remove '--data-root X' from argv before positional arguments are read (existing argument handling unchanged)."""
     if "--data-root" in argv:
         i = argv.index("--data-root")
         del argv[i:i + 2]
@@ -75,7 +78,7 @@ OUT = PROJECT_ROOT / "outputs/multi_dataset_experiment/loop_requirement_analysis
 MAX_LEN = 100
 INF = 10 ** 9
 
-DATASETS = {  # tree = 기존 진단에서 저장한 discovered tree (IM noise 0, clean case)
+DATASETS = {  # tree = discovered tree stored by the earlier diagnostics (IM noise 0, clean cases)
     "Credit": (SIM / "Credit/dataset_audit/process_tree.txt", FULL / "credit-card_1.00.csv"),
     "Pub": (SIM / "Pub/dataset_audit/process_tree.txt", FULL / "mccloud_1.00.csv"),
     "RoadTraffic_raw": (SIM / "RoadTraffic/exploratory_dedup/A_raw_process_tree.txt", FULL / "Road_Traffic_1.00.csv"),
@@ -83,7 +86,7 @@ DATASETS = {  # tree = 기존 진단에서 저장한 discovered tree (IM noise 0
                           SIM / "RoadTraffic/exploratory_dedup/derived_data/Road_Traffic_1.00_dedup.csv"),
     "BPIC2017": (SIM / "BPIC2017/dataset_audit/process_tree.txt", FULL / "b17_1.00.csv"),
 }
-# 기존 enumeration 결과 (근거 파일의 값). (n, t) -> (generated_unique, covered clean cases)
+# existing enumeration results (values from the source files). (n, t) -> (generated_unique, covered clean cases)
 REFERENCE = {
     "Pub": ("Pub/dataset_audit/generation_feasibility.csv", None),
     "Credit": ("Credit/dataset_audit/generation_feasibility.csv", None),
@@ -128,9 +131,9 @@ def depth_of_loops(t, d=0, out=None):
     return out
 
 
-# ------------------------------------------------------------------ 방법 1: requirement
+# ------------------------------------------------------------------ method 1: requirement
 def pareto2(points):
-    """points: (a, b, w). (a, b) 2차원 Pareto front, 같은 (a, b)는 첫 witness 유지."""
+    """points: (a, b, w). 2-D Pareto front of (a, b); for equal (a, b) the first witness is kept."""
     best = {}
     for a, b, w in points:
         if (a, b) not in best:
@@ -144,7 +147,7 @@ def pareto2(points):
 
 
 def pareto3(points):
-    """points: (k, imax, itot, w). 세 값 모두 작거나 같은 점이 있으면 제거."""
+    """points: (k, imax, itot, w). Remove a point if another point is <= in all three values."""
     best = {}
     for k, a, b, w in points:
         best.setdefault((k, a, b), w)
@@ -224,7 +227,7 @@ class Requirement:
         li = self.loop_idx[id(node)]
 
         def blocks(i, A, child):
-            """seq[i:j]가 A 안의 label로만 이루어진 j들과 그 requirement."""
+            """The end indices j for which seq[i:j] consists only of labels in A, with their requirements."""
             out = []
             j = i
             while True:
@@ -248,7 +251,7 @@ class Requirement:
             for j1, PR in blocks(i, ar, redo):
                 for j2, PD in blocks(j1, ad, do):
                     if j2 <= i:
-                        continue  # 반복마다 최소 1 event를 소비 (빈 반복 무한 루프 방지)
+                        continue  # each iteration consumes at least one event (prevents infinite empty iterations)
                     for k, a, b, w in S[i]:
                         for ar_, br, wr in PR:
                             for ad_, bd, wd in PD:
@@ -271,13 +274,13 @@ def covered(front, n, t):
     return any(a <= n and b <= t for a, b, _ in front)
 
 
-# ------------------------------------------------------------------ 방법 2: language size
+# ------------------------------------------------------------------ method 2: language size
 def lang_count(node, n, t, par_as_seq=False):
-    """(길이 0..MAX_LEN, loop_total 사용량 0..t) -> trace 수 (float64, EGF로 interleaving 계산)."""
+    """(length 0..MAX_LEN, loop_total usage 0..t) -> number of traces (float64; interleavings via EGF)."""
     L = MAX_LEN
 
     def norm(A):
-        # 빈 trace는 1개뿐: 가장 작은 loop_total 사용량 하나로 합친다 (generator의 최소 count dedup과 같음)
+        # there is only one empty trace: merge it into the smallest loop_total usage (same as the generator's minimal-count dedup)
         if A[0].any():
             j = int(np.argmax(A[0] > 0))
             A[0] = 0
@@ -320,10 +323,10 @@ def lang_count(node, n, t, par_as_seq=False):
             for k in range(1, n + 1):
                 if k > t:
                     break
-                out[:, k:] += cur[:, : t + 1 - k]   # 이 loop instance의 do 실행 k회 -> 사용량 +k
+                out[:, k:] += cur[:, : t + 1 - k]   # k do executions of this loop instance -> usage +k
                 if k == n:
                     break
-                lim = t - (k + 1)  # do를 k+1번 실행하면 안쪽 사용량은 t-(k+1) 이하여야 한다
+                lim = t - (k + 1)  # with k+1 do executions the inner usage must be <= t-(k+1)
                 if lim < 0:
                     break
                 cur = conv(conv(cur, R), D)
@@ -400,7 +403,7 @@ def main():
     print(json.dumps(summary, indent=1))
 
 
-# ------------------------------------------------------------------ BPIC 2017 분석 (enumeration 없음)
+# ------------------------------------------------------------------ BPIC 2017 analysis (no enumeration)
 def bpic(nmax=12, tmax=60):
     name = "BPIC2017"
     tree, R, obs, fronts, sec = analyze(name)
@@ -416,7 +419,7 @@ def bpic(nmax=12, tmax=60):
     out["trace_length"] = {"min": int(arr.min()), "median": float(np.median(arr)), "p95": float(np.percentile(arr, 95)),
                            "max": int(arr.max()), "cases_longer_than_100": int((arr > 100).sum())}
 
-    # 1) case별 requirement
+    # 1) per-case requirement
     rows = []
     for v, c in obs.items():
         F = fronts[v]
@@ -424,7 +427,7 @@ def bpic(nmax=12, tmax=60):
             rows.append({"variant": " ".join(v), "cases": c, "length": len(v), "coverable": False})
             continue
         a1 = [b for a, b, _ in F if a == 1]
-        wit = min(F, key=lambda x: (x[1], x[0]))[2]  # loop_total이 가장 작은 parse의 loop별 (instance max k, k 합)
+        wit = min(F, key=lambda x: (x[1], x[0]))[2]  # per loop of the parse with the smallest loop_total: (instance max k, sum of k)
         r = {"variant": " ".join(v), "cases": c, "length": len(v), "coverable": True,
              "front": ";".join(f"({a},{b})" for a, b, _ in F), "min_loop_num": min(a for a, _, _ in F),
              "min_loop_total": min(b for _, b, _ in F), "min_total_if_no_repetition": a1[0] if a1 else None,
@@ -451,7 +454,7 @@ def bpic(nmax=12, tmax=60):
     out["coverage (1, unlimited total)"] = round(coverage(obs, fronts, 1, INF), 6)
     out["coverage (unlimited, unlimited)"] = round(coverage(obs, fronts, INF, INF), 6)
 
-    # 2) (1,4)에서 빠진 case의 이유
+    # 2) why cases are not covered at (1,4)
     unc = w[[not covered(fronts[tuple(x.split())], 1, 4) for x in w.variant]]
     reason = Counter()
     for _, r in unc.iterrows():
@@ -471,7 +474,7 @@ def bpic(nmax=12, tmax=60):
                    "k_p50_p95_max_among_entering": [float(np.percentile(ks, 50)), float(np.percentile(ks, 95)), int(ks.max())] if len(ks) else None}
     out["all_clean_per_loop (min-total parse)"] = per
 
-    # 3) coverage 목표별 Pareto-minimal bound와 그 language 크기
+    # 3) Pareto-minimal bounds per coverage target and their language sizes
     targets, best_rows = [], []
     for p in (0.5, 0.8, 0.9, 0.95, 0.99):
         ok = G[G.coverage >= p]
@@ -497,7 +500,7 @@ def bpic(nmax=12, tmax=60):
     pd.DataFrame(best_rows).to_csv(OUT / "bpic_bound_targets_best.csv", index=False)
     out["targets_best (smallest language among Pareto-minimal bounds)"] = best_rows
 
-    # 4) 폭발 원인 분해: 같은 bound에서 PAR->SEQ / loop 반복 제거(n=1, 같은 t)
+    # 4) explosion decomposition at the same bound: PAR->SEQ / no loop repetition (n=1, same t)
     dec = []
     for n, t in [(1, 4), (1, 10)] + [(r["loop_num"], r["loop_total"]) for r in best_rows]:
         full = lang_count(tree, n, t)

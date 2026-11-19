@@ -1,11 +1,4 @@
-"""
-data_utils — 데이터 root 결정, 입력 파일 경로/checksum, 로그 읽기와 변환 (REF-001)
-
-출처:
-    load_case_traces, build_event_log         <- src/61_method_b_alignment_repair.py
-    read_log_like_sim, add_start_end_like_sim  <- src/63_generated_nbg_rpbear.py
-    write_generated_log                        <- src/63 stage_generate
-"""
+"""Data root resolution, input paths / checksums, and log reading / conversion."""
 
 import os
 from pathlib import Path
@@ -16,11 +9,11 @@ ENV_DATA_ROOT = "ICPM2027_DATA_ROOT"
 
 
 # ------------------------------------------------------------
-# 1. 데이터 root / 입력 파일
+# 1. Data root / input files
 # ------------------------------------------------------------
 
 def resolve_data_root(cli_root=None):
-    """우선순위: CLI --data-root > 환경변수 ICPM2027_DATA_ROOT > 프로젝트 data/raw."""
+    """Priority: CLI --data-root > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw."""
     if cli_root:
         return Path(cli_root).resolve(), "cli --data-root"
     env = os.environ.get(ENV_DATA_ROOT)
@@ -30,9 +23,9 @@ def resolve_data_root(cli_root=None):
 
 
 def resolve_input_paths(cfg, data_root, anomaly_level):
-    """dataset 설정 + data root -> 이상 log / ground-truth log 경로.
+    """Dataset config + data root -> anomaly log / ground-truth log paths.
 
-    P-BEAR-RL 형식(encoded_anomaly/, encoded_normal/)과 flat 형식(data/raw)을 자동 인식한다.
+    Detects the P-BEAR-RL layout (encoded_anomaly/, encoded_normal/) and the flat layout (data/raw).
     """
     stem = cfg["file_stem"]
     root = Path(data_root)
@@ -48,16 +41,16 @@ def resolve_input_paths(cfg, data_root, anomaly_level):
 
 
 def describe_inputs(input_paths):
-    """각 입력 파일의 resolved path / size / SHA-256."""
+    """Resolved path, size and SHA-256 of each input file."""
     return [file_record(role, path) for role, path in input_paths.items()]
 
 
 # ------------------------------------------------------------
-# 2. 관측 log 읽기 (pm4py용, 파일 event 순서 유지)
+# 2. Observed log (PM4Py, file event order preserved)
 # ------------------------------------------------------------
 
 def load_case_traces(anomaly_log_path):
-    """case별 activity list, label, clean / anomalous case id (EXP-061과 동일)."""
+    """Per-case activity list, label, and clean / anomalous case ids."""
     import pandas as pd
 
     df = pd.read_csv(anomaly_log_path, usecols=["Case", "Activity", "type_res_trace"])
@@ -69,7 +62,7 @@ def load_case_traces(anomaly_log_path):
 
 
 def build_event_log(case_ids, traces):
-    """pm4py dataframe 변환은 timestamp로 정렬할 수 있으므로 EventLog를 직접 만든다."""
+    """Build the EventLog directly: PM4Py dataframe conversion may re-sort events by timestamp."""
     from pm4py.objects.log.obj import Event, EventLog, Trace
 
     log = EventLog()
@@ -83,11 +76,11 @@ def build_event_log(case_ids, traces):
 
 
 # ------------------------------------------------------------
-# 3. 생성 trace -> event log (RP-BEAR 입력 형식)
+# 3. Generated traces -> event log (RP-BEAR input format)
 # ------------------------------------------------------------
 
 def write_generated_log(generated_traces, path):
-    """생성 trace를 1회씩(weight 1) Case/Activity CSV로 쓴다. case id = gen_0001, ..."""
+    """Write each generated trace once (weight 1) as a Case/Activity CSV. Case ids: gen_0001, ..."""
     import pandas as pd
 
     rows = []
@@ -99,7 +92,7 @@ def write_generated_log(generated_traces, path):
 
 
 def read_log_like_sim(path, has_label):
-    """sim._load_and_prepare_data와 같은 dtype/열 이름으로 CSV를 읽는다."""
+    """Read a CSV with the same dtypes / column names as sim._load_and_prepare_data."""
     import numpy as np
     import pandas as pd
 
@@ -117,9 +110,9 @@ def read_log_like_sim(path, has_label):
 
 
 def add_start_end_like_sim(data):
-    """sim._load_and_prepare_data()의 Start/End/order 처리와 같은 코드 (입력만 다름).
+    """Same Start/End/order handling as sim._load_and_prepare_data() (different input only).
 
-    return: label이 비어 있는 case의 rows (= sim의 `clean`과 같은 형식)
+    Returns the rows of cases with an empty label (same format as `clean` in sim).
     """
     import pandas as pd
 

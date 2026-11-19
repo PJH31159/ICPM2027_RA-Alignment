@@ -1,51 +1,47 @@
-"""
-simulation.py  —  multi-dataset research pipeline orchestrator (REF-001)
+"""Multi-dataset research pipeline orchestrator.
 
-역할 구분:
-    simulation.py = 여러 dataset(Small → Medium → Large → Wide → Credit → Road)에 같은
-                    연구 pipeline을 단계별로 적용하는 orchestrator. 단계 순서, 이전 단계
-                    통과 확인, 입력 파일 기록, 출력 위치만 관리한다. 실제 계산은 utils/에 있다.
-    sim.py        = RP-BEAR를 한 번 실행하는 엔진(wrapper). run 단계 등에서 호출된다.
+simulation.py applies the same research pipeline, stage by stage, to every dataset. It manages the
+stage order, checks that the previous stage passed, records the input files and sets the output
+locations; the computations are in utils/. sim.py is the RP-BEAR engine called by the run stages.
 
-Pipeline (Method A / Method C, D034):
+Pipeline:
     Method A: observed clean log -> Original NBG -> RP-BEAR
-    Method C: observed clean log -> Inductive Miner -> Petri Net -> generated traces
+    Method B: clean cases -> Inductive Miner -> Petri net -> alignment repair
+    Method C: observed clean log -> Inductive Miner -> Petri net -> generated (bounded) traces
               -> New NBG -> RP-BEAR
-    (Method B / Alignment는 아직 넣지 않았다. 나중에 stage를 추가하면 된다.)
+    C+PN    : Method C + Petri-net conformance gate on episode termination
 
-단계와 실행 환경:
-    discover  (.venv)        IM -> Process Tree -> Petri Net, 구조 점검 (loop / parallel / cycle)
-    generate  (.venv)        생성 전략 판단 -> (허용되면) Petri Net 직접 나열 -> 관측 vs 생성
-    nbg       (.venv-rpbear) New NBG (weight 1, actset 순서, anchor 검증), Original과 비교, ADM 비교
-    smoke     (.venv-rpbear) num_epi=5 end-to-end + 순차 실행 A' vs C'
-    run       (.venv-rpbear) 공식 run (--method A|C --run-id N), 약 1시간 이상 (Small 기준)
-    evaluate  (어느 환경이든) 공통 채점 (--with-reference: config의 기존 결과도 함께)
-    regression(어느 환경이든) Small 전용: 기존 EXP-063 결과와 비교
-    test-timing          (.venv-rpbear) 학습된 agent로 Test만 순차 재실행 → per-case repair latency
-                         (--agent, --repaired-log, --label, --method; timing 전용, accuracy 실험 아님)
-    test-timing-validate (.venv-rpbear) Test-only 재실행이 같은 상태에서 원래 Test와 byte-identical인지 확인
-    agreement            (어느 환경이든) 공식 Method A / B / C repaired log 일치율 → outputs/repaired_log_agreement/
-                         (Small: config reference_runs, 그 외: runs/methodA_run1, methodB_run1, methodC_run1)
-    run-b                (.venv) Method B official run (--run-id N) 또는 smoke (--limit N): IM → Petri Net → alignment repair
-    test-timing-b        (.venv) Method B: 공식 Petri Net으로 Test만 순차 Alignment + repair → per-case latency
-                         (--pnml, --repaired-log, --label; timing 전용, accuracy 실험 아님)
-    loop-bound-screening (.venv) loop 모델의 공식 loop bound 결정 (EXP-066, D004): (loop_num, loop_total)별
-                         bounded trace set -> clean case coverage >= 0.90 최소 조합 -> outputs/<dataset>_loop_bound_screening/
-    credit-loop-bound-sensitivity (.venv) Credit 전용: bound별 coverage vs generated trace 수, 최종 bound (5,7)
-                         (D038 elbow) trace set / uncovered variant -> outputs/credit_loop_bound_sensitivity/
-    pngate-*  / run-c-pngate / test-timing-pngate  Credit 탐색 variant C+PN (W2 + Petri Net conformance gate):
-                         utils/pn_gate_utils.py, 출력 <dataset>/C_PN_Gate/, <dataset>/pn_gate_analysis/ (기존 A/B/C 불변)
-    all       discover -> generate -> nbg -> smoke 를 각 환경으로 차례로 실행 (run은 포함하지 않음)
+Stages and environments:
+    discover  (.venv)        IM -> process tree -> Petri net, structure checks (loop / parallel / cycle)
+    generate  (.venv)        generation strategy -> exhaustive or bounded generation -> observed vs generated
+    nbg       (.venv-rpbear) New NBG (weight 1, actset order, anchor check), comparison with Original, ADM check
+    smoke     (.venv-rpbear) num_epi=5 end-to-end run + sequential A' vs C'
+    run       (.venv-rpbear) official run (--method A|C --run-id N)
+    evaluate  (any)          common scoring (--with-reference: also the configured reference results)
+    regression (any)         Small only: comparison with the existing Small results
+    test-timing          (.venv-rpbear) sequential test-only replay with a trained agent -> per-case repair latency
+                         (--agent, --repaired-log, --label, --method; timing only, not an accuracy experiment)
+    test-timing-validate (.venv-rpbear) checks that a test-only replay is byte-identical to the original test phase
+    agreement            (any) agreement of the official Method A / B / C repaired logs
+    run-b                (.venv) Method B official run (--run-id N) or smoke (--limit N)
+    test-timing-b        (.venv) Method B: sequential alignment + repair of the test cases with the official Petri net
+                         (--pnml, --repaired-log, --label; timing only)
+    loop-bound-screening (.venv) loop bound selection for loop models: bounded trace set per (loop_num, loop_total)
+                         -> smallest bound with clean-case coverage >= 0.90
+    credit-loop-bound-sensitivity (.venv) Credit only: coverage vs number of generated traces per bound, final bound (5,7)
+    pngate-* / run-c-pngate / test-timing-pngate  C+PN (W2 + Petri-net conformance gate), utils/pn_gate_utils.py;
+                         outputs in <dataset>/C_PN_Gate/ and <dataset>/pn_gate_analysis/
+    all       runs discover -> generate -> nbg -> smoke, each in its own environment (run not included)
 
-예:
-    .venv\\Scripts\\python src\\simulation.py --dataset Small --stage discover
-    .venv-rpbear\\Scripts\\python src\\simulation.py --dataset Small --stage nbg
-    python src\\simulation.py --dataset Medium --stage discover --data-root <DATA_ROOT>
+Examples:
+    .venv/Scripts/python src/simulation.py --dataset Small --stage discover
+    .venv-rpbear/Scripts/python src/simulation.py --dataset Small --stage nbg
+    python src/simulation.py --dataset Medium --stage discover --data-root <DATA_ROOT>
 
-데이터 root 우선순위: --data-root > 환경변수 ICPM2027_DATA_ROOT > 프로젝트 data/raw
-출력: outputs/simulation/<Dataset>/<stage>/  (단계 폴더가 있으면 --overwrite 없이는 멈춤,
-      runs/ 아래 공식 run 폴더는 절대 덮어쓰지 않음)
-종료 코드: 0 PASSED, 1 FAILED, 2 BLOCKED (사람의 결정이 필요)
+Data root priority: --data-root > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw
+Output: outputs/simulation/<Dataset>/<stage>/ (an existing stage folder stops the run unless --overwrite;
+        official run folders under runs/ are never overwritten)
+Exit codes: 0 PASSED, 1 FAILED, 2 BLOCKED (needs a human decision)
 """
 
 import argparse
@@ -67,7 +63,7 @@ STAGE_REQUIRES = {"discover": [], "generate": ["discover"], "nbg": ["generate"],
 
 
 # ============================================================
-# 1. 실행 문맥 (dataset, 데이터 root, 입력 파일, 출력 위치)
+# 1. Run context (dataset, data root, input files, output location)
 # ============================================================
 
 class Context:
@@ -77,17 +73,17 @@ class Context:
         self.name = args.dataset
         self.data_root, self.root_source = resolve_data_root(args.data_root)
         self.input_paths, self.layout = resolve_input_paths(self.cfg, self.data_root, dc.ANOMALY_LEVEL)
-        if self.cfg.get("anomaly_log_override"):  # RoadTraffic: 탐색용 derived copy (원본 raw는 수정하지 않음)
+        if self.cfg.get("anomaly_log_override"):  # RoadTraffic: derived copy (the raw file is not modified)
             self.input_paths["anomaly_log"] = PROJECT_ROOT / self.cfg["anomaly_log_override"]
         self.out = OUTPUT_ROOT / self.name
-        # noise_threshold (Inductive Miner, 2026-11 교수님 지시): 지정하면 결과를 threshold_0pXX/ 아래로 분리한다.
-        # 지정하지 않으면 기존과 같이 dc.DISCOVERY 값(0.0)과 기존 경로를 쓴다 (기존 official output 경로 불변).
+        # noise_threshold (Inductive Miner): if given, outputs go to threshold_0pXX/.
+        # Otherwise dc.DISCOVERY (0.0) and the default output paths are used.
         th = getattr(args, "noise_threshold", None)
         self.noise = dc.DISCOVERY["noise_threshold"] if th is None else float(th)
         if th is not None:
             self.out = self.out / threshold_tag(self.noise)
         lb = getattr(args, "loop_bound", None)
-        if lb:  # --loop-bound n,t : bounded_loop generation의 loop bound 지정 (D004 semantics)
+        if lb:  # --loop-bound n,t : loop bound for bounded_loop generation
             n, t = (int(x) for x in lb.split(","))
             self.cfg["trace_generation"].update({"strategy": "bounded_loop", "loop_num": n, "loop_total": t,
                                                  "reference_traces": None})
@@ -98,17 +94,17 @@ class Context:
         return self.out / stage
 
     def data_name(self):
-        """sim.run_rpbear의 data_name (저장 파일 이름에 쓰임) = file_stem (run_name이 있으면 run_name)."""
+        """data_name for sim.run_rpbear (used in output file names) = file_stem, or run_name if set."""
         return self.cfg.get("run_name", self.cfg["file_stem"])
 
 
 def threshold_tag(th):
-    """noise_threshold -> 출력 폴더 이름 (0.2 -> threshold_0p20)."""
+    """noise_threshold -> output folder name (0.2 -> threshold_0p20)."""
     return f"threshold_{th:.2f}".replace(".", "p")
 
 
 def record_inputs(ctx, rec):
-    """입력 파일의 resolved path / size / SHA-256을 기록하고, 이전 기록과 다르면 실패."""
+    """Record resolved path / size / SHA-256 of the input files; fail if they differ from the previous record."""
     print(f"  dataset={ctx.name} (file_stem={ctx.cfg['file_stem']}) | data root={ctx.data_root} "
           f"[{ctx.root_source}] | layout={ctx.layout}")
     if not ctx.cfg["identity_confirmed"]:
@@ -131,7 +127,7 @@ def record_inputs(ctx, rec):
 
 
 def open_stage(ctx, stage):
-    """단계 폴더 준비 + 이전 단계 통과 확인. return: stage_dir 또는 None."""
+    """Prepare the stage folder and check that the previous stage passed. Returns the stage dir or None."""
     for req in STAGE_REQUIRES[stage]:
         st = read_stage_status(ctx.stage_dir(req))
         if not st or st["status"] != "PASSED":
@@ -162,7 +158,7 @@ def need_pm4py():
         return False
 
 
-TIMING_SCOPE = {  # 교수님 요청 (2026-11-11) + D037. training과 preprocessing을 섞지 않는다.
+TIMING_SCOPE = {  # training time and preprocessing time are reported separately
     "training_ms": "RP-BEAR validation(학습) phase wall-clock = sim.py val_total_ms "
                    "(data load / NBG 생성 / agent 저장 / test / 평가 제외). Method B = N/A",
     "test_repair_mean_ms_per_case / median": "A / C / C+PN: case별 timer (worker 안 perf_counter, multiprocessing CPU 공유 포함; "
@@ -173,7 +169,7 @@ TIMING_SCOPE = {  # 교수님 요청 (2026-11-11) + D037. training과 preprocess
 
 
 def write_standard_timing(ctx, run_dir, method):
-    """official run 폴더에 <prefix>_timing.json을 쓴다 (공통 schema). 이미 있으면 덮어쓰지 않는다."""
+    """Write <prefix>_timing.json (common schema) into an official run folder; never overwrites."""
     import pandas as pd
 
     stats_f = next(Path(run_dir).glob("*_stats.json"), None)
@@ -223,7 +219,7 @@ def write_standard_timing(ctx, run_dir, method):
         pre["generation_ms"] = round(read_json(gs)["generation_time_sec"] * 1000, 4)
     ns = ctx.stage_dir("nbg") / "nbg_comparison_summary.json"
     if ns.exists():
-        pre["nbg_build_ms"] = read_json(ns).get("timing_ms")  # nbg stage가 2026-11-11 이후 실행된 경우에만 있음
+        pre["nbg_build_ms"] = read_json(ns).get("timing_ms")  # only present if the nbg stage recorded its timing
     row["preprocessing"] = pre
     row["source"] = {"stats": stats_f.name}
     write_json(out, row)
@@ -298,7 +294,7 @@ def stage_generate(ctx):
         prev = read_json(ctx.stage_dir("discover") / "model_check.json")
         rec.check("re-discovered model == discover stage", model_check["process_tree"] == prev["process_tree"])
 
-        if tg["strategy"] == "bounded_loop":  # loop 모델 (Credit, D038): 공식 loop bound로 bounded generation
+        if tg["strategy"] == "bounded_loop":  # loop model: bounded generation with the official loop bound
             return generate_bounded_loop(ctx, d, rec, tree, net, im, fm, traces, clean_ids)
 
         decision = decide_strategy(tg, model_check)
@@ -343,10 +339,11 @@ def stage_generate(ctx):
 
 
 def generate_bounded_loop(ctx, d, rec, tree, net, im, fm, traces, clean_ids):
-    """loop 모델용 generate (D004 semantics, 공식 loop bound). Credit: (5,7) → 5,000 traces (EXP-066).
+    """Generate stage for loop models with the official loop bound (e.g. Credit (5,7) -> 5,000 traces).
 
-    W1(generated-only) 입력이 실수로 쓰이지 않도록 generated_normal_log.csv는 만들지 않는다.
-    대신 model_only_generated_log.csv (D039 Expanded New NBG 입력)와 generated_bounded_traces.csv(기록용)를 쓴다.
+    generated_normal_log.csv (generated-only input) is not written, so that it cannot be used by mistake.
+    Instead model_only_generated_log.csv (input of the W2 Expanded New NBG) and generated_bounded_traces.csv
+    (record) are written.
     """
     from collections import Counter
 
@@ -363,7 +360,7 @@ def generate_bounded_loop(ctx, d, rec, tree, net, im, fm, traces, clean_ids):
     print(f"  strategy=bounded_loop (loop_num={n}, loop_total={t}; D004 / D038)")
     lang, gst = generate_bounded(tree, n, t, tg["safety_max_trace_length"], tg["safety_max_traces"], 600, 16)
     gen = set(lang)
-    if tg.get("reference_traces"):  # Credit: EXP-066 탐색 결과와 같은지 확인. 처음 보는 dataset(Pub)은 기준 없음
+    if tg.get("reference_traces"):  # check against the reference trace set if configured (Credit); otherwise no reference
         ref_path = PROJECT_ROOT / tg["reference_traces"]
         ref = {tuple(x.split(">>")) for x in pd.read_csv(ref_path)["trace"]}
         rec.check(f"bounded generation ({n},{t}) == reference traces ({tg['reference_traces']})", gen == ref,
@@ -425,7 +422,7 @@ def generate_bounded_loop(ctx, d, rec, tree, net, im, fm, traces, clean_ids):
 
 
 def w2_nbg_preparation(ctx, rec, d, clean, anomaly, actset, filtered_actset, original, new):
-    """D039 Expanded New NBG 준비 검증 (EXP-067 전): 구조 / edge 출처 / alpha 0 ADM (clean 전체 + anomalous 전체)."""
+    """W2 Expanded New NBG preparation checks: structure / edge provenance / alpha-0 ADM (all clean + all anomalous cases)."""
     import pandas as pd
 
     from utils.nbg_utils import adm_equality, edge_set_digest, nbg_edge_set, trace_edge_set
@@ -447,7 +444,7 @@ def w2_nbg_preparation(ctx, rec, d, clean, anomaly, actset, filtered_actset, ori
 
     so, sn = summ(original, "Original NBG (observed clean log)"), summ(new, "Expanded New NBG (W2, D039)")
     for key, s in (("original_nbg", so), ("expanded_nbg", sn)):
-        if exp is None:  # 처음 보는 dataset (Pub): 기대값 없이 관찰값만 기록 (edge 출처 구조 검증은 아래에서 그대로 check)
+        if exp is None:  # dataset without expected values: record observations only (edge-provenance checks still apply below)
             rec.info(f"{key} graphs / nodes / edges / digest (observed)", (s["graphs"], s["nodes"], s["edges"], s["digest"]))
             continue
         e = exp[key]
@@ -490,7 +487,7 @@ def w2_nbg_preparation(ctx, rec, d, clean, anomaly, actset, filtered_actset, ori
                 "newly_accepted_case_ids": sorted(an.loc[~an.normal_original & an.normal_w2, "case"].astype(str))}
     write_json(prep / "alpha0_clean_adm_check.json", clean_chk)
     write_json(prep / "alpha0_anomaly_adm_check.json", anom_chk)
-    if exp is None:  # 처음 보는 dataset: 구조적으로 성립해야 하는 것만 check, 나머지는 관찰값
+    if exp is None:  # dataset without expected values: check only structural invariants, record the rest
         rec.check(f"alpha0 clean: same decision Original vs W2 ({len(cl)}/{len(cl)})", clean_chk["same_decision"] == len(cl), clean_chk)
         rec.info("alpha0 uncovered clean cases / W2 normal", (len(unc), clean_chk["uncovered_clean_normal_w2"]))
         rec.info("alpha0 anomaly miss original / W2 / newly accepted",
@@ -507,7 +504,7 @@ def w2_nbg_preparation(ctx, rec, d, clean, anomaly, actset, filtered_actset, ori
 
 
 def w2_smoke_checks(ctx, rec, d, results, n):
-    """D039 Method C smoke 확인 (num_epi = SMOKE_NUM_EPI, official 성능값 아님)."""
+    """W2 Method C smoke checks (num_epi = SMOKE_NUM_EPI; not official performance values)."""
     import pandas as pd
 
     mp, seq_a, seq_c = results["mp_methodC"], results["seq_methodA"], results["seq_methodC"]
@@ -583,7 +580,7 @@ def stage_nbg(ctx):
                                            ctx.params["seed"])
         (d / "split_val_case_ids.txt").write_text("\n".join(sorted(val_ids)) + "\n", encoding="utf-8")
         (d / "split_test_case_ids.txt").write_text("\n".join(sorted(test_ids)) + "\n", encoding="utf-8")
-        # generated_only (Small~Wide): 기존과 같이 alpha 0 / 0.01 / 0.05 진단. W2 (Credit): 공식 alpha 0만
+        # generated_only (Small-Wide): diagnostics at alpha 0 / 0.01 / 0.05; W2: official alpha 0 only
         alphas = [ctx.params["alpha"]] if w2 else [ctx.params["alpha"], 0.01, 0.05]
         adm, per_case = adm_equality(anomaly, {"test": test_ids, "val": val_ids}, actset, filtered_actset,
                                      original, new, alphas)
@@ -654,7 +651,7 @@ def stage_smoke(ctx):
 
 
 def stage_run(ctx):
-    from utils.nbg_utils import edge_set_digest  # noqa: F401  (C에서 사용)
+    from utils.nbg_utils import edge_set_digest  # noqa: F401  (used for Method C)
 
     method, run_id = ctx.args.method, ctx.args.run_id
     if method is None or run_id is None:
@@ -697,7 +694,7 @@ def stage_run(ctx):
 
 
 def collect_runs(ctx, with_reference):
-    """평가할 repaired log 목록 {label: path}."""
+    """Repaired logs to evaluate {label: path}."""
     runs = {}
     runs_dir = ctx.out / "runs"
     if runs_dir.exists():
@@ -717,9 +714,9 @@ COST_FIELDS = ["num_epi", "alpha", "use_multiprocessing", "num_cores", "n_val_ca
 
 
 def rpbear_cost_summary(runs):
-    """각 run 폴더의 *_stats.json에서 계산비용 / 학습시간 필드를 모은다 (stats.json이 없는 run은 건너뜀).
+    """Collect cost / training-time fields from *_stats.json of each run folder (runs without stats.json are skipped).
 
-    timing instrumentation(2026-10-12) 이전 run에는 case별 필드가 없으므로 빈 값으로 남는다.
+    Runs made before per-case timing was added have no per-case fields; those stay empty.
     """
     import pandas as pd
 
@@ -801,7 +798,7 @@ def stage_evaluate(ctx):
 
 
 def stage_regression(ctx):
-    """Small 전용: 새 공통 구조의 결과가 기존 EXP-063과 같은지 확인한다."""
+    """Small only: check that the results of the common pipeline equal the existing Small results."""
     reg = ctx.cfg.get("regression")
     if not reg:
         print(f"[ERROR] {ctx.name}에는 regression 기준이 없습니다 (Small 전용).")
@@ -887,8 +884,8 @@ def stage_regression(ctx):
         rec.check("case-level table == EXP-063 exp063_case_level.csv (A, C, B, A run2/3)", not mismatch,
                   mismatch or f"({len(old_cl)} cases)")
 
-        # REF-002: EXP-060~063은 src/experiments/p6_small_repaired_log_comparison/로 이동했다.
-        # 커밋 전에는 HEAD의 옛 경로와 비교하고 REF-002 경로 수정 줄만 허용한다.
+        # The historical Small scripts live in src/experiments/p6_small_repaired_log_comparison/.
+        # They are compared with HEAD; only the allowed path lines may differ.
         from utils.validation_utils import historical_script_drift
 
         p6 = "src/experiments/p6_small_repaired_log_comparison"
@@ -903,7 +900,7 @@ def stage_regression(ctx):
 
 
 def _open_dir(ctx, d):
-    """label별 폴더 준비 (open_stage와 같은 덮어쓰기 규칙)."""
+    """Prepare a per-label folder (same overwrite rule as open_stage)."""
     if d.exists():
         if not ctx.args.overwrite:
             print(f"[ABORT] {d} 가 이미 있음. 다시 실행하려면 --overwrite")
@@ -914,7 +911,7 @@ def _open_dir(ctx, d):
 
 
 def stage_test_timing_validate(ctx):
-    """Test-only 순차 재실행이 원래 Test 결과와 byte-identical인지 확인한다 (smoke 조건, A와 C)."""
+    """Check that a sequential test-only replay is byte-identical to the original test phase (smoke settings, A and C)."""
     d = _open_dir(ctx, ctx.stage_dir("test_timing") / "validation")
     if d is None:
         return 1
@@ -943,7 +940,7 @@ def stage_test_timing_validate(ctx):
             rep_csv = r["test_replay"].to_csv(index=False)
             rec.check(f"{label}: Test-only replay byte-identical to original sequential Test phase", ref_csv == rep_csv,
                       f"({len(r['test_reference'])} rows)")
-            tmp = d / f"_full_sequential_{label}.csv"  # smoke와 같은 방식(df.to_csv(path))으로 써서 byte 비교
+            tmp = d / f"_full_sequential_{label}.csv"  # written like the smoke stage (df.to_csv(path)) for a byte comparison
             pd.concat([r["val"], r["test_reference"]], ignore_index=True).to_csv(tmp, index=False)
             full = tmp.read_bytes()
             tmp.unlink()
@@ -960,19 +957,21 @@ def stage_test_timing_validate(ctx):
     return finish(d, "test-timing-validate", rec)
 
 
-LOOP_BOUND_SCREENING = {  # EXP-066. 공식 semantics는 D004, 안전장치는 연구 파라미터가 아님
+LOOP_BOUND_SCREENING = {  # safety guards are not research parameters
     "loop_num_range": (1, 5),
     "loop_total_range": (1, 20),
-    "coverage_threshold": 0.90,          # clean case coverage >= 0.90 (교수님 결정)
-    "explosion_unique_traces": 100_000,  # safety: 최종 unique trace 수가 이보다 크면 EXPLOSION
+    "coverage_threshold": 0.90,          # clean-case coverage >= 0.90
+    "explosion_unique_traces": 100_000,  # safety: EXPLOSION if the final number of unique traces exceeds this
     "max_seconds_per_combo": 600,        # safety
     "max_rss_gb": 16,                    # safety
 }
 
 
 def stage_loop_bound_screening(ctx):
-    """loop가 있는 모델의 공식 loop bound 결정 (EXP-066): 작은 (loop_num, loop_total)부터 bounded trace set을
-    만들고 clean case coverage가 처음 0.90 이상이 되는 조합을 고른다. NBG / RP-BEAR는 실행하지 않는다."""
+    """Official loop-bound selection for models with loops: build bounded trace sets from small
+    (loop_num, loop_total) upwards and select the first bound with clean-case coverage >= 0.90.
+    NBG / RP-BEAR are not run.
+    """
     if not need_pm4py():
         return 1
     STAGE_REQUIRES.setdefault("loop-bound-screening", ["discover"])
@@ -1023,7 +1022,7 @@ def stage_loop_bound_screening(ctx):
                   n_anom_acc < len(_a), f"(accepted anomalous {n_anom_acc}/{len(_a)})")
 
         rows, sets, first_cov = [], {}, {}
-        exploded = []  # (n, t): 이 조합의 superset은 실행하지 않음
+        exploded = []  # (n, t): supersets of this bound are not run
 
         def run_combo(n, t, phase):
             if any(n >= en and t >= et for en, et in exploded):
@@ -1093,7 +1092,7 @@ def stage_loop_bound_screening(ctx):
             run_combo(nn, tt, "neighbor_check")
         df = pd.DataFrame(rows)
 
-        # --- 검증 ---
+        # --- checks ---
         S = sets[(n, t)]
         rec.check("selected: all generated traces accepted by discovered Petri Net",
                   all(accepts(x) for x in S), f"({len(S)} traces)")
@@ -1159,11 +1158,11 @@ def stage_loop_bound_screening(ctx):
     return finish(out, "loop-bound-screening", rec, extra=checks_extra)
 
 
-CREDIT_LOOP_BOUND_SENSITIVITY = {  # EXP-066 step 2 (D038). 안전장치는 연구 파라미터가 아님
-    # (3,7)보다 큰 bound. 순서대로 실행하고, EXPLOSION이 난 bound의 superset은 실행하지 않는다.
+CREDIT_LOOP_BOUND_SENSITIVITY = {  # safety guards are not research parameters
+    # bounds larger than (3,7), run in order; supersets of a bound that hit EXPLOSION are not run
     "bounds": [(2, 7), (3, 7), (3, 8), (3, 9), (3, 10), (4, 7), (4, 8), (4, 9), (4, 10), (5, 7), (5, 8)],
-    "analytic_only_bounds": [(6, 7), (7, 7)],  # trace 생성 없이 관측 variant의 loop 횟수로 coverage만 계산
-    "final_bound": (5, 7),                    # D038: coverage-complexity elbow (2026-10-14 교수님 확정)
+    "analytic_only_bounds": [(6, 7), (7, 7)],  # coverage from the loop counts of observed variants, without generating traces
+    "final_bound": (5, 7),                    # final bound at the coverage-complexity elbow
     "explosion_unique_traces": 100_000,
     "max_seconds_per_combo": 600,
     "max_rss_gb": 16,
@@ -1171,8 +1170,9 @@ CREDIT_LOOP_BOUND_SENSITIVITY = {  # EXP-066 step 2 (D038). 안전장치는 연�
 
 
 def stage_credit_loop_bound_sensitivity(ctx):
-    """Credit loop bound sensitivity (EXP-066 step 2, D038): bound별 coverage vs generated trace 수를 비교하고,
-    확정된 최종 bound (5,7)의 trace set / uncovered variant를 저장한다. NBG / RP-BEAR는 실행하지 않는다."""
+    """Credit loop-bound sensitivity: compare coverage vs number of generated traces per bound and store the
+    trace set / uncovered variants of the final bound (5,7). NBG / RP-BEAR are not run.
+    """
     if ctx.name != "Credit":
         print("[ERROR] 이 stage는 Credit 전용입니다 (loop 횟수 계산이 Credit tree에 맞춰져 있음).")
         return 1
@@ -1270,7 +1270,7 @@ def stage_credit_loop_bound_sensitivity(ctx):
         df = pd.DataFrame(rows)
         gen_rows = {(r["loop_num"], r["loop_total"]): r for r in rows if r.get("generated_unique") is not None}
 
-        def prev_of(n, t):  # 같은 loop_num에서 loop_total - 1, loop_total 7이면 loop_num - 1
+        def prev_of(n, t):  # previous bound: same loop_num with loop_total - 1; at loop_total 7, loop_num - 1
             return (n, t - 1) if t > 7 else (n - 1, 7)
 
         base = gen_rows.get((3, 7))
@@ -1290,7 +1290,7 @@ def stage_credit_loop_bound_sensitivity(ctx):
                 df.at[i, "trace_ratio_vs_3_7"] = round(r["generated_unique"] / base["generated_unique"], 3)
         df.to_csv(out / "credit_loop_bound_sensitivity.csv", index=False)
 
-        # --- 검증 ---
+        # --- checks ---
         rec.check("all generated traces accepted by discovered Petri Net (every generated bound)",
                   all(accepts(x) for g in sets.values() for x in g), f"({sum(map(len, sets.values())):,} traces)")
         rec.check("coverage from observed loop counts == coverage from generated sets (every generated bound)",
@@ -1359,10 +1359,10 @@ def stage_credit_loop_bound_sensitivity(ctx):
 
 
 def stage_run_b(ctx):
-    """Method B (Alignment) official run: 정상 case → IM → Petri Net → state-equation A* alignment → repaired log.
+    """Method B (alignment) official run: clean cases -> IM -> Petri net -> state-equation A* alignment -> repaired log.
 
-    EXP-061(Small)과 같은 alignment / repair 코드 (utils.alignment_utils). split은 nbg 단계 split (A / C와 같음).
-    --limit N 이면 smoke: test N개만, outputs/simulation/<dataset>/smoke_b/ 에 저장 (official run 아님).
+    Same alignment / repair code as the Small Method B script (utils.alignment_utils). The split is the nbg-stage split
+    (same as A / C). With --limit N: smoke run on N test cases, stored in outputs/simulation/<dataset>/smoke_b/.
     """
     if not need_pm4py():
         return 1
@@ -1410,8 +1410,7 @@ def stage_run_b(ctx):
         wall0, started = _time.perf_counter(), datetime.now()
         write_json(f("environment.json"), environment_info())
         traces, labels, clean_ids, anomalous_ids = load_case_traces(ctx.input_paths["anomaly_log"])
-        # case id를 문자열로 통일 (split 파일은 문자열; Credit은 숫자 case id라 pandas가 int로 읽음.
-        # Small~Wide는 이미 문자열이라 변화 없음)
+        # case ids as strings (split files are strings; Credit has numeric case ids that pandas reads as int)
         traces.index, labels.index = traces.index.map(str), labels.index.map(str)
         clean_ids, anomalous_ids = [str(c) for c in clean_ids], [str(c) for c in anomalous_ids]
         test_ids = read_ids(ctx.stage_dir("nbg") / "split_test_case_ids.txt")
@@ -1465,13 +1464,13 @@ def stage_run_b(ctx):
 
 
 def stage_agreement(ctx):
-    """Method A / B / C repaired log 일치율 (기존 official repaired log만 사용, 새 repair 없음)."""
+    """Agreement of the Method A / B / C repaired logs (existing official repaired logs only, no new repair)."""
     refs = ctx.cfg.get("reference_runs", {})
     need = {"A": "A_run1", "B": "B_run1", "C": "C_run1"}
-    if all(v in refs for v in need.values()):  # Small: 기존 EXP-060 / 061 / 063 공식 결과
+    if all(v in refs for v in need.values()):  # Small: existing official results
         paths = {m: PROJECT_ROOT / refs[r] for m, r in need.items()}
         split_file = PROJECT_ROOT / ctx.cfg["regression"]["split_test_ids"]
-    else:  # 그 외 dataset: pipeline 공식 run (runs/method{A,B,C}_run1)
+    else:  # other datasets: official pipeline runs (runs/method{A,B,C}_run1)
         paths = {}
         for m in "ABC":
             fs = list((ctx.out / "runs" / f"method{m}_run1").glob("*_repaired_log_*.csv"))
@@ -1503,7 +1502,7 @@ def stage_agreement(ctx):
 
 
 def stage_test_timing_b(ctx):
-    """Method B (Alignment): 저장된 공식 Petri Net으로 Test만 순차 alignment + repair 시간을 잰다 (timing 전용, .venv)."""
+    """Method B (alignment): sequential test-only alignment + repair timing with the saved official Petri net (.venv)."""
     a = ctx.args
     if not (a.pnml and a.label and a.repaired_log):
         print("[ERROR] --pnml, --repaired-log(공식 alignment_per_case.csv가 있는 run 폴더의 repaired log), --label이 필요합니다.")
@@ -1535,7 +1534,7 @@ def stage_test_timing_b(ctx):
         from utils.data_utils import load_case_traces
 
         traces = load_case_traces(ctx.input_paths["anomaly_log"])[0]
-        traces.index = traces.index.map(str)  # split id는 문자열 (Credit 숫자 case id 대응, Small~Wide는 변화 없음)
+        traces.index = traces.index.map(str)  # split ids are strings (numeric Credit case ids)
         rows, net_info, wall = replay_alignment_timing(script, a.pnml, test_ids, traces)
         mc = read_json(model_f[0])
         rec.check("Petri Net (PNML) == official model_check (places / transitions)",
@@ -1567,7 +1566,7 @@ def stage_test_timing_b(ctx):
 
 
 def stage_test_timing(ctx):
-    """학습된 agent(.pkl)로 Test만 순차 재실행해 per-case repair latency를 잰다 (timing 전용)."""
+    """Sequential test-only replay with a trained agent (.pkl) to measure per-case repair latency (timing only)."""
     a = ctx.args
     if not (a.agent and a.repaired_log and a.label and a.method):
         print("[ERROR] --agent, --repaired-log, --label, --method가 필요합니다.")
@@ -1626,7 +1625,8 @@ def stage_test_timing(ctx):
         rep.to_csv(d / "replay_test_repaired.csv", index=False)
         pd.DataFrame(timing)[["case_id", "path", "repair_time_ms"]].to_csv(d / "case_timing.csv", index=False)
 
-        # 공식 결과와 비교 (case 단위). RL path는 난수 흐름이 달라 같다고 보장할 수 없다 (timing_utils 참고).
+        # per-case comparison with the official results; RL-path results may differ because the random
+        # streams differ (see timing_utils)
         off_test = off[off["type"] == "test"]
         rep_s = pd.read_csv(d / "replay_test_repaired.csv", dtype=str, keep_default_na=False)
         cols = list(off.columns)
@@ -1672,7 +1672,7 @@ def stage_test_timing(ctx):
 
 
 def stage_all(ctx):
-    """discover -> generate -> nbg -> smoke 를 각 환경의 python으로 차례로 실행 (run 제외)."""
+    """Run discover -> generate -> nbg -> smoke with each environment's python (run not included)."""
     plan = [("discover", "pm4py"), ("generate", "pm4py"), ("nbg", "rpbear"), ("smoke", "rpbear")]
     for stage, env in plan:
         py = PROJECT_ROOT / dc.ENV_DIRS[env] / "Scripts" / "python.exe"
@@ -1697,8 +1697,8 @@ def stage_all(ctx):
 # ============================================================
 
 # ============================================================
-# 2b. Method C + Petri Net Conformance Gate (C+PN) — 탐색 variant (2026-11)
-#     기존 Method C(W2) / A / B 경로는 바꾸지 않는다. 출력: <dataset>/C_PN_Gate/, <dataset>/pn_gate_analysis/
+# 2b. Method C + Petri-net conformance gate (C+PN)
+#     The Method C (W2) / A / B paths are unchanged. Outputs: <dataset>/C_PN_Gate/, <dataset>/pn_gate_analysis/
 # ============================================================
 
 PNGATE_DIR, PNGATE_ANALYSIS = "C_PN_Gate", "pn_gate_analysis"
@@ -1712,7 +1712,7 @@ def _pngate_require_w2(ctx):
 
 
 def _pngate_inputs(ctx, rec):
-    """W2 NBG (official Method C와 같은 입력) + 공식 discovered Petri Net gate + 기본 검증."""
+    """W2 NBG (same input as official Method C) + gate from the official discovered Petri net + basic checks."""
     import numpy as np
 
     from sim import _load_and_prepare_data
@@ -1726,7 +1726,7 @@ def _pngate_inputs(ctx, rec):
     ref = read_json(ctx.stage_dir("nbg") / "nbg_comparison_summary.json")["comparison"]["edge_set_digest"]["new"]
     rec.check("W2 Expanded New NBG digest == nbg stage (official Method C input)", digest == ref, digest)
     gate = PNMLAcceptor(ctx.stage_dir("discover") / "petri_net.pnml")
-    gate.accepts(("a",))  # build
+    gate.accepts(("a",))  # parse the PNML once
     mc = read_json(ctx.stage_dir("discover") / "model_check.json")
     rec.check("gate Petri Net == official discovered model (places / transitions / invisible / arcs)",
               gate.info == {"places": mc["n_places"], "transitions": mc["n_transitions"],
@@ -1735,7 +1735,7 @@ def _pngate_inputs(ctx, rec):
 
 
 def stage_pngate_acceptor_check(ctx):
-    """(.venv) PNMLAcceptor(.venv-rpbear용, pm4py 없음) == loop_bound_utils.make_petri_acceptor (pm4py) 확인."""
+    """(.venv) Check PNMLAcceptor (for .venv-rpbear, no PM4Py) == loop_bound_utils.make_petri_acceptor (PM4Py)."""
     if not need_pm4py() or not _pngate_require_w2(ctx):
         return 1
     out = ctx.out / PNGATE_ANALYSIS
@@ -1771,7 +1771,7 @@ def stage_pngate_acceptor_check(ctx):
 
 
 def stage_pngate_offline(ctx):
-    """(.venv-rpbear) 기존 official C repaired trace에 gate를 적용하면 어떤 case가 종료 거부되는지 (RL 실행 없음)."""
+    """(.venv-rpbear) Which official C repaired traces the gate would reject at termination (no RL run)."""
     if not _pngate_require_w2(ctx):
         return 1
     out = ctx.out / PNGATE_ANALYSIS
@@ -1825,7 +1825,7 @@ def stage_pngate_offline(ctx):
 
 
 def stage_pngate_smoke(ctx):
-    """(.venv-rpbear) C+PN smoke: gate off == 기존 sim (byte), accept-all gate == gate off, PN gate 동작 / 불변식."""
+    """(.venv-rpbear) C+PN smoke: gate off == sim (byte), accept-all gate == gate off, PN gate behaviour / invariants."""
     if not _pngate_require_w2(ctx):
         return 1
     d = _open_dir(ctx, ctx.out / PNGATE_ANALYSIS / "smoke")
@@ -1847,19 +1847,19 @@ def stage_pngate_smoke(ctx):
             return run_rpbear_gated(ctx.data_name(), n, p["alpha"], p["val_ratio"], p["seed"], p["max_step"],
                                     p["num_cores"], mp, nbg, ctx.input_paths, pn_gate=g, limit=limit)
 
-        # 1) gate off == 기존 sim 순차 smoke (A, C) byte-identical
+        # 1) gate off == sim sequential smoke (A, C), byte-identical
         for label, nbg in (("A", None), ("C", nbgs)):
             df, st, _t, _ag = run(nbg, None, False, None)
             df.to_csv(d / f"gateoff_seq_epi{n}_method{label}.csv", index=False)
             same = (d / f"gateoff_seq_epi{n}_method{label}.csv").read_bytes() == \
                 (ctx.stage_dir("smoke") / f"smoke_seq_epi{n}_method{label}.csv").read_bytes()
             rec.check(f"gate off (pn_gate_utils runner) == sim sequential smoke Method {label} (byte-identical)", same)
-        # 2) accept-all gate == gate off (limit, 순차): conformant이면 기존처럼 종료
+        # 2) accept-all gate == gate off (limit, sequential): conformant traces terminate as before
         off, _s, _t, _a = run(nbgs, None, False, lim)
         allg, _s, _t, _a = run(nbgs, AcceptAllGate(), False, lim)
         rec.check(f"accept-all gate == gate off (W2, sequential, val/test first {lim})",
                   off.equals(allg.drop(columns=["pn_gate_rejected_episodes"])))
-        # 3) PN gate, 순차 + multiprocessing
+        # 3) PN gate, sequential + multiprocessing
         res = {}
         for mp in (False, True):
             df, st, _t, ag = run(nbgs, gate, mp, lim)
@@ -1889,7 +1889,7 @@ def stage_pngate_smoke(ctx):
 
 
 def stage_run_c_pngate(ctx):
-    """(.venv-rpbear) C+PN official run: W2 Expanded New NBG + Petri Net gate, official 조건. 기존 C run은 건드리지 않음."""
+    """(.venv-rpbear) C+PN official run: W2 Expanded New NBG + Petri-net gate, official settings. The C run is not touched."""
     if not _pngate_require_w2(ctx) or ctx.args.run_id is None:
         print("[ERROR] --run-id N 이 필요합니다 (W2 dataset 전용).")
         return 1
@@ -1929,8 +1929,8 @@ def stage_run_c_pngate(ctx):
         rec.check("official conditions (num_epi 1000 / alpha 0 / val_ratio 0.5 / seed 42 / max_step 8 / multiprocessing)",
                   (p["num_epi"], p["alpha"], p["val_ratio"], p["seed"], p["max_step"], p["use_multiprocessing"]) ==
                   (1000, 0.0, 0.5, 42, 8, True), p)
-        official_bound = {"Credit": (5, 7), "Pub": (4, 4)}.get(ctx.name)  # Credit D038, Pub 2026-11-10 (탐색 단계 결정)
-        if official_bound is None:  # threshold run (RoadTraffic 등): generate stage에서 실제로 쓴 bound와 같아야 한다
+        official_bound = {"Credit": (5, 7), "Pub": (4, 4)}.get(ctx.name)  # fixed official bounds for Credit / Pub
+        if official_bound is None:  # threshold runs (e.g. RoadTraffic): must equal the bound actually used by the generate stage
             gs = read_json(ctx.stage_dir("generate") / "generate_summary.json")
             official_bound = (gs["loop_num"], gs["loop_total"])
         rec.check(f"loop bound == {official_bound}", (tg["loop_num"], tg["loop_total"]) == official_bound)
@@ -1968,7 +1968,7 @@ def stage_run_c_pngate(ctx):
 
 
 def stage_test_timing_pngate(ctx):
-    """(.venv-rpbear) C+PN 학습된 agent로 Test만 순차 재실행 (gate 포함, timing 전용). 정의는 test-timing과 같음 (D037)."""
+    """(.venv-rpbear) Sequential test-only replay with the trained C+PN agent (with gate; timing only). Same definition as test-timing."""
     a = ctx.args
     if not _pngate_require_w2(ctx) or not (a.label and a.run_id):
         print("[ERROR] --label 과 --run-id 가 필요합니다.")
@@ -2021,7 +2021,7 @@ def stage_test_timing_pngate(ctx):
 
 
 def stage_pngate_evaluate(ctx):
-    """(.venv-rpbear) C+PN official 결과 평가: EMR / 오답 유형 / agreement / 40건 / 15건 / 불일치 재분류 / timing 요약."""
+    """(.venv-rpbear) Evaluate the official C+PN results: EMR / error types / agreement / case subsets / timing summary."""
     if not _pngate_require_w2(ctx) or ctx.args.run_id is None:
         print("[ERROR] --run-id N 이 필요합니다.")
         return 1
@@ -2078,7 +2078,7 @@ def stage_pngate_evaluate(ctx):
         agr = {"pairs_exact": {k: f"{v}/210 = {v / 210:.4f}" for k, v in pairs.items()}, "A_B_CPN_categories": cats,
                "target_80pct": 168, "B-CPN": pairs["B-CPN"], "B-C baseline": pairs["B-C"],
                "B-CPN_reaches_80pct": pairs["B-CPN"] >= 168, "shortfall_to_80pct": max(0, 168 - pairs["B-CPN"])}
-        # 40건
+        # B-C disagreement cases caused by W2 edge-level over-generalisation
         dis = pd.read_csv(ctx.out / "concurrency_analysis" / "bc_disagreement_cases.csv", dtype={"case_id": str})
         d40 = list(dis.loc[dis.primary_cause == "D_W2_edge_level_overgeneralization", "case_id"])
         rows40 = []
@@ -2094,7 +2094,7 @@ def stage_pngate_evaluate(ctx):
         s40 = {"n": len(t40), "CPN_eq_B": int(t40.CPN_eq_B.sum()), "CPN_correct": int(t40.CPN_correct.sum()),
                "CPN_petri_conformant": int(t40.CPN_petri.sum()), "CPN_unrepaired": int(t40.CPN_unrepaired.sum()),
                "CPN_other_wrong": int((~t40.CPN_correct & ~t40.CPN_unrepaired).sum()), "CPN_kinds": t40.CPN_kind.value_counts().to_dict()}
-        # 15건 (W2 newly accepted, 전체 split)
+        # cases newly accepted by W2 (all splits)
         ids15 = read_json(ctx.out / "preparation" / "alpha0_anomaly_adm_check.json")["newly_accepted_case_ids"]
         allrep = {m: ev.canonical_traces(p, "case:concept:name", "concept:name") for m, p in logs.items()}
         cpn_df = pd.read_csv(logs["CPN"], dtype=str, keep_default_na=False)
@@ -2115,7 +2115,7 @@ def stage_pngate_evaluate(ctx):
         s15 = {"n": len(t15), "A_correct": int(t15.A_correct.sum()), "CPN_correct": int(t15.CPN_correct.sum()),
                "CPN_unrepaired": int(t15.CPN_unrepaired.sum()), "anomaly_petri_accepts": int(t15.anomaly_petri.sum()),
                "gate_rejections_on_these": int(t15.CPN_gate_rejected_episodes.astype(int).sum())}
-        # B-CPN 불일치 재분류 (concurrency_analysis와 같은 정의)
+        # re-classification of B-CPN disagreements (same definition as concurrency_analysis)
         ind = {frozenset(x) for x in read_json(ctx.out / "concurrency_analysis" / "concurrency_analysis_summary.json")
                ["independence"]["used_independence (both)"]}
 
@@ -2223,7 +2223,8 @@ if __name__ == "__main__":
                         help="bounded_loop generation의 loop bound 'loop_num,loop_total' (예: 2,2)")
     args = parser.parse_args()
     if args.noise_threshold is not None and args.noise_threshold > 0 and os.environ.get("PYTHONHASHSEED") != "0":
-        # PM4Py IMf (2.7.23.6)는 Python hash 순서에 따라 process마다 다른 tree를 낼 수 있다 (2026-11-12 확인).
+        # PM4Py IMf (2.7.23.6) can return different trees in different processes depending on Python's hash
+        # order, so PYTHONHASHSEED=0 is required for reproducibility.
         print("[ERROR] --noise-threshold > 0 은 재현성을 위해 환경변수 PYTHONHASHSEED=0 으로 실행해야 합니다.")
         sys.exit(1)
     ctx = Context(args)

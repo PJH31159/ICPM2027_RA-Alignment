@@ -1,18 +1,14 @@
-"""
-trace_generation_utils — 생성 전략 판단, Petri Net 직접 나열, 관측 vs 생성 비교 (REF-001)
+"""Generation strategy decision, direct Petri-net enumeration, observed vs generated comparison.
 
-출처: enumerate_petri_net_language <- src/63_generated_nbg_rpbear.py (같은 알고리즘)
-
-보수적인 원칙 (D034, 사용자 지시 2026-10-11):
-    - 전략(strategy)이 config에 명시되지 않으면 trace를 만들지 않는다 (BLOCKED).
-    - "exhaustive_acyclic"은 다음을 모두 만족할 때만 허용한다:
-        Process Tree에 LOOP / 기타(OR 등) operator 없음, Petri Net에 cycle 없음,
-        예상 언어 크기(raw) <= safety_max_traces.
-    - loop가 있는 모델은 자동으로 exhaustive enumeration을 하지 않는다. 모델 구조를
-      보고하고 멈추며, bounded generation 설계는 따로 결정한다.
-    - safety_max_firings_per_transition / safety_max_trace_length / safety_max_traces는
-      무한 탐색 방지용 안전장치이며, 연구 개념인 loop_num / loop_total과 다르다.
-    - 잘림 / 가지치기 / dead end 수는 항상 기록한다.
+Conservative rules:
+    - If no strategy is configured, no traces are generated (BLOCKED).
+    - "exhaustive_acyclic" is allowed only if the process tree has no LOOP / other (e.g. OR) operators,
+      the Petri net has no cycle, and the expected (raw) language size is <= safety_max_traces.
+    - Models with loops are never enumerated exhaustively; bounded generation (loop_num / loop_total)
+      is configured separately.
+    - safety_max_firings_per_transition / safety_max_trace_length / safety_max_traces only prevent
+      unbounded search; they are not the research parameters loop_num / loop_total.
+    - Truncation, pruning and dead-end counts are always recorded.
 """
 
 from collections import Counter
@@ -21,7 +17,7 @@ SUPPORTED_STRATEGIES = ("exhaustive_acyclic",)
 
 
 def decide_strategy(tg_cfg, model_check):
-    """return: {"allowed": bool, "strategy": ..., "reasons": [...]}"""
+    """Returns {"allowed": bool, "strategy": ..., "reasons": [...]}."""
     strategy = tg_cfg.get("strategy")
     s = model_check["structure"]
     reasons = []
@@ -46,10 +42,10 @@ def decide_strategy(tg_cfg, model_check):
 
 def enumerate_petri_net_language(net, im, fm, safety_max_firings_per_transition,
                                  safety_max_trace_length, safety_max_traces):
-    """initial marking -> final marking까지 가능한 firing sequence를 DFS로 모두 따라간다.
+    """DFS over all firing sequences from the initial to the final marking.
 
-    - visible transition의 label만 trace에 넣고 tau(label None)는 넣지 않는다.
-    - 단순 visited-marking pruning은 하지 않는다 (D025).
+    - Only visible transition labels are added to the trace; tau (label None) is not.
+    - No visited-marking pruning is applied.
     """
     transitions = sorted(net.transitions, key=lambda t: (t.label is None, t.label or "", t.name))
     pre = {t: [(a.source, a.weight) for a in t.in_arcs] for t in transitions}

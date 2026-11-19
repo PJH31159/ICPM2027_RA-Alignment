@@ -1,7 +1,6 @@
-"""
-validation_utils — 검사 기록, 단계 상태, 로그, 환경 정보, checksum (REF-001)
+"""Check records, stage status, logging, environment info and checksums.
 
-외부 라이브러리 없이 표준 라이브러리만 쓴다 (어느 환경에서도 import 가능).
+Standard library only, so it can be imported in every environment.
 """
 
 import hashlib
@@ -16,11 +15,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 # ------------------------------------------------------------
-# 검사 기록
+# Check records
 # ------------------------------------------------------------
 
 class CheckRecorder:
-    """check()로 통과/실패를 기록하고, 마지막에 상태를 JSON으로 남긴다."""
+    """Record pass/fail with check() and write the final status as JSON."""
 
     def __init__(self):
         self.checks = []
@@ -31,7 +30,7 @@ class CheckRecorder:
         return bool(ok)
 
     def info(self, name, value):
-        """통과/실패가 아닌 관찰값 (예: Medium의 generated-only 수)."""
+        """An observation that is not pass/fail (e.g. a count)."""
         self.checks.append({"check": name, "passed": None, "detail": str(value)})
         print(f"  [INFO] {name} {value}")
 
@@ -45,7 +44,7 @@ class CheckRecorder:
 
 
 # ------------------------------------------------------------
-# 단계 상태 (다음 단계는 이전 단계가 PASSED여야 시작한다)
+# Stage status (a stage starts only if the previous stage PASSED)
 # ------------------------------------------------------------
 
 STATUS_FILE = "stage_status.json"
@@ -75,11 +74,11 @@ def read_stage_status(stage_dir):
 
 
 # ------------------------------------------------------------
-# 로그 (화면 + 파일)
+# Logging (screen + file)
 # ------------------------------------------------------------
 
 class Tee:
-    """with Tee(path): 블록 안의 print를 화면과 파일에 함께 쓴다."""
+    """with Tee(path): write print output of the block to the screen and to a file."""
 
     def __init__(self, path):
         self.path = Path(path)
@@ -107,7 +106,7 @@ class Tee:
 
 
 # ------------------------------------------------------------
-# 환경 / 파일 정보
+# Environment / file information
 # ------------------------------------------------------------
 
 def environment_info():
@@ -165,10 +164,10 @@ def project_path(relative):
 
 
 # ------------------------------------------------------------
-# 과거 실험 script 보존 확인 (REF-002)
+# Preservation check of historical experiment scripts
 # ------------------------------------------------------------
 
-# REF-002 이동 때 허용된 변경: 프로젝트 root 계산, sys.path 추가, 같은 폴더 경로, 실행 예시 경로
+# changes allowed when the scripts were moved: project-root computation, sys.path insert, same-folder paths, example paths
 _REF002_REMOVED_OK = (
     "    .parent",
     "PROJECT_ROOT = Path(__file__).resolve().parent.parent",
@@ -180,11 +179,11 @@ _REF002_ADDED_OK = ("", "import sys", "from pathlib import Path", "from sim impo
 
 
 def historical_script_drift(new_rel, old_rel):
-    """과거 실험 script가 HEAD 대비 REF-002 경로 수정 외에 바뀌었는지 확인한다.
+    """Check whether a historical experiment script changed relative to HEAD beyond the allowed path edits.
 
-    HEAD에 새 경로가 있으면(=REF-002 커밋 후) 그 파일과 완전히 같아야 한다.
-    없으면(=커밋 전) HEAD의 옛 경로 파일과 비교하고, 허용된 경로 수정 줄만 다를 수 있다.
-    return: 예상하지 못한 변경 줄 목록 (빈 목록이면 보존됨)
+    If the new path exists in HEAD, the file must be identical to it; otherwise it is compared with the
+    old-path file in HEAD and only the allowed path lines may differ.
+    Returns the list of unexpected changed lines (empty = preserved).
     """
     import difflib
 

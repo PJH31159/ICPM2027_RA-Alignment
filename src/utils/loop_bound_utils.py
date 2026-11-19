@@ -1,19 +1,19 @@
-"""
-loop_bound_utils — loop가 있는 Process Tree의 bounded trace language 생성과 coverage 계산 (EXP-066)
+"""Bounded trace language of a process tree with loops, and clean-case coverage.
 
-공식 loop semantics (D004, 2026-10-14 확정):
-    loop_num   : loop instance 하나에서 do-part가 실행될 수 있는 최대 횟수 (instance-local)
-    loop_total : 한 trace 안 모든 loop instance의 do-part 실행 횟수 총합의 상한 (redo가 아니라 do 실행 기준)
-    nested loop: instance-local. 바깥 loop가 다시 돌면서 안쪽 loop가 새로 시작되면 안쪽 counter도 새로 센다.
-    trace length: 연구 파라미터가 아님. max length 100은 안전장치(safety guard)로만 쓴다.
+Loop-bound semantics:
+    loop_num   : maximum number of do-part executions within one loop instance (instance-local).
+    loop_total : upper bound on the total number of do-part executions over all loop instances
+                 in one trace (counted on do executions, not redo executions).
+    nested loop: instance-local; when an outer loop iterates and restarts an inner loop, the
+                 inner counter restarts as well.
+    trace length is not a research parameter; max length 100 is only a safety guard.
 
-PM4Py LOOP *(do, redo) 의 실행 = do (redo do)^k  ->  do 실행 횟수 = k + 1.
+A PM4Py LOOP *(do, redo) executes as do (redo do)^k, i.e. k + 1 do executions.
 
-출처: src/experiments/p1_toy_trace_generation/15_full_bounded_process_tree_generator.py 의
-generate_bounded_traces와 같은 의미를 dict(trace -> 최소 loop count) 형태로 다시 구현했다.
-    - 같은 trace가 여러 방법으로 만들어지면 가장 작은 do 실행 총합을 그 trace의 count로 쓴다 (원본 dedup과 같음).
-    - 원본과 달리 중간 결과를 개수로 자르지 않는다. 대신 안전장치를 넘으면 ExplosionAborted를 올려
-      그 조합 전체를 ABORTED로 기록한다 (잘린 결과로 coverage를 계산하지 않기 위해).
+The language is stored as dict(trace -> minimal loop count): if a trace can be produced in
+several ways, its count is the smallest total number of do executions. Intermediate results are
+never truncated; if a safety guard is exceeded, ExplosionAborted is raised and the whole bound
+is recorded as ABORTED, so coverage is never computed from a truncated language.
 """
 
 import time
@@ -23,7 +23,7 @@ from pm4py.objects.process_tree.obj import Operator
 
 
 class ExplosionAborted(Exception):
-    """안전장치(중간 집합 크기 / 시간 / 메모리)를 넘어서 생성을 중단했다."""
+    """Generation stopped because a safety guard (intermediate set size / time / memory) was exceeded."""
 
 
 class _Guard:
@@ -50,14 +50,14 @@ class _Guard:
 
 
 def _add(out, trace, count):
-    """trace -> 최소 count."""
+    """trace -> minimal count."""
     old = out.get(trace)
     if old is None or count < old:
         out[trace] = count
 
 
 def _interleavings(x, y):
-    """두 sequence의 모든 interleaving (각 sequence 안의 순서는 유지)."""
+    """All interleavings of two sequences (the order inside each sequence is kept)."""
     if not x:
         return {y}
     if not y:
@@ -71,7 +71,7 @@ def _interleavings(x, y):
 
 
 def bounded_language(node, loop_num, loop_total, max_len, guard, path="root"):
-    """node가 만들 수 있는 trace -> 최소 do 실행 총합 (loop_num / loop_total / max_len 안에서)."""
+    """Traces a node can produce -> minimal total do executions (within loop_num / loop_total / max_len)."""
     op = node.operator
     if op is None:
         return {(): 0} if node.label is None else {(node.label,): 0}
@@ -115,7 +115,7 @@ def bounded_language(node, loop_num, loop_total, max_len, guard, path="root"):
             raise ValueError(f"LOOP with {len(kids)} children is not supported ({path})")
         do, redo = kids
         out = {}
-        cur = dict(do)  # do가 k번 실행된 partial trace (count = 안쪽 do 실행 합, 이 loop의 k는 아직 안 더함)
+        cur = dict(do)  # partial trace with k do executions (count = inner do executions; k of this loop not added yet)
         for k in range(1, loop_num + 1):
             cur = {t: c for t, c in cur.items() if c + k <= loop_total}
             for t, c in cur.items():
@@ -137,7 +137,7 @@ def bounded_language(node, loop_num, loop_total, max_len, guard, path="root"):
 
 
 def generate_bounded(tree, loop_num, loop_total, max_len, max_intermediate, max_seconds, max_rss_gb):
-    """return (language dict, stats). 안전장치를 넘으면 ExplosionAborted."""
+    """Returns (language dict, stats). Raises ExplosionAborted when a guard is exceeded."""
     guard = _Guard(max_intermediate, max_seconds, max_rss_gb)
     t0 = time.time()
     lang = bounded_language(tree, loop_num, loop_total, max_len, guard)
@@ -145,7 +145,7 @@ def generate_bounded(tree, loop_num, loop_total, max_len, max_intermediate, max_
 
 
 # ------------------------------------------------------------
-# Petri Net 정확 accepting execution (tau closure 포함) — 생성 trace의 conformance 검증용
+# Exact accepting execution of the Petri net (with tau closure), used to check generated traces
 # ------------------------------------------------------------
 
 def _marking_key(m):
@@ -181,7 +181,7 @@ def _tau_closure(markings, taus, max_states=100_000):
 
 
 def make_petri_acceptor(net, im, fm):
-    """trace를 받아 Petri Net이 정확히 받아들이는지(초기 marking -> 최종 marking) 판정하는 함수."""
+    """Return a function that decides whether the Petri net accepts a trace (initial -> final marking)."""
     taus = [t for t in net.transitions if t.label is None]
     by_label = {}
     for t in net.transitions:
@@ -209,7 +209,7 @@ def make_petri_acceptor(net, im, fm):
 
 
 # ------------------------------------------------------------
-# 관측 trace의 loop 실행 횟수 (Credit discovered tree 전용) — sensitivity 분석 / coverage cross-check
+# Loop execution counts of observed traces (Credit discovered tree only): sensitivity / coverage cross-check
 # ------------------------------------------------------------
 
 CREDIT_TREE = ("->( 'a', +( X( tau, *( 'e', tau ) ), *( ->( *( 'b', ->( 'j', 'k' ) ), 'c', 'd' ), 'l' ) ), "
@@ -217,13 +217,13 @@ CREDIT_TREE = ("->( 'a', +( X( tau, *( 'e', tau ) ), *( ->( *( 'b', ->( 'j', 'k'
 
 
 def credit_loop_requirements(trace):
-    """Credit tree의 loop별 do 실행 횟수와, 이 trace를 포함하는 데 필요한 최소 (loop_num, loop_total).
+    """Do-execution counts per loop of the Credit tree, and the minimal (loop_num, loop_total) for the trace.
 
-    loop 3개의 label이 서로 겹치지 않아서 실행 횟수가 하나로 정해진다:
-        e-loop *(e, tau): do 실행 = e의 수 (0이면 XOR의 tau 가지, loop 실행 없음)
-        바깥 loop *(…, l): do 실행 = l의 수 + 1
-        안쪽 b-loop *(b, ->(j,k)): instance(바깥 loop의 do 한 번)마다 b의 수
-    D004 semantics: need_loop_num = 가장 큰 instance의 do 실행, need_loop_total = 모든 do 실행의 합.
+    The three loops have disjoint labels, so the execution counts are unique:
+        e-loop *(e, tau): do executions = number of e (0 means the XOR tau branch, no loop execution)
+        outer loop *(..., l): do executions = number of l + 1
+        inner b-loop *(b, ->(j,k)): number of b per instance (one do execution of the outer loop)
+    need_loop_num = largest per-instance do count; need_loop_total = sum of all do executions.
     """
     e = trace.count("e")
     outer = trace.count("l") + 1

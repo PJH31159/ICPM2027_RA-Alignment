@@ -1,18 +1,19 @@
-"""15_build_paper_tables.py — 저장된 실험 output만 읽어 논문용 결과표(CSV + Markdown)와 검증 결과를 만든다.
+"""Build the paper result tables (CSV + Markdown) and their validation from stored outputs only.
 
-새 실험을 하지 않는다. 값이 output에 없으면 추정하지 않고 N/A로 둔다.
-timing 단위는 모두 ms (Training = ms, Test Repair = mean ms/case). 병렬 throughput(wall/n)은 main 표에 쓰지 않는다.
-main repair 시간 = 순차(sequential) Test-only 측정:
-  B     : alignment + repair, 1 process, scipy LP (shim). threshold sweep은 14 script, 공식 replay는 test-timing-b
-  C/C+PN: 학습된 agent로 Test만 순차 재실행 (test-timing / test-timing-pngate, D037). test 전체 case 평균(RL + Mem path)
+No new experiments are run. Values missing in the outputs are reported as N/A, never estimated.
+All timings are in ms (training = ms, test repair = mean ms/case). Parallel throughput (wall/n) is not used in the main table.
+Main repair time = sequential test-only measurement:
+  B     : alignment + repair, one process, scipy LP (shim). Threshold sweep: script 14; official replay: test-timing-b
+  C/C+PN: test-only sequential replay with the trained agent (test-timing / test-timing-pngate), mean over all test
+          cases (RL + Mem paths)
 
-출력 (outputs/multi_dataset_experiment/):
+Output (outputs/multi_dataset_experiment/):
   threshold_sweep_summary.csv / .md
   paper_threshold_model_table.csv / .md, paper_threshold_timing_table.csv / .md,
   paper_threshold_agreement_table.csv / .md, paper_threshold_tradeoff_table.csv / .md,
   threshold_alignment_speed.csv, threshold_c_speed.csv,
   paper_result_table.csv / .md, table_validation.json
-실행: python outputs/multi_dataset_experiment/scripts/15_build_paper_tables.py
+Usage: python outputs/multi_dataset_experiment/scripts/15_build_paper_tables.py
 """
 import json
 import math
@@ -26,12 +27,13 @@ SIM = PROJECT_ROOT / "outputs/simulation"
 SWEEP = MD / "threshold_sweep"
 THRESHOLDS = [0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40]
 SELECTED = {"RoadTraffic": 0.20, "BPIC2017": 0.10}
-# BPIC 2017 (2026-11-12 교수님 방향 수정): coverage >= 90% 기준 폐기 -> "best executable trade-off".
-# loop bound는 95% 규칙이 아니라 17_bpic_feasibility_tables.py의 후보 탐색에서 고른 값 (50k language 안 최대 coverage).
-# BPIC 2017 C+PN: In progress (pending final C+PN result). 최종값이 나오기 전까지 표에는 N/A로 둔다.
+# BPIC 2017: the coverage >= 90 % criterion is not reachable -> "best executable trade-off".
+# The loop bound comes from the candidate search of 17_bpic_feasibility_tables.py (maximal coverage within a
+# 50k-trace language), not from the 95 % rule.
+# BPIC 2017 C+PN: in progress (pending final C+PN result); reported as N/A until the final values exist.
 BPIC_BOUND = "(1,9)"
 BPIC_CPN_NOTE = "C+PN: In progress (pending final C+PN result)"
-SAME_MODEL = {("RoadTraffic", 0.30): 0.20, ("BPIC2017", 0.30): 0.20}  # Process Tree가 0.20과 동일 (md5 확인)
+SAME_MODEL = {("RoadTraffic", 0.30): 0.20, ("BPIC2017", 0.30): 0.20}  # same process tree as 0.20 (md5 checked)
 NA = "N/A"
 
 
@@ -60,7 +62,7 @@ def fmt(v, nd=2):
     if isinstance(v, float):
         if v.is_integer() and abs(v) < 1e7:
             return f"{int(v):,}"
-        if abs(v) >= 1e7 and (v.is_integer() or abs(v) >= 1e12):  # 큰 language 추정치만 지수 표기 (ms 값은 그대로)
+        if abs(v) >= 1e7 and (v.is_integer() or abs(v) >= 1e12):  # exponent notation only for large language estimates (ms values unchanged)
             return f"{v:.3g}"
         return f"{v:,.{nd}f}"
     if isinstance(v, int):
@@ -72,7 +74,7 @@ def cnt(c, n):
     return NA if c is None else f"{int(c)} / {int(n)} ({100 * c / n:.2f}%)"
 
 
-# ------------------------------------------------------------------ 결과 읽기
+# ------------------------------------------------------------------ read results
 def b_sweep(ds, th):
     src = SAME_MODEL.get((ds, th), th) if ds == "BPIC2017" else th
     s = rj(SIM / ds / tag(src) / "b_alignment_timing" / "summary.json")
@@ -81,13 +83,13 @@ def b_sweep(ds, th):
     return s
 
 
-REPLAY_LABELS = {  # 순차 Test-only replay 폴더. Credit은 기존 D037 replay 3회 (평균 사용)
+REPLAY_LABELS = {  # sequential test-only replay folders. Credit: mean of three earlier sequential replays
     "Credit": {"C": ["rep1_C_alpha0", "rep2_C_alpha0", "rep3_C_alpha0"], "CPN": ["rep1_CPN", "rep2_CPN", "rep3_CPN"]},
 }
 
 
 def rl_run(base, kind):
-    """kind C: runs/methodC_run1 + test_timing/<label> ; CPN: C_PN_Gate/run1 + C_PN_Gate/test_timing/<label>."""
+    """kind C: runs/methodC_run1 + test_timing/<label>; CPN: C_PN_Gate/run1 + C_PN_Gate/test_timing/<label>."""
     run = base / ("runs/methodC_run1" if kind == "C" else "C_PN_Gate/run1")
     tj = first(run, "*_timing.json")
     t = rj(tj) if tj else None
@@ -100,7 +102,7 @@ def rl_run(base, kind):
         ts = {k: round(sum(r[k] for r in reps) / len(reps), 4) for k in ("test_case_ms_all_mean", "test_case_ms_all_median")}
         ts["test_case_ms_all_n"] = reps[0]["test_case_ms_all_n"]
     train = t["training_ms"] if t else None
-    if train is None:  # timing.json 도입(2026-11-11) 전 run: stats.json의 val_total_ms (같은 정의, timing_summary.csv와 같음)
+    if train is None:  # runs without timing.json: val_total_ms from stats.json (same definition, same as timing_summary.csv)
         sj = first(run, "*_stats.json")
         train = rj(sj).get("val_total_ms") if sj else None
     return {"training_ms": train, "replays": len(reps),
@@ -121,10 +123,10 @@ def b_official_replay(base, label="seq_B"):
 
 
 def state_limit_note(base):
-    """all-optimal exact search가 state 상한에 걸린 case 수 (그 case는 불일치로 셈 -> agreement는 하한)."""
+    """Number of cases where the exact all-optimal search hit the state limit (counted as disagreement -> lower bound)."""
     s = rj(base / "alignment_all_optimal_analysis/run1/agreement_summary.json")
     k = s["checks"].get("state_limit_hit", 0) if s else 0
-    rl = s["checks"].get("resource_limit_hit", 0) if s else 0  # BPIC: 메모리 위험으로 탐색을 끝내지 못한 case (07 --resource-skip)
+    rl = s["checks"].get("resource_limit_hit", 0) if s else 0  # cases whose search could not finish because of the memory guard (07 --resource-skip)
     if not k and not rl:
         return None
     txt = f"all-optimal search hit max_states for {k}/{s['cases']} cases"
@@ -169,7 +171,7 @@ def sweep_rows():
         tot = r["CleanCases"]
         cov_cnt = r.get("CleanCaseCoverageCount")
         bpic_sel = ds == "BPIC2017" and sel
-        if bpic_sel:  # sweep의 95% 규칙 bound 대신 실제 pipeline generate 결과 (best executable trade-off)
+        if bpic_sel:  # the actual pipeline generate result instead of the sweep's 95 % bound (best executable trade-off)
             gs = rj(base / "generate/generate_summary.json")
             r = dict(r, LoopBound=BPIC_BOUND, GeneratedTraces=gs["generated_unique_trace_count"],
                      ModelOnlyTraces=gs["model_only_count"], CleanCaseCoverageCount=gs["clean_cases_covered"],
@@ -178,10 +180,10 @@ def sweep_rows():
             gen, cov_cnt = r["GeneratedTraces"], r["CleanCaseCoverageCount"]
             notes.append("BPIC bound rule: best executable trade-off (coverage >= 90% abandoned); see paper_bpic_threshold_tradeoff")
             notes.append(BPIC_CPN_NOTE)
-        if cov_cnt is None:  # 생성하지 않은 경우: 분석값(enumeration-free)으로 coverage 기록
+        if cov_cnt is None:  # not generated: coverage from the analytic (enumeration-free) values
             cov_cnt = round(r["AnalyticCoverage"] * tot)
             notes.append("coverage = enumeration-free analytic value (traces not generated)")
-        # 상태
+        # status
         if bpic_sel:
             status = "SELECTED" if c["training_ms"] is not None else "SELECTED (C run pending)"
             reason = BPIC_CPN_NOTE
@@ -395,7 +397,7 @@ def main():
     (MD / "paper_threshold_tradeoff_table.md").write_text("# Threshold trade-off\n\n" + md_table(D) + "\n" + rationale,
                                                            encoding="utf-8")
 
-    # 5) relation tables (RQ4 / RQ5)
+    # 5) relation tables
     S[["Dataset", "NoiseThreshold", "Places", "Transitions", "TauTransitions", "Arcs", "LoopCount", "BAlignmentCases",
        "BAlignmentMeanMsPerCase", "BAlignmentMedianMsPerCase", "BAlignmentP95MsPerCase", "BAlignmentTimeouts"]].to_csv(
         MD / "threshold_alignment_speed.csv", index=False)
@@ -419,7 +421,7 @@ def main():
         ag = None
         if ds == "Credit":
             j = rj(base / "alignment_all_optimal_analysis/bcpn_all_optimal_agreement.json")
-            if j:  # "dev" = tau-excluded (deviation-only cost) all-optimal, 예: "162/210 = 0.7714"
+            if j:  # "dev" = tau-excluded (deviation-only cost) all-optimal, e.g. "162/210 = 0.7714"
                 c_, n_ = j["dev"]["all_optimal_agreement"].split(" = ")[0].split("/")
                 ag = {"n": int(n_), "tau": int(c_)}
         else:
@@ -448,12 +450,12 @@ def main():
         base = SIM / ds / tag(th)
         b = b_official_replay(base, "seq_B")
         n_test = to_py(r.TestCases)
-        if ds == "BPIC2017" and n_test is None:  # C+PN 없음 -> all-optimal 분석 대신 run-b test case 수
+        if ds == "BPIC2017" and n_test is None:  # no C+PN -> number of run-b test cases instead of the all-optimal analysis
             sj = first(base / "runs/methodB_run1", "*_stats.json")
             n_test = rj(sj)["n_test"] if sj else None
         main_rows.append({"Dataset": ds, "Selected Noise Threshold": th, "Loop Bound": r.LoopBound,
                           "Test Cases": n_test, "B-C+PN Agreement": to_py(r.BCPNAllOptimalAgreement),
-                          # BPIC: sweep 30-case sample로 대체하지 않음 (seq_B 없으면 N/A)
+                          # BPIC: not replaced by the 30-case sweep sample (N/A if seq_B is missing)
                           "B Alignment Repair (ms/case)": b["mean"] if b else (
                               None if ds == "BPIC2017" else to_py(r.BAlignmentMeanMsPerCase)),
                           "C Training (ms)": to_py(r.CTrainingMs), "C Repair (ms/case)": to_py(r.CRepairMeanMsPerCase),
@@ -474,7 +476,7 @@ def main():
     P = P[["Dataset", "Selected Noise Threshold", "Loop Bound", "Clean Coverage (%)", "Generated Traces", "Test Cases",
            "B-C+PN Agreement", "B-C+PN Agreement (%)", "B Alignment Repair (ms/case)", "C Training (ms)",
            "C Repair (ms/case)", "C+PN Training (ms)", "C+PN Repair (ms/case)", "C Speedup vs B", "C+PN Speedup vs B",
-           "Status", "Notes"]]  # 사용자 지정 순서 (2026-11-12) + Status / Notes
+           "Status", "Notes"]]  # column order + Status / Notes
     P.to_csv(MD / "paper_result_table.csv", index=False)
     (MD / "paper_result_table.md").write_text(
         "# Main result table (selected condition per dataset)\n\n"
@@ -501,7 +503,7 @@ def main():
                     chk(f"{r.Dataset} {r.NoiseThreshold}: {p} == count / test", abs(getattr(r, p) - round(100 * getattr(r, c) / r.TestCases, 2)) < 1e-9)
         sw = rj(SIM / r.Dataset / tag(r.NoiseThreshold) / "sweep/sweep_result.json")["row"]
         gs = rj(SIM / r.Dataset / tag(r.NoiseThreshold) / "generate/generate_summary.json")
-        if r.Dataset == "BPIC2017" and r.Status.startswith("SELECTED"):  # 95% 규칙 sweep 대신 16 frontier와 비교
+        if r.Dataset == "BPIC2017" and r.Status.startswith("SELECTED"):  # compare with the frontier of script 16 instead of the 95 % rule
             fr = pd.read_csv(MD / "bpic_candidates" / f"frontier_{tag(r.NoiseThreshold)}.csv")
             n_, t_ = map(int, BPIC_BOUND.strip("()").split(","))
             ana = fr[(fr.loop_num == n_) & (fr.loop_total == t_)].iloc[0]

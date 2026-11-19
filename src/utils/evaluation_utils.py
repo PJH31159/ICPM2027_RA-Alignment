@@ -1,15 +1,10 @@
-"""
-evaluation_utils — 공통 평가 함수 (REF-001)
+"""Shared evaluation functions.
 
-출처: src/62_compare_method_a_b.py (canonical_traces, levenshtein, pattern_key,
-      mcnemar_exact, fmt, 오답 유형), src/63 stage_evaluate (metric, pattern 표,
-      contingency, case 일치율)
-
-규칙 (D033):
-    - trace 복원은 CSV file row order 유지 -> Start/End 제거 -> activity tuple
-      (Method A의 order column은 쓰지 않는다)
-    - Ground truth는 평가에만 쓴다.
-    - Exact Match Rate = repaired trace == ground truth인 test case 비율 (= p.anomaly)
+Rules:
+    - Traces are rebuilt in CSV row order, Start/End removed, as activity tuples
+      (the order column of Method A is not used).
+    - Ground truth is used for evaluation only.
+    - Exact Match Rate = share of test cases with repaired trace == ground truth.
 """
 
 import math
@@ -39,7 +34,7 @@ def levenshtein(a, b):
 
 
 def pattern_key(label):
-    # R script labelpadding과 같은 규칙: 알파벳만 남기고 정렬 후 "+"로 연결
+    # Pattern key: keep letters only, sort, and join with '+'.
     parts = sorted(re.findall(r"[a-zA-Z]+", label))
     return "+".join(parts) if parts else "normal"
 
@@ -58,7 +53,7 @@ def fmt(t):
 
 
 def load_evaluation_basis(anomaly_log, ground_truth_log):
-    """ground truth, anomalous trace, anomaly label, clean normal variant 집합."""
+    """Ground truth, anomalous traces, anomaly labels and the set of clean normal variants."""
     import pandas as pd
 
     gt = canonical_traces(ground_truth_log, "Case", "Activity")
@@ -78,7 +73,7 @@ def error_type(rep, an, g, normal_variants):
 
 
 def case_level_table(test_ids, gt, anomalous, labels, normal_variants, runs):
-    """runs: {label: canonical Series (test)} -> case별 표."""
+    """runs: {label: canonical Series (test)} -> per-case table."""
     import pandas as pd
 
     rows = []
@@ -141,7 +136,7 @@ def contingency(cl, x, y):
 
 
 def case_agreement(full_runs, ids):
-    """full_runs: {label: {case: trace}} -> 모든 쌍의 같은 수리 비율."""
+    """full_runs: {label: {case: trace}} -> share of identical repairs for every pair."""
     labels = list(full_runs)
     out = {}
     for i, a in enumerate(labels):

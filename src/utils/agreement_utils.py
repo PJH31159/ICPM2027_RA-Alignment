@@ -1,9 +1,9 @@
-"""
-agreement_utils — Method 간 repaired log 일치율 (2026-10-12)
+"""Agreement between the repaired logs of two methods.
 
-EMR(repaired == ground truth)과 다르다: 여기서는 Method X의 repaired trace == Method Y의 repaired trace인지 본다.
-case_id 기준, activity sequence 전체가 정확히 같을 때만 일치. 기존 official repaired log만 읽는다 (새 repair 없음).
-trace 복원 규칙은 evaluation_utils.canonical_traces와 같다 (파일 행 순서 유지, Start/End 제거).
+Unlike the Exact Match Rate (repaired == ground truth), this compares the repaired trace of
+method X with the repaired trace of method Y for the same case id. Two cases agree only if
+the full activity sequences are identical. Only existing repaired logs are read.
+Trace reconstruction follows evaluation_utils.canonical_traces (file row order, Start/End removed).
 """
 
 
@@ -20,7 +20,7 @@ def category(a, b, c):
 
 
 def abc_agreement(paths, test_ids, anomaly_log, ground_truth_log):
-    """paths: {"A": csv, "B": csv, "C": csv}. return: (per_case DataFrame, summary DataFrame)."""
+    """paths: {"A": csv, "B": csv, "C": csv}. Returns (per-case DataFrame, summary DataFrame)."""
     import pandas as pd
 
     from utils.evaluation_utils import canonical_traces, fmt, load_evaluation_basis

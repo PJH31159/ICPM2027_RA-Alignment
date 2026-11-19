@@ -1,25 +1,23 @@
-"""
-timing_utils — 학습된 agent로 Test phase만 순차 재실행해 per-case repair latency를 잰다 (2026-10-12)
+"""Sequential test-only replay with a trained agent to measure per-case repair latency.
 
-왜:
-    공식 run(multiprocessing, 15 workers)에서 worker 안에서 잰 case 시간은 CPU를 나눠 쓰는 영향이 섞인다.
-    이 모듈은 저장된 agent(Q-table)로 Test case만 한 프로세스에서 순서대로 처리해,
-    multiprocessing 영향이 없는 case별 수리 시간을 잰다. accuracy를 다시 재는 실험이 아니다.
+Why: in the official run (multiprocessing, 15 workers) per-case times measured inside a worker include
+CPU sharing. Here the saved agent (Q-table) processes only the test cases, one by one in a single
+process, which gives per-case repair times without multiprocessing effects. Accuracy is not re-measured.
 
-지키는 것:
-    - RP-BEAR core(rpbear/)와 sim.py 로직을 바꾸지 않는다. Test 처리는 sim._process_case_with_memory
-      (train_mode=False, case_type="test")를 그대로 호출한다 → Q-table 업데이트 없음, 기존 action-selection 그대로.
-    - setup 순서는 sim.run_rpbear와 같다: seed → 데이터 로드 → NBG → val/test split.
+Guarantees:
+    - RP-BEAR core (rpbear/) and sim.py are not changed. Test cases are processed with
+      sim._process_case_with_memory(train_mode=False, case_type="test"): no Q-table update,
+      unchanged action selection.
+    - Setup order is the same as sim.run_rpbear: seed -> data load -> NBG -> val/test split.
 
-repair memory:
-    공식 Test는 validation에서 채워진 repair memory를 이어서 쓴다. 공식 run은 memory를 저장하지 않으므로
-    공식 repaired log의 validation 행으로 다시 만든다 (trace당 validation 결과).
+Repair memory: the official test phase continues with the repair memory filled during training. The
+memory is not saved, so it is rebuilt from the training rows of the official repaired log.
 
-한계 (byte-identical에 대해):
-    공식 Test의 무작위 행동(epsilon-greedy)은 worker별 난수 흐름에 달려 있고 그 상태는 저장되지 않았다.
-    그래서 공식 agent 재실행의 RL path 결과는 공식 결과와 같다고 보장할 수 없다. 대신
-    validate_test_only_equivalence()로, 같은 상태(Q-table, 탐색률, memory, 난수 상태)에서 시작하면
-    Test-only 재실행이 원래 Test 결과와 byte-identical임을 순차 조건에서 확인한다.
+Limitation (byte-identity): random actions (epsilon-greedy) during the official test depend on the
+per-worker random streams, whose state was not saved, so RL-path results of a replay are not guaranteed
+to equal the official ones. validate_test_only_equivalence() instead shows, under sequential execution,
+that a test-only replay starting from the same state (Q-table, exploration rate, memory, RNG state)
+is byte-identical to the original test phase.
 """
 
 import copy
@@ -30,7 +28,7 @@ import numpy as np
 
 
 def prepare_rpbear_inputs(data_name, input_paths, val_ratio, seed, nbgs_override=None):
-    """sim.run_rpbear와 같은 순서로 입력을 준비한다 (seed → load → NBG → split)."""
+    """Prepare the inputs in the same order as sim.run_rpbear (seed -> load -> NBG -> split)."""
     from rpbear.func_rpbear_final import discover_NBG
     from sim import _load_and_prepare_data, _prepare_case_split
 
@@ -56,9 +54,9 @@ def _case_func(prep, agent, repair_memory, alpha, num_epi, max_step, train_mode,
 
 
 def replay_test_phase(prep, agent, repair_memory, alpha, num_epi, max_step, rng_state=None, seed=None):
-    """Test case를 순서대로 한 프로세스에서 처리한다. return: (results list, timing rows, phase wall ms).
+    """Process the test cases one by one in one process. Returns (results list, timing rows, phase wall ms).
 
-    rng_state: (random state, numpy state)를 주면 그 상태에서 시작, 아니면 seed로 초기화한다.
+    rng_state: (random state, numpy state) to start from; otherwise the RNGs are seeded.
     """
     from sim import _timing_row
 
@@ -79,10 +77,10 @@ def replay_test_phase(prep, agent, repair_memory, alpha, num_epi, max_step, rng_
 
 
 def rebuild_repair_memory(official_repaired_csv, case_to_trace, val_ids):
-    """공식 repaired log의 validation 행으로 repair memory {trace: result df}를 다시 만든다.
+    """Rebuild the repair memory {trace: result df} from the training rows of the official repaired log.
 
-    return: (memory, info). 같은 trace가 validation에 여러 번 있으면 파일에서 처음 나온 case의 결과를 쓰고,
-    그 trace의 validation 결과가 case마다 달랐는지(info["conflicting_traces"])를 기록한다.
+    Returns (memory, info). If a trace occurs several times in training, the result of its first case in the
+    file is used, and info["conflicting_traces"] records whether results differed between those cases.
     """
     import pandas as pd
 
@@ -115,7 +113,7 @@ def test_result_frame(results):
 
 
 def summarize(timing_rows, phase_wall_ms):
-    """Test 전체 / RL / Mem 요약 + 보조 지표(논문 산식: test phase wall-clock / test cases)."""
+    """Summary over all / RL / Mem test cases plus the auxiliary metric (test phase wall-clock / test cases)."""
     from sim import _timing_summary
 
     out = _timing_summary(timing_rows, "test")
@@ -127,13 +125,13 @@ def summarize(timing_rows, phase_wall_ms):
 
 
 def replay_alignment_timing(exp061_script, pnml_path, test_ids, traces=None):
-    """Method B (Alignment): 저장된 공식 Petri Net으로 Test case만 순차 alignment + repair, case별 시간을 잰다.
+    """Method B (alignment): sequential alignment + repair of the test cases with the saved official Petri net.
 
-    EXP-061 script의 load_case_traces / build_event_log / align_case / repair_from_alignment를 그대로 import해서
-    공식 run과 같은 코드 경로를 쓴다. 측정 구간(perf_counter)은 공식 run과 같다:
-    trace 객체를 만든 뒤 align_case(PM4Py alignment) + repair_from_alignment까지.
-    데이터 로딩 / Process Discovery / Petri Net 생성(PNML 읽기) / CSV 저장 / 평가는 제외한다.
-    return: (rows: case_id, repaired_trace, repair_time_ms, alignment_cost, failed), net 정보, test phase wall ms
+    Uses load_case_traces / build_event_log / align_case / repair_from_alignment of the Method B script,
+    i.e. the same code path as the official run. The timed section (perf_counter) is the same as in the
+    official run: after building the trace object, align_case (PM4Py alignment) + repair_from_alignment.
+    Data loading, discovery, Petri-net loading (PNML), CSV writing and evaluation are excluded.
+    Returns (rows: case_id, repaired_trace, repair_time_ms, alignment_cost, failed), net info, test phase wall ms.
     """
     import importlib.util
 
@@ -143,7 +141,7 @@ def replay_alignment_timing(exp061_script, pnml_path, test_ids, traces=None):
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
 
-    if traces is None:  # Small (EXP-061 data/raw 경로). 다른 dataset은 호출하는 쪽에서 traces를 넘긴다
+    if traces is None:  # Small default input path; other datasets pass traces explicitly
         traces, _labels, _clean, _anom = m.load_case_traces()
     net, im, fm = pm4py.read_pnml(str(pnml_path))
     net_info = {"n_places": len(net.places), "n_transitions": len(net.transitions), "n_arcs": len(net.arcs),
@@ -157,7 +155,7 @@ def replay_alignment_timing(exp061_script, pnml_path, test_ids, traces=None):
             res = m.align_case(trace_obj, net, im, fm)
             repaired, _moves = m.repair_from_alignment(res["alignment"])
             failed, cost = False, res["cost"]
-        except Exception:  # noqa: BLE001  (공식 run과 같은 fallback: 원래 trace 보존)
+        except Exception:  # noqa: BLE001  (same fallback as the official run: keep the original trace)
             repaired, failed, cost = list(traces[cid]), True, None
         elapsed = (time.perf_counter() - t0) * 1000
         rows.append({"case_id": str(cid), "repaired_trace": ">>".join(repaired), "repair_time_ms": round(elapsed, 4),
@@ -166,7 +164,7 @@ def replay_alignment_timing(exp061_script, pnml_path, test_ids, traces=None):
 
 
 def summarize_values(values):
-    """n, mean, median, std(표본), min, max (ms)."""
+    """n, mean, median, std (sample), min, max (ms)."""
     import statistics
 
     if not values:
@@ -178,11 +176,11 @@ def summarize_values(values):
 
 def validate_test_only_equivalence(data_name, input_paths, num_epi, alpha, val_ratio, seed, max_step,
                                    nbgs_override=None):
-    """순차 조건에서 Test-only 재실행이 원래 Test 결과와 byte-identical인지 확인한다.
+    """Check under sequential execution that a test-only replay is byte-identical to the original test phase.
 
-    1) run_rpbear(use_multiprocessing=False)와 같은 순서로 validation → (상태 저장) → test를 실행 (reference)
-    2) 저장한 상태(agent deep copy, memory copy, 난수 상태)에서 replay_test_phase로 Test만 다시 실행
-    return: dict (reference DataFrame들, replay DataFrame, timing)
+    1) run training -> (save state) -> test in the same order as run_rpbear(use_multiprocessing=False) (reference)
+    2) replay only the test phase with replay_test_phase from the saved state (agent deep copy, memory copy, RNG state)
+    Returns a dict (reference DataFrames, replay DataFrame, timing).
     """
     from rpbear.func_rpbear_final import QLearningAgent
     from sim import _run_phase

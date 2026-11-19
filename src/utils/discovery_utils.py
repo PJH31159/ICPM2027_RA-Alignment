@@ -1,24 +1,17 @@
-"""
-discovery_utils — Inductive Miner -> Process Tree -> Petri Net, 모델 구조 점검 (REF-001)
+"""Inductive Miner -> process tree -> Petri net, and model structure checks.
 
-출처:
-    discover_model / model_check의 기본 항목 <- src/61 discover_and_check (같은 계산)
-    enumerate_tree_language, interleave, count_operators <- src/61
-
-추가 (모든 dataset에 안전하게 쓰기 위해):
-    tree_length_distribution / estimate_tree_language_size:
-        trace를 만들지 않고 Process Tree 언어 크기를 미리 계산한다 (D011/D012의
-        multinomial 방식). LOOP가 있으면 None (유한하지 않음).
-        같은 label이 여러 branch에 있으면 실제 unique 수보다 클 수 있다 (raw candidate).
-    petri_net_has_cycle: Petri Net 그래프에 cycle(=반복 가능 구조)이 있는지.
-    Process Tree 언어 나열은 예상 크기가 safety bound 이하일 때만 한다.
+tree_length_distribution / estimate_tree_language_size compute the size of the process-tree
+language without generating traces (multinomial counting). They return None if the tree has a
+LOOP (infinite language). With duplicate labels in several branches the count is an upper bound
+(raw candidates). petri_net_has_cycle reports whether the Petri net graph contains a cycle.
+The process-tree language is enumerated only when its expected size is below the safety bound.
 """
 
 import time
 from collections import Counter
 from math import comb
 
-ALIGNMENT_VARIANT_NAME = "VERSION_STATE_EQUATION_A_STAR"  # D032 (EXP-061과 같은 alignment)
+ALIGNMENT_VARIANT_NAME = "VERSION_STATE_EQUATION_A_STAR"  # PM4Py state-equation A* alignments
 
 
 # ------------------------------------------------------------
@@ -26,7 +19,7 @@ ALIGNMENT_VARIANT_NAME = "VERSION_STATE_EQUATION_A_STAR"  # D032 (EXP-061과 같
 # ------------------------------------------------------------
 
 def discover_model(traces, clean_ids, noise_threshold):
-    """정상 case -> Inductive Miner -> Process Tree -> Petri Net (EXP-061과 같은 호출)."""
+    """Clean cases -> Inductive Miner -> process tree -> Petri net."""
     import pm4py
 
     from utils.data_utils import build_event_log
@@ -39,7 +32,7 @@ def discover_model(traces, clean_ids, noise_threshold):
 
 
 # ------------------------------------------------------------
-# 2. Process Tree 구조 / 언어
+# 2. Process tree structure / language
 # ------------------------------------------------------------
 
 def count_operators(node, counter=None):
@@ -51,8 +44,10 @@ def count_operators(node, counter=None):
 
 
 def operator_kind_counts(node, counter=None):
-    """Operator enum으로 직접 센다. (str(operator)는 '*', '+', 'X', '->' 같은 기호라서
-    'LOOP' 같은 이름으로 문자열 검색을 하면 항상 0이 된다.)"""
+    """Count operators via the Operator enum.
+
+    str(operator) is a symbol such as '*', '+', 'X', '->', so searching for names like 'LOOP' would always give 0.
+    """
     counter = Counter() if counter is None else counter
     if node.operator is None:
         counter["tau" if node.label is None else "activity"] += 1
@@ -72,8 +67,10 @@ def interleave(a, b):
 
 
 def enumerate_tree_language(node):
-    """SEQUENCE / XOR / PARALLEL / tau만 있는 tree의 언어를 모두 나열 (EXP-061과 동일).
-    LOOP 등 다른 operator가 있으면 None. 크기 확인 없이 부르지 말 것 (tree_language_safe 사용)."""
+    """Enumerate the full language of a tree with only SEQUENCE / XOR / PARALLEL / tau.
+
+    Returns None for other operators (e.g. LOOP). Check the size first (use tree_language_safe).
+    """
     from pm4py.objects.process_tree.obj import Operator
 
     if node.operator is None:
@@ -97,7 +94,7 @@ def enumerate_tree_language(node):
 
 
 def tree_length_distribution(node):
-    """{trace 길이: raw trace 수}. LOOP / OR 등이 있으면 None."""
+    """{trace length: number of raw traces}. None if the tree contains LOOP / OR."""
     from pm4py.objects.process_tree.obj import Operator
 
     if node.operator is None:
@@ -129,7 +126,7 @@ def estimate_tree_language_size(tree):
 
 
 def petri_net_has_cycle(net):
-    """place -> transition -> place 그래프에서 cycle이 있으면 True (반복 가능 구조)."""
+    """True if the place -> transition -> place graph has a cycle (repeatable behaviour)."""
     succ = {}
     for arc in net.arcs:
         succ.setdefault(arc.source, []).append(arc.target)
@@ -156,14 +153,14 @@ def petri_net_has_cycle(net):
 
 
 # ------------------------------------------------------------
-# 3. 모델 점검 보고 (EXP-061 model_check와 같은 항목 + 구조 정보)
+# 3. Model check report
 # ------------------------------------------------------------
 
 def model_report(tree, net, im, fm, traces, clean_ids, discovery_sec, safety_max_traces):
-    """EXP-061 discover_and_check의 model_check와 같은 key/계산 + structure 블록.
+    """Model check (fitness, soundness, language) plus a structure block.
 
-    Process Tree 언어는 예상 크기가 safety_max_traces 이하일 때만 나열한다.
-    return: (model_check dict, tree_language_set 또는 None)
+    The process-tree language is enumerated only if its expected size is <= safety_max_traces.
+    Returns (model_check dict, tree language set or None).
     """
     from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments_algo
     from pm4py.objects.log.obj import Event, Trace

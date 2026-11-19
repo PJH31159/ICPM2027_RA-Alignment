@@ -1,28 +1,28 @@
-"""
-pn_gate_utils — Method C + Petri Net Conformance Gate (C+PN), 탐색 variant (2026-11)
+"""Method C + Petri-net conformance gate (C+PN).
 
-목적:
-    W2 Expanded New NBG의 ADM이 "anomaly 없음"이라고 판단해도, 최종 trace가 공식 discovered Petri Net에서
-    exact replay(initial marking -> visible / invisible transitions -> final marking)로 실행 가능할 때만
-    repair를 "완료"로 인정한다.
+Purpose: even when the ADM of the W2 Expanded New NBG reports "no anomaly", a repair is accepted
+as complete only if the final trace replays exactly on the discovered Petri net
+(initial marking -> visible / invisible transitions -> final marking).
 
-현재 RP-BEAR 종료 구조 (rpbear/func_rpbear_final.py, 수정하지 않음):
-    - P_BEAR_RL.step(): 행동 전 loc_anomalies(prev_state)가 비면 즉시 done=True. 행동 후 done = _is_done()
-      (= loc_anomalies(state)가 비었는지). current_step > max_step 또는 len(state) < 4이면 game_over.
-    - process_case_id_wrapper(): episode 반복 (train = num_epi, test = 최대 100). `done and not game_over`인 episode만
-      성공으로 기록하고, test는 첫 성공에서 멈춘다. 성공 episode가 없으면 원래 trace(init_state)를 반환한다.
+RP-BEAR termination (rpbear/func_rpbear_final.py, unchanged):
+    - P_BEAR_RL.step(): done=True immediately if loc_anomalies(prev_state) is empty before the action;
+      after the action done = _is_done() (loc_anomalies(state) is empty).
+      game_over if current_step > max_step or len(state) < 4.
+    - process_case_id_wrapper(): repeats episodes (train = num_epi, test = at most 100). Only episodes with
+      `done and not game_over` count as successes; test stops at the first success. Without a successful
+      episode the original trace (init_state) is returned.
 
-Gate (이 모듈):
-    process_case_id_wrapper의 성공 조건을 `done and not game_over and gate(final trace)`로 바꾼 사본.
-    - gate가 거부하면 그 episode는 완료로 인정하지 않고 다음 episode로 repair를 계속한다
-      (ADM이 정상이면 anomaly 위치가 없어 같은 episode 안에서는 행동할 위치가 없다 — 위치를 새로 정하는 규칙은 만들지 않음).
-    - max_step, train num_epi, test 최대 100 episode는 기존 값 그대로 (새 제한 없음). RL reward는 바꾸지 않는다.
-    - pn_gate=None이면 core / sim과 똑같이 동작한다 (smoke에서 byte-identical 확인).
+Gate (this module): a copy of process_case_id_wrapper whose success condition is
+`done and not game_over and gate(final trace)`.
+    - If the gate rejects, the episode is not accepted and repair continues with the next episode
+      (when the ADM is normal there is no anomaly location left to act on within the same episode;
+      no new location rule is introduced).
+    - max_step, train num_epi and the test limit of 100 episodes are unchanged; the RL reward is unchanged.
+    - With pn_gate=None the behaviour is identical to the core / sim (checked byte-identical in the smoke stage).
 
-core 파일(func_rpbear_final.py, main_rpbear_final.py)과 sim.py는 수정하지 않는다. 아래 함수들은 core / sim 로직의
-사본이며, 바뀐 곳은 `# [PN gate]` 표시가 있는 줄뿐이다.
-.venv-rpbear에는 pm4py가 없으므로 Petri Net 판정은 PNML을 직접 읽는 PNMLAcceptor로 한다
-(loop_bound_utils.make_petri_acceptor와 같은 의미; smoke에서 결과 동일성 확인).
+The functions below are copies of the core / sim logic; the only changed lines are marked `# [PN gate]`.
+.venv-rpbear has no PM4Py, so Petri-net acceptance uses PNMLAcceptor, which reads the PNML directly
+(same semantics as loop_bound_utils.make_petri_acceptor; equality checked in the smoke stage).
 """
 
 import random
@@ -34,14 +34,15 @@ import numpy as np
 
 
 # ------------------------------------------------------------
-# 1. Petri Net exact acceptor (pm4py 없이, PNML)
+# 1. Exact Petri-net acceptor (PNML, without PM4Py)
 # ------------------------------------------------------------
 
 class PNMLAcceptor:
-    """공식 PNML의 Petri Net으로 trace가 initial marking -> final marking까지 정확히 실행 가능한지 판정.
+    """Decide whether a trace runs exactly from the initial to the final marking of the official PNML Petri net.
 
-    invisible transition(tau)은 closure로 자유롭게 발화, visible transition은 label이 trace activity와 같을 때 발화.
-    loop_bound_utils.make_petri_acceptor와 같은 알고리즘. pickle 시 경로만 넘기고 worker에서 다시 읽는다.
+    Invisible transitions (tau) fire freely via closure; visible transitions fire when their label equals the
+    trace activity. Same algorithm as loop_bound_utils.make_petri_acceptor. When pickled, only the path is
+    passed and the net is re-read in the worker.
     """
 
     def __init__(self, pnml_path):
@@ -140,13 +141,13 @@ class PNMLAcceptor:
         return any(self._key(m) == self.final_key for m in states)
 
     def accepts_case(self, case_df):
-        """RP-BEAR state DataFrame (Start / End 포함) -> trace 판정."""
+        """RP-BEAR state DataFrame (with Start / End) -> acceptance decision."""
         acts = [a for a in case_df["concept:name"].tolist() if a not in ("Start", "End")]
         return self.accepts(tuple(acts))
 
 
 # ------------------------------------------------------------
-# 2. core process_case_id_wrapper 사본 + gate
+# 2. Copy of core process_case_id_wrapper + gate
 # ------------------------------------------------------------
 
 def gated_process_case_id_wrapper(case_id_for_processing, p_anomaly_nolabel, p_filtered_actset, p_act_freq, p_actset,
@@ -159,7 +160,7 @@ def gated_process_case_id_wrapper(case_id_for_processing, p_anomaly_nolabel, p_f
 
     episodes = p_num_epi if train_mode else 100
     all_episode_histories = []
-    gate_rejected = 0  # [PN gate] ADM normal인데 Petri Net이 거부한 episode 수
+    gate_rejected = 0  # [PN gate] number of episodes that the ADM accepts but the Petri net rejects
 
     for _ in range(episodes):
         state = env.reset()
@@ -183,7 +184,7 @@ def gated_process_case_id_wrapper(case_id_for_processing, p_anomaly_nolabel, p_f
             state = next_state
 
         if done and not game_over:
-            # [PN gate] ADM이 anomaly 없음이라고 해도 Petri Net exact replay를 통과해야 완료로 인정
+            # [PN gate] even if the ADM reports no anomaly, the trace must pass exact Petri-net replay
             if pn_gate is not None and not pn_gate.accepts_case(next_state):
                 gate_rejected += 1
                 continue
@@ -227,13 +228,13 @@ def gated_process_case_id_wrapper(case_id_for_processing, p_anomaly_nolabel, p_f
     case_result_df['type'] = case_type
     case_result_df['rl_steps'] = rl_steps
     case_result_df['rl_success'] = rl_success
-    if pn_gate is not None:  # [PN gate] 진단용 열 (gate off일 때는 core와 같은 열만)
+    if pn_gate is not None:  # [PN gate] diagnostic columns (gate off: same columns as the core)
         case_result_df['pn_gate_rejected_episodes'] = gate_rejected
     return case_result_df
 
 
 # ------------------------------------------------------------
-# 3. sim._process_case_with_memory / _run_phase / run_rpbear 사본 + gate
+# 3. Copies of sim._process_case_with_memory / _run_phase / run_rpbear + gate
 # ------------------------------------------------------------
 
 def gated_process_case_with_memory(case_id, case_to_trace, repair_memory, p_anomaly_nolabel, p_filtered_actset, p_act_freq,
@@ -291,10 +292,10 @@ def _run_phase_gated(caseids, case_type, train_mode, case_to_trace, repair_memor
 
 def run_rpbear_gated(data_name, num_epi, alpha, val_ratio, seed, max_step, num_cores, use_multiprocessing, nbgs_override,
                      input_paths, pn_gate=None, limit=None, verbose=False):
-    """sim.run_rpbear와 같은 순서(seed -> load -> NBG -> split -> agent -> val -> test). 저장은 호출하는 쪽에서 한다.
+    """Same order as sim.run_rpbear (seed -> load -> NBG -> split -> agent -> val -> test). The caller saves outputs.
 
-    limit: smoke 전용. split 후 val / test 앞의 N개 case만 처리 (official run에서는 None).
-    return: (repaired_log df, stats dict, case_timing df, agent with q_table snapshot)
+    limit: smoke only; process the first N val / test cases after the split (None in official runs).
+    Returns (repaired_log df, stats dict, case_timing df, agent with q_table snapshot).
     """
     import pandas as pd
     from multiprocessing import Manager, cpu_count
@@ -366,7 +367,7 @@ def run_rpbear_gated(data_name, num_epi, alpha, val_ratio, seed, max_step, num_c
 
 
 def replay_test_phase_gated(prep, agent, repair_memory, alpha, num_epi, max_step, pn_gate, seed):
-    """timing_utils.replay_test_phase와 같은 순차 Test-only 재실행 (gate 포함)."""
+    """Sequential test-only replay as in timing_utils.replay_test_phase, with the gate."""
     from functools import partial
 
     from sim import _timing_row
@@ -387,7 +388,7 @@ def replay_test_phase_gated(prep, agent, repair_memory, alpha, num_epi, max_step
 
 
 class AcceptAllGate:
-    """smoke 전용: 항상 통과하는 gate. gate 경로 자체가 결과를 바꾸지 않는지(conformant면 기존처럼 종료) 확인."""
+    """Smoke only: a gate that always accepts. Checks that the gate path itself does not change results."""
 
     pnml_path = "accept-all (smoke only)"
 
@@ -396,7 +397,7 @@ class AcceptAllGate:
 
 
 def case_df_from_trace(trace):
-    """activity tuple (Start / End 없이) -> RP-BEAR case DataFrame (Start / End / order 포함)."""
+    """Activity tuple (without Start / End) -> RP-BEAR case DataFrame (with Start / End / order)."""
     import pandas as pd
 
     acts = ["Start"] + list(trace) + ["End"]
@@ -404,7 +405,7 @@ def case_df_from_trace(trace):
 
 
 def adm_normal(trace, actset, filtered_actset, nbgs, alpha=0.0):
-    """official P_BEAR_RL.ADM으로 trace에 anomaly 위치(2표 이상)가 없는지."""
+    """Whether the official P_BEAR_RL.ADM finds no anomaly location (2 or more votes) in the trace."""
     from rpbear.func_rpbear_final import P_BEAR_RL
 
     case = case_df_from_trace(trace)

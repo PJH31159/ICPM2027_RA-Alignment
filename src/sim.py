@@ -1,23 +1,13 @@
-"""
-sim.py  —  RP-BEAR execution engine / wrapper
+"""RP-BEAR execution engine.
 
-역할 구분:
-    sim.py        = RP-BEAR를 한 번 실행하는 엔진(wrapper). 데이터 로드, NBG, val/test
-                    split, Q-learning 학습/추론을 수행하고 repaired log를 돌려준다.
-    simulation.py = 여러 dataset에 같은 연구 pipeline(discover → generate → nbg →
-                    smoke → run → evaluate)을 적용하는 orchestrator. RP-BEAR 실행이
-                    필요할 때 이 파일의 run_rpbear()를 호출한다.
+sim.py runs RP-BEAR once: data loading, NBG, train/test split, Q-learning training and test-phase
+repair; it returns the repaired log. src/simulation.py is the orchestrator that applies the research
+pipeline (discover -> generate -> nbg -> smoke -> run -> evaluate) to each dataset and calls
+run_rpbear() from here.
 
-Method A(RP-BEAR) 실행 로직을 모아둔 모듈이다.
-
-`main.py`는 이 파일의 `run_rpbear(...)`만 호출한다. RP-BEAR의 핵심
-알고리즘(NBG 생성, ADM, QLearningAgent, P_BEAR_RL)은
-`src/rpbear/func_rpbear_final.py`를 reference implementation으로
-그대로 import해서 사용하며, 이 파일에서는 수정하지 않는다.
-
-이 wrapper의 목적은 새로운 RP-BEAR를 만드는 것이 아니라,
-`src/rpbear/main_rpbear_final.py`의 baseline behavior를
-ICPM2027 프로젝트 경로/구조 안에서 최대한 동일하게 재현하는 것이다.
+The RP-BEAR core (NBG discovery, ADM, QLearningAgent, P_BEAR_RL) is imported unchanged from
+src/rpbear/func_rpbear_final.py. This module does not implement a new RP-BEAR; it reproduces the
+behaviour of the original RP-BEAR script as closely as possible inside this project's structure.
 """
 
 from __future__ import annotations
@@ -44,19 +34,17 @@ warnings.filterwarnings(action="ignore")
 
 
 # ============================================================
-# 1. Project Root
+# 1. Project root
 # ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 # ============================================================
-# 2. Case 단위 처리 (main_rpbear_final.py의 process_case_with_memory 이식)
+# 2. Per-case processing (with repair memory)
 # ============================================================
-#
-# multiprocessing.Pool로 워커 프로세스에 전달되려면 이 함수가
-# 모듈 최상위(top-level)에 있어야 pickle이 가능하다. 로직 자체는
-# 원본 main_rpbear_final.py의 process_case_with_memory와 동일하다.
+# Must be a top-level function so that multiprocessing.Pool can pickle it.
+# The logic is the same as process_case_with_memory of the original RP-BEAR script.
 
 def _process_case_with_memory(
     case_id,
@@ -74,19 +62,19 @@ def _process_case_with_memory(
     case_type,
     max_step,
 ):
-    # timing instrumentation: case 하나를 처리하는 데 걸린 시간 (worker 안에서 측정).
-    # time.perf_counter()는 난수를 쓰지 않으므로 수리 결과에 영향이 없다.
+    # Per-case processing time, measured inside the worker. perf_counter() consumes no random
+    # numbers, so it does not affect the repair results.
     t0 = time.perf_counter()
     trace_str = case_to_trace[case_id]
 
     if trace_str in repair_memory:
-        # 이미 수리된 trace라면 메모리에서 불러오기 (RL 학습 생략)
+        # trace already repaired: reuse the result from the repair memory (no RL run)
         result = repair_memory[trace_str].copy()
         result["type"] = case_type
         result["case:concept:name"] = case_id
-        return case_id, result, 0, (time.perf_counter() - t0) * 1000  # 0: RL 안 돌았음 (메모리 사용)
+        return case_id, result, 0, (time.perf_counter() - t0) * 1000  # 0: repair memory used, no RL run
 
-    # 메모리에 없는 새로운 trace면 RL 수리 진행
+    # new trace: run the RL repair
     result = process_case_id_wrapper(
         case_id_for_processing=case_id,
         p_anomaly_nolabel=p_anomaly_nolabel,
@@ -102,22 +90,16 @@ def _process_case_with_memory(
         max_step=max_step,
     )
     repair_memory[trace_str] = result.copy()
-    return case_id, result, 1, (time.perf_counter() - t0) * 1000  # 1: 새롭게 RL/추론 돌았음
+    return case_id, result, 1, (time.perf_counter() - t0) * 1000  # 1: new RL training / inference run
 
 
 # ============================================================
-# 3. Worker 초기화 (multiprocessing=True일 때 seed 재현용)
+# 3. Worker initialisation (seed reproducibility with multiprocessing)
 # ============================================================
-#
-# 원본 main_rpbear_final.py는 random.seed(seed)/np.random.seed(seed)를
-# 모듈 최상위(스크립트 레벨)에서 호출한다. Windows spawn 방식에서는
-# 워커 프로세스가 그 스크립트를 다시 import하면서 이 seed 설정도
-# 함께 재실행되므로, 결과적으로 "모든 워커가 동일한 seed로 시작"하는
-# 효과가 있었다. sim.py에서는 seed 설정을 run_rpbear() 함수 안으로
-# 옮겼기 때문에(부모 프로세스에서만 실행됨), 워커 프로세스가 그대로
-# 두면 OS entropy로 시드가 결정되어 원본과 다른 무작위성을 갖는다.
-# 이를 막기 위해 Pool의 initializer로 각 워커에서도 동일하게
-# seed를 다시 걸어준다.
+# The original RP-BEAR script seeds random / np.random at module level. With Windows spawn,
+# every worker re-imports that script and therefore starts from the same seed. Here the seed is set
+# inside run_rpbear() (parent process only); without an initializer the workers would be seeded from
+# OS entropy. The Pool initializer therefore re-seeds every worker with the same seed.
 
 def _worker_init(seed: int) -> None:
     random.seed(seed)
@@ -125,12 +107,12 @@ def _worker_init(seed: int) -> None:
 
 
 # ============================================================
-# 4. 데이터 로드 / clean-anomaly 분리 (경로만 ICPM2027 구조로 수정)
+# 4. Data loading / clean-anomaly separation
 # ============================================================
 
 def _load_and_prepare_data(data_name: str, input_paths: dict | None = None):
-    # input_paths=None: 기존과 같이 data/raw/{data_name}_1.00.csv, data/raw/{data_name}.csv
-    # input_paths 지정: {"anomaly_log": Path, "ground_truth_log": Path} 파일을 그대로 사용
+    # input_paths=None: data/raw/{data_name}_1.00.csv and data/raw/{data_name}.csv
+    # input_paths given: {"anomaly_log": Path, "ground_truth_log": Path}
     if input_paths is None:
         anomalous_data_path = PROJECT_ROOT / "data" / "raw" / f"{data_name}_1.00.csv"
         normal_data_path = PROJECT_ROOT / "data" / "raw" / f"{data_name}.csv"
@@ -155,7 +137,7 @@ def _load_and_prepare_data(data_name: str, input_paths: dict | None = None):
         copy=False,
     )
 
-    # 실시간 성능 검증을 위한 원본(정상) 데이터 Ground Truth 로드
+    # ground truth (normal log) for the running accuracy printout
     gt_traces = {}
     try:
         normal_data = pd.read_csv(normal_data_path, usecols=["Case", "Activity"])
@@ -171,7 +153,7 @@ def _load_and_prepare_data(data_name: str, input_paths: dict | None = None):
     except Exception as e:
         print(f"[경고] 정상 데이터({normal_data_path})를 불러오지 못했습니다. 실시간 정확도 계산이 생략됩니다. 오류: {e}")
 
-    # Add 'Start' and 'End' activity
+    # add 'Start' and 'End' activities
     data["order"] = data.groupby("case:concept:name", observed=True).cumcount() + 1
 
     start_df_orig = data[data["order"] == 1].copy()
@@ -214,7 +196,7 @@ def _load_and_prepare_data(data_name: str, input_paths: dict | None = None):
 
 
 # ============================================================
-# 5. Anomaly case를 val/test로 분할 (원본과 동일 로직)
+# 5. Split anomalous cases into train ('val') / test (same logic as the original RP-BEAR script)
 # ============================================================
 
 def _prepare_case_split(anomaly: pd.DataFrame, val_ratio: float):
@@ -244,7 +226,7 @@ def _prepare_case_split(anomaly: pd.DataFrame, val_ratio: float):
 
 
 # ============================================================
-# 6. Validation / Test 진행 상황 출력 (원본 print 포맷 재현)
+# 6. Progress printout (same format as the original RP-BEAR script)
 # ============================================================
 
 def _report_progress(result, case_id, gt_traces, idx, total, success_count, case_type, is_run, verbose):
@@ -276,7 +258,7 @@ def _report_progress(result, case_id, gt_traces, idx, total, success_count, case
 
 
 # ============================================================
-# 7. Validation 또는 Test 한 phase 실행
+# 7. Run one phase (training or test)
 # ============================================================
 
 def _run_phase(
@@ -318,7 +300,7 @@ def _run_phase(
     )
 
     results = []
-    case_timing = []  # timing instrumentation: case별 처리 시간 (phase, path = RL / Mem)
+    case_timing = []  # per-case processing time (phase, path = RL / Mem)
     rl_count = 0
     success_count = 0
     start_time = time.time()
@@ -333,10 +315,9 @@ def _run_phase(
                     result, case_id, gt_traces, idx, len(caseids), success_count, case_type, is_run, verbose
                 )
     else:
-        # Debug / smoke-test 경로: 단일 프로세스, case 순서대로 순차 처리.
-        # Pool.imap_unordered와 처리 순서가 다르므로 Q-table 업데이트
-        # 순서, 그리고 alpha/exploration 관련 결과가 use_multiprocessing=True와
-        # 정확히 일치하지 않을 수 있다.
+        # Debug / smoke path: single process, cases in order. The processing order differs from
+        # Pool.imap_unordered, so the order of Q-table updates (and results that depend on alpha /
+        # exploration) may differ from use_multiprocessing=True.
         for idx, case_id in enumerate(caseids, start=1):
             case_id_out, result, is_run, elapsed_ms = func(case_id)
             results.append(result)
@@ -353,15 +334,15 @@ def _run_phase(
 
 
 def _timing_row(case_id, case_type, is_run, elapsed_ms):
-    """case timing CSV의 한 행. path: RL = 새로 RL 학습/추론, Mem = repair memory 재사용."""
+    """One row of the case-timing CSV. path: RL = new RL training/inference, Mem = repair-memory reuse."""
     return {"case_id": str(case_id), "phase": case_type, "path": "RL" if is_run else "Mem",
             "repair_time_ms": round(float(elapsed_ms), 4)}
 
 
 def _timing_summary(case_timing, phase):
-    """phase 하나의 case 처리 시간 요약 (all / RL / Mem 각각 n, mean, median, std, min, max; ms).
+    """Per-phase case-time summary (all / RL / Mem: n, mean, median, std, min, max; ms).
 
-    std는 표본 표준편차(ddof=1). case가 1개 이하이면 std는 None.
+    std is the sample standard deviation (ddof=1); None if there is at most one case.
     """
     import statistics
 
@@ -384,7 +365,7 @@ def _timing_summary(case_timing, phase):
 
 
 # ============================================================
-# 8. Public Entry Point - Method A
+# 8. Public entry point
 # ============================================================
 
 def run_rpbear(
@@ -402,43 +383,32 @@ def run_rpbear(
     input_paths: dict | None = None,
     return_case_timing: bool = False,
 ) -> tuple[pd.DataFrame, dict] | tuple[pd.DataFrame, dict, pd.DataFrame]:
-    """
-    Method A(기존 RP-BEAR) 파이프라인을 실행하고 repaired log를 반환한다.
+    """Run the RP-BEAR pipeline and return the repaired log.
 
-    use_multiprocessing=True  : 기존 RP-BEAR baseline 재현용
-                                 (Manager + Pool.imap_unordered, 원본과 동일)
-    use_multiprocessing=False : debugging / smoke test용
-                                 (단일 프로세스 순차 처리, 처리 순서가 달라짐)
+    use_multiprocessing=True  : reproduces the RP-BEAR baseline (Manager + Pool.imap_unordered).
+    use_multiprocessing=False : debugging / smoke runs (single process, different processing order).
 
-    nbgs_override : None(기본값)이면 기존과 완전히 같게 observed clean log로
-                    discover_NBG(clean)을 만든다 (Method A).
-                    NBG 목록을 주면 discover_NBG 대신 그 목록을 그대로 쓴다
-                    (EXP-063 Method C: Petri Net 생성 trace로 만든 New NBG).
-                    목록은 반드시 이 함수 안의 actset 순서
-                    (= observed clean log의 activity 첫 등장 순서)로 정렬되어
-                    있어야 한다. ADM이 NBGs[actset 위치]로 NBG를 찾기 때문이다.
-                    actset, act_freq 등 NBG 외의 입력은 바뀌지 않는다.
-    input_paths   : None(기본값)이면 기존과 같이 data/raw/{data_name}_1.00.csv,
-                    data/raw/{data_name}.csv를 읽는다. dict를 주면
-                    {"anomaly_log": ..., "ground_truth_log": ...} 파일을 읽는다
-                    (예: 외부 P-BEAR-RL/Full_input). 저장 파일 이름 규칙은 바뀌지 않는다.
-    return_case_timing : False(기본값)이면 기존과 같이 (repaired_log, stats)를 반환한다.
-                    True이면 (repaired_log, stats, case_timing)을 반환한다.
-                    case_timing = case별 처리 시간 DataFrame
-                    (case_id, phase = val/test, path = RL/Mem, repair_time_ms).
+    nbgs_override : None (default) builds discover_NBG(clean) from the observed clean log (Method A).
+                    A list of NBGs is used instead of discover_NBG (Method C: New NBGs built from
+                    Petri-net-generated traces). The list must follow this function's actset order
+                    (= first occurrence order of activities in the observed clean log), because the ADM
+                    looks NBGs up by actset position. actset, act_freq and other inputs are unchanged.
+    input_paths   : None reads data/raw/{data_name}_1.00.csv and data/raw/{data_name}.csv. A dict
+                    {"anomaly_log": ..., "ground_truth_log": ...} reads those files instead.
+                    Output file naming is unchanged.
+    return_case_timing : False returns (repaired_log, stats); True returns (repaired_log, stats, case_timing),
+                    where case_timing has one row per case (case_id, phase = val/test, path = RL/Mem, repair_time_ms).
 
-    Timing 필드 (stats, 2026-10-12 instrumentation, 수리 결과에는 영향 없음):
-        training_time_sec      = Validation(학습) phase wall-clock (= val_total_ms / 1000)
-        total_repair_time_sec  = Test(추론) phase wall-clock (= test_total_ms / 1000)
-        total_run_time_sec     = run_rpbear 전체 시간 (= total_sec)
+    Timing fields in stats (they do not affect the repair results):
+        training_time_sec      = wall-clock of the training ("validation") phase (= val_total_ms / 1000)
+        total_repair_time_sec  = wall-clock of the test phase (= test_total_ms / 1000)
+        total_run_time_sec     = total run_rpbear time (= total_sec)
         {val,test}_case_ms_{all,rl,mem}_{n,mean,median,std,min,max}
-                               = worker 안에서 잰 case 하나의 처리 시간 (ms).
-                                 RL = 새로 RL 학습/추론, Mem = repair memory 재사용.
-                                 multiprocessing에서는 병렬 실행 중의 시간이다.
+                               = per-case processing time measured inside the worker (ms);
+                                 under multiprocessing these are times during parallel execution.
 
-    Windows에서 use_multiprocessing=True로 호출하려면, 이 함수를
-    호출하는 최상위 스크립트가 `if __name__ == "__main__":` 로
-    감싸져 있어야 한다 (multiprocessing spawn 제약).
+    On Windows, with use_multiprocessing=True the calling top-level script must be guarded by
+    `if __name__ == "__main__":` (multiprocessing spawn).
     """
 
     overall_start = time.time()
@@ -477,9 +447,8 @@ def run_rpbear(
         print(f"[INFO] Validation cases = {len(val_caseids)}")
         print(f"[INFO] Test cases       = {len(test_caseids)}")
 
-    # Manager는 명시적으로 shutdown하지 않으면 백그라운드 서버 프로세스가
-    # 남는다. run_rpbear()가 (비교 실험 등에서) 여러 번 호출될 수 있으므로
-    # try/finally로 항상 정리되도록 한다.
+    # Without an explicit shutdown the Manager leaves a background server process behind.
+    # run_rpbear() may be called several times, so it is always cleaned up in try/finally.
     manager = Manager() if use_multiprocessing else None
 
     if use_multiprocessing:
@@ -501,7 +470,7 @@ def run_rpbear(
 
     try:
         # ------------------------------------------------------
-        # Validation phase (train_mode=True)
+        # Training phase ('validation' in the code; train_mode=True, Q-table updated)
         # ------------------------------------------------------
         if verbose:
             print("\n[1/2] Validation phase 시작...")
@@ -548,7 +517,7 @@ def run_rpbear(
                 print(f"[INFO] Agent 저장 완료 -> {model_path}")
 
         # ------------------------------------------------------
-        # Test phase (train_mode=False)
+        # Test phase (train_mode=False, no Q-table update)
         # ------------------------------------------------------
         if verbose:
             print("\n[2/2] Test phase 시작...")
@@ -578,14 +547,14 @@ def run_rpbear(
         if verbose:
             print(f"\n[INFO] Test 완료: total={test_total_ms:.2f} ms | per_case={test_per_case_ms:.2f} ms")
 
-        # manager가 살아있는 동안(shutdown 전에) Q-table 크기를 미리 읽어둔다.
+        # read the Q-table size while the manager is still alive (before shutdown)
         q_table_size = len(agent.q_table)
     finally:
         if manager is not None:
             manager.shutdown()
 
     # ------------------------------------------------------
-    # 결과 병합
+    # Merge results
     # ------------------------------------------------------
     val_repaired_df = pd.concat(val_results, ignore_index=True) if len(val_results) > 0 else pd.DataFrame()
     test_repaired_df = pd.concat(test_results, ignore_index=True) if len(test_results) > 0 else pd.DataFrame()

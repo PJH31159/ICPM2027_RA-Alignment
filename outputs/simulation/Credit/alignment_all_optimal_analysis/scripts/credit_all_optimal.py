@@ -1,15 +1,17 @@
-"""Credit Method B all-optimal alignment 진단 (탐색, .venv). official output은 읽기만 한다.
+"""All-optimal alignment analysis for Credit Method B (.venv). Official outputs are only read.
 
-실행 환경 메모: 이 PC의 Windows 애플리케이션 제어 정책이 cvxopt.blas / lxml.objectify DLL을 차단한다 (2026-11-09 확인).
-설치 환경은 바꾸지 않고, 이 process 안에서만
-  - cvxopt를 숨겨 PM4Py LP solver가 scipy를 쓰게 하고 (official run은 cvxopt_solver_custom_align),
-  - PTML importer 전용인 lxml.objectify를 빈 module로 대체한다 (PNML 읽기 / alignment에는 쓰이지 않음).
+Environment shim: cvxopt is hidden inside this process so that the PM4Py LP solver uses scipy, and
+lxml.objectify (used only by the PTML importer, not by PNML reading or alignments) is replaced by a stub.
+This is needed where the cvxopt / lxml.objectify binaries cannot be loaded; the installation is not changed.
 
-modes:
-  --toy                  toy tie test만
-  --toy-once <name>      (subprocess용) toy 하나에 state-equation A* 1회 → stdout
-  --astar-only <out>     (subprocess용) Credit test 210 state-equation A*만 → json
-  --limit N              Credit 앞 N case만 (smoke)
+Modes:
+  --toy                  toy tie tests only
+  --toy-once <name>      (subprocess) one state-equation A* run on one toy -> stdout
+  --astar-only <out>     (subprocess) state-equation A* on the Credit test cases only -> json
+  --limit N              first N Credit cases only (smoke)
+
+The definitions between `def trace_obj` and the toy section (repair_from_alignment, net_struct, fire,
+dev_optimal) are also loaded by 07_pub_all_optimal_agreement.py.
 """
 import sys
 import types
@@ -20,7 +22,7 @@ import lxml  # noqa: E402
 from lxml import etree as _etree  # noqa: E402
 
 _obj = types.ModuleType("lxml.objectify")
-_obj.parse, _obj.fromstring = _etree.parse, _etree.fromstring  # PNML importer는 etree.XMLParser를 명시적으로 넘긴다
+_obj.parse, _obj.fromstring = _etree.parse, _etree.fromstring  # the PNML importer passes etree.XMLParser explicitly
 sys.modules["lxml.objectify"] = _obj
 lxml.objectify = _obj
 
@@ -46,7 +48,7 @@ from pm4py.util.lp import solver as lp_solver  # noqa: E402
 D = ROOT / "outputs/simulation/Credit"
 OUT = D / "alignment_all_optimal_analysis"
 B_DIR = D / "runs/methodB_run1"
-VARIANT = alignments_algo.Variants.VERSION_STATE_EQUATION_A_STAR  # official Method B (EXP-061 / D032)
+VARIANT = alignments_algo.Variants.VERSION_STATE_EQUATION_A_STAR  # official Method B alignment variant
 SCRIPT = Path(__file__).resolve()
 PY = sys.executable
 
@@ -59,7 +61,7 @@ def trace_obj(acts):
 
 
 def repair_from_alignment(alignment):
-    """EXP-061 repair_from_alignment와 같은 규칙 (sync 유지 / log move 삭제 / visible model move 삽입 / tau 제외)."""
+    """Same rule as the Method B repair: keep sync moves, delete log moves, insert visible model moves, skip tau."""
     rep, n = [], Counter()
     for log_label, model_label in alignment:
         if log_label != ">>" and model_label != ">>":
@@ -81,13 +83,13 @@ def astar(acts, net, im, fm):
 
 
 def all_opt_pm4py(acts, net, im, fm, variant=gen_nh):
-    """PM4Py generator variant: 같은 최소 PM4Py cost(log/model 10000, tau 1, sync 0)의 alignment 전부."""
+    """PM4Py generator variant: all alignments with the same minimal PM4Py cost (log/model 10000, tau 1, sync 0)."""
     als = list(variant.apply(trace_obj(acts), net, im, fm))
     costs = {a["cost"] for a in als}
     return als, costs
 
 
-# ---------------------------------------------------------------- deviation-only all-optimal (직접 구현, 검증용 / 보조 정의)
+# ---------------------------------------------------------------- deviation-only all-optimal (own search; auxiliary definition)
 def net_struct(net, im, fm):
     trans = []
     for t in net.transitions:
@@ -110,10 +112,13 @@ def fire(m, pre, post):
 
 
 def dev_optimal(acts, ns, move_cost=1, tau_cost=0, max_states=5_000_000):
-    """최소 cost의 repaired trace 전부 (sync 0, log / visible model move = move_cost, tau = tau_cost).
-    move_cost=1, tau_cost=0  : deviation-only (visible deviation 수만 최소)
-    move_cost=10000, tau_cost=1 : PM4Py 표준 cost와 같은 정의 (exact all-optimal)
-    state = (marking, trace index, output). output까지 state에 넣으므로 서로 다른 repaired trace를 모두 구한다."""
+    """All repaired traces of minimal cost (sync 0, log / visible model move = move_cost, tau = tau_cost).
+
+    move_cost=1, tau_cost=0     : tau-excluded (deviation-only): minimise visible deviations only;
+                                  invisible transitions are routing steps of the model and produce no event
+    move_cost=10000, tau_cost=1 : same cost as the PM4Py standard (native / exact all-optimal)
+    state = (marking, trace index, output). The output is part of the state, so all distinct repaired traces are found.
+    """
     trans, m0, mf = ns
     n = len(acts)
     start = (m0, 0, ())
@@ -265,13 +270,13 @@ for idx, c in enumerate(ids, 1):
         "C_repaired": " ".join(cc), "CPN_repaired": " ".join(cp),
         "B_official_cost": cost_off, "B_official_deviations": cost_off // 10000, "B_official_tau": cost_off % 10000,
         "astar_rerun_repaired": " ".join(rep_a), "astar_rerun_cost": int(cost_a), "astar_rerun_eq_official": rep_a == b_off,
-        # exact all-optimal (PM4Py cost, 직접 search) = 주 정의
+        # native all-optimal (PM4Py cost, own search) = main definition
         "exact_cost": xcost, "exact_cost_eq_official": xcost == cost_off, "exact_n_unique_repaired": len(S_ex),
         "B_official_in_exact_set": b_off in S_ex, "GT_in_exact_set": g in S_ex, "C_in_exact_set": cc in S_ex, "CPN_in_exact_set": cp in S_ex,
-        # deviation-only (tau cost 0) = 보조 정의
+        # tau-excluded / deviation-only (tau cost 0) = auxiliary definition
         "dev_deviations": dcost, "dev_n_unique_repaired": len(S_dev), "exact_subset_of_dev": S_ex <= S_dev,
         "B_official_in_dev_set": b_off in S_dev, "GT_in_dev_set": g in S_dev, "C_in_dev_set": cc in S_dev, "CPN_in_dev_set": cp in S_dev,
-        # PM4Py generator_dijkstra_no_heuristics (진단: 완전한지)
+        # PM4Py generator_dijkstra_no_heuristics (diagnostic: completeness)
         "gen_cost": sorted(costs)[0] if costs else None, "gen_n_alignments": len(als), "gen_n_unique_repaired": len(S_gen),
         "gen_duplicate_alignments": len(als) - len(S_gen), "gen_subset_of_exact": S_gen <= S_ex, "gen_complete": S_gen == S_ex,
         "B_official_in_gen_set": b_off in S_gen,

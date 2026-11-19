@@ -1,23 +1,23 @@
-"""13_noise_threshold_sweep.py — Road / BPIC 2017: IM noise_threshold별 모델 구조, bounded language, clean coverage (.venv)
+"""Road / BPIC 2017: model structure, bounded language and clean coverage per IM noise_threshold (.venv).
 
-왜 (교수님 2026-11 미팅): "Road / BPIC이 너무 크면 Alignment 쪽 threshold를 조정해 Petri Net을 경량화해서 기존 방법 그대로 돌려 보라."
-    여기서 threshold = Process Discovery(Inductive Miner)의 noise_threshold (PM4Py 2.7.23.6: > 0이면 IMf).
-    ADM alpha(P-BEAR-RL main.py --alpha)와는 다른 값이다. Method C 구조는 바꾸지 않는다.
+Why: for large models, a higher discovery noise_threshold simplifies the Petri net so that the methods can run
+unchanged. The threshold is the Inductive Miner noise_threshold (PM4Py 2.7.23.6: IMf if > 0); it is not the
+ADM alpha. Method C itself is not changed.
 
-threshold마다:
-  1. clean case로 discover_model (pipeline과 같은 함수) -> Process Tree / Petri Net 저장, 구조 수 세기
-  2. clean variant별 필요한 (loop_num, loop_total) Pareto front (12 script의 Requirement, enumeration 없음)
-  3. coverage 목표(90 / 95 / 99%)별 Pareto-minimal bound 중 language가 가장 작은 bound와 그 language 크기 (lang_count)
-  4. 선택 규칙 (모든 threshold에 같은 규칙):
-       chosen bound = clean case coverage >= 95%를 만족하는 bound 중 language가 가장 작은 것
-                      (95%가 불가능하면 도달 가능한 최대 coverage를 주는 bound 중 language가 가장 작은 것)
-       language <= GUARD (2,000,000, 기존 generation guard)일 때만 generate_bounded로 실제 생성해서 수와 coverage를 확인
-       GUARD 초과면 생성하지 않고 INFEASIBLE(추정 language size)로 기록
-  loop가 없는 tree는 bound와 상관없이 language가 유한하다 -> chosen bound = (0,0)로 표시하고 그대로 생성.
+Per threshold:
+  1. discover_model on the clean cases (same function as the pipeline) -> store process tree / Petri net, count structures
+  2. Pareto front of the required (loop_num, loop_total) per clean variant (requirement of script 12, no enumeration)
+  3. per coverage target (90 / 95 / 99 %): the Pareto-minimal bound with the smallest language and its size (lang_count)
+  4. selection rule (same for every threshold):
+       chosen bound = the bound with the smallest language among those with clean-case coverage >= 95 %
+                      (if 95 % is unreachable: smallest language among the bounds with the maximal reachable coverage)
+       only if language <= GUARD (2,000,000, the generation guard) the traces are generated with generate_bounded
+       to confirm count and coverage; otherwise nothing is generated and INFEASIBLE (estimated size) is recorded
+  A tree without loops has a finite language regardless of the bound -> chosen bound = (0,0), generated as is.
 
-출력: outputs/simulation/<Dataset>/threshold_0pXX/sweep/ (tree, pnml, coverage grid, json)
-      outputs/multi_dataset_experiment/threshold_sweep/sweep_structure_language.csv / .json
-실행: .venv\\Scripts\\python outputs\\multi_dataset_experiment\\scripts\\13_noise_threshold_sweep.py [Road|BPIC ...]
+Output: outputs/simulation/<Dataset>/threshold_0pXX/sweep/ (tree, pnml, coverage grid, json)
+        outputs/multi_dataset_experiment/threshold_sweep/sweep_structure_language.csv / .json
+Usage:  PYTHONHASHSEED=0 .venv/Scripts/python outputs/multi_dataset_experiment/scripts/13_noise_threshold_sweep.py [Road|BPIC ...]
 """
 import importlib.util
 import json
@@ -28,7 +28,7 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-spec = importlib.util.spec_from_file_location("lra", HERE / "12_loop_requirement_analysis.py")  # shim 포함
+spec = importlib.util.spec_from_file_location("lra", HERE / "12_loop_requirement_analysis.py")  # includes the LP-solver shim
 lra = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lra)
 
@@ -40,8 +40,10 @@ PROJECT_ROOT = HERE.parents[2]
 
 
 def _data_root(cli_root=None):
-    """data root: --data-root 인자 > 환경변수 ICPM2027_DATA_ROOT > <repo>/data/raw
-    (src/utils/data_utils.resolve_data_root와 같은 우선순위). P-BEAR-RL Full_input 폴더를 가리켜야 한다."""
+    """Data root: --data-root argument > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw.
+
+    Same priority as src/utils/data_utils.resolve_data_root; it must point to the P-BEAR-RL Full_input folder.
+    """
     import os
     if cli_root is None and "--data-root" in sys.argv:
         cli_root = sys.argv[sys.argv.index("--data-root") + 1]
@@ -52,7 +54,7 @@ def _data_root(cli_root=None):
 
 
 def _strip_data_root(argv):
-    """positional 인자를 읽기 전에 '--data-root X'를 argv에서 뺀다 (기존 인자 처리는 그대로)."""
+    """Remove '--data-root X' from argv before positional arguments are read (existing argument handling unchanged)."""
     if "--data-root" in argv:
         i = argv.index("--data-root")
         del argv[i:i + 2]
@@ -68,7 +70,7 @@ INPUTS = {
     "RoadTraffic": SIM / "RoadTraffic/exploratory_dedup/derived_data/Road_Traffic_1.00_dedup.csv",
     "BPIC2017": FULL / "b17_1.00.csv",
 }
-THRESHOLDS = [0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40]  # 0.15 / 0.40: Road 0.10 non-monotone, 0.20 == 0.30 -> 보조 후보
+THRESHOLDS = [0.0, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40]  # 0.15 / 0.40: Road 0.10 is non-monotone and 0.20 == 0.30 -> auxiliary candidates
 GUARD = 2_000_000
 TARGET = 0.95
 NMAX, TMAX = 12, 60
@@ -142,7 +144,7 @@ def run(ds, th):
         targets[str(p)] = b
         row[f"bound_for_{int(p*100)}"] = None if b is None else f"({b['loop_num']},{b['loop_total']})"
         row[f"language_for_{int(p*100)}"] = None if b is None else b["language_size"]
-    # guard(2M) 안에서 얻을 수 있는 최대 coverage: n마다 language <= GUARD인 가장 큰 t (language는 t에 대해 단조 증가)
+    # maximal coverage within the guard (2M): for each n the largest t with language <= GUARD (language grows monotonically in t)
     best_g = None
     for n in (range(1, NMAX + 1) if has_loop else [0]):
         lo, hi = (n, TMAX) if has_loop else (0, 0)

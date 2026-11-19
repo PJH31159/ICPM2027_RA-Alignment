@@ -1,21 +1,21 @@
-"""08_road_raw_vs_dedup.py — Road Traffic: raw clean log vs 중복 event 복원 derived copy의 discovery 비교 (탐색, official 아님)
+"""Road Traffic: discovery on the raw clean log vs. a duplicate-event derived copy.
 
-왜: Road_Traffic_1.00.csv에서 k(Appeal to Judge)를 포함한 clean case 475건은 모든 event가 두 번씩(x x y y ...) 들어 있다.
-    1차 진단에서 raw model은 LOOP 11개(거의 모든 activity가 *(x, tau))였고, k case를 discovery에서 빼면 LOOP가 1개만 남았다.
-    여기서는 k case를 빼지 않고 "한 번씩으로 복원"한 derived copy로 discovery를 다시 하고 raw와 비교한다.
-      A. raw clean log (현재 pipeline 입력 그대로)
-      B. derived copy: clean case 중 exact doubling(t[2i] == t[2i+1] 전부)인 case만 t[0::2]로 복원.
-         anomaly case는 바꾸지 않는다 (doubling 위에 주입된 anomaly를 복원하는 규칙은 정의되지 않음).
-      R. 참고: 예전 EXP-039~058의 Road XES model (원본 XES 전체, pm4py.discover_process_tree_inductive 기본값)
-    원본 파일은 읽기만 한다 (실행 전후 SHA-256 확인). official run / 연구 문서 반영은 하지 않는다.
+In Road_Traffic_1.00.csv, 475 clean cases containing k (Appeal to Judge) have every event twice
+(x x y y ...). With the raw log the discovered model has 11 LOOPs (almost every activity becomes *(x, tau)).
+This script restores those cases to single occurrences and compares discovery on:
+  A. the raw clean log
+  B. the derived copy: only clean cases with exact doubling (t[2i] == t[2i+1] for all i) are restored to t[0::2].
+     Anomalous cases are unchanged (no rule is defined to undo doubling below injected anomalies).
+  R. reference: a model discovered from the original Road Traffic XES (PM4Py inductive miner defaults)
+The raw file is only read (SHA-256 checked before and after).
 
-비교: Process Tree, LOOP / PARALLEL / XOR, places / transitions / tau / arcs,
-      clean fitness (exact Petri Net acceptance 비율 + token-based replay fitness),
-      anomaly acceptance (anomaly 200건 sample, seed 42, 05 script와 같은 sample), bounded trace growth.
+Comparison: process tree, LOOP / PARALLEL / XOR, places / transitions / tau / arcs, clean fitness (exact
+Petri-net acceptance and token-based replay fitness), anomaly acceptance (200-case sample, seed 42) and
+bounded trace growth.
 
-출력: outputs/simulation/RoadTraffic/exploratory_dedup/
-      derived_data/Road_Traffic_1.00_dedup.csv (90 MB급, gitignore) + manifest / 비교 결과
-실행: .venv\\Scripts\\python outputs\\multi_dataset_experiment\\scripts\\08_road_raw_vs_dedup.py
+Output: outputs/simulation/RoadTraffic/exploratory_dedup/
+        derived_data/Road_Traffic_1.00_dedup.csv (large, not tracked) + manifest / comparison results
+Usage:  .venv/Scripts/python outputs/multi_dataset_experiment/scripts/08_road_raw_vs_dedup.py
 """
 import sys
 import types
@@ -43,8 +43,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _data_root(cli_root=None):
-    """data root: --data-root 인자 > 환경변수 ICPM2027_DATA_ROOT > <repo>/data/raw
-    (src/utils/data_utils.resolve_data_root와 같은 우선순위). P-BEAR-RL Full_input 폴더를 가리켜야 한다."""
+    """Data root: --data-root argument > environment variable ICPM2027_DATA_ROOT > <repo>/data/raw.
+
+    Same priority as src/utils/data_utils.resolve_data_root; it must point to the P-BEAR-RL Full_input folder.
+    """
     import os
     if cli_root is None and "--data-root" in sys.argv:
         cli_root = sys.argv[sys.argv.index("--data-root") + 1]
@@ -55,7 +57,7 @@ def _data_root(cli_root=None):
 
 
 def _strip_data_root(argv):
-    """positional 인자를 읽기 전에 '--data-root X'를 argv에서 뺀다 (기존 인자 처리는 그대로)."""
+    """Remove '--data-root X' from argv before positional arguments are read (existing argument handling unchanged)."""
     if "--data-root" in argv:
         i = argv.index("--data-root")
         del argv[i:i + 2]
@@ -68,7 +70,7 @@ RAW = _data_root() / "encoded_anomaly" / "Road_Traffic_1.00.csv"
 XES = PROJECT_ROOT / "data/raw/Road_Traffic_Fine_Management_Process.xes"
 OUT = PROJECT_ROOT / "outputs/simulation/RoadTraffic/exploratory_dedup"
 DERIVED = OUT / "derived_data" / "Road_Traffic_1.00_dedup.csv"
-GUARD = dict(max_intermediate=2_000_000, max_seconds=120, max_rss_gb=6)  # 1차 진단(03)과 같은 guard
+GUARD = dict(max_intermediate=2_000_000, max_seconds=120, max_rss_gb=6)  # same guard as the generation feasibility probe
 ACCEPT_BUDGET_SEC = 600
 
 
@@ -85,7 +87,7 @@ def exact_double(t):
 
 
 def make_derived(df):
-    """clean exact-doubling case만 짝수 위치 event(0, 2, 4, ...)를 남긴다. Event 열은 case 안에서 다시 번호를 매긴다."""
+    """Keep the even-position events (0, 2, 4, ...) of clean exact-doubling cases only; renumber the Event column per case."""
     lab = df.groupby("Case", sort=False)["type_res_trace"].first()
     tr = df.groupby("Case", sort=False)["Activity"].agg(tuple)
     target = [c for c in tr.index if pd.isna(lab[c]) and exact_double(tr[c])]
@@ -152,7 +154,7 @@ def clean_fitness(tr, clean_ids, net, im, fm):
             checked[v] = None
     n_chk = sum(variants[v] for v, x in checked.items() if x is not None)
     n_acc = sum(variants[v] for v, x in checked.items() if x is True)
-    # token-based replay fitness (variant 대표 1건씩 x 빈도로 가중) — 빠른 보조 지표
+    # token-based replay fitness (one representative per variant, weighted by frequency): fast auxiliary metric
     vlist = list(variants)
     vid = {v: f"v{i}" for i, v in enumerate(vlist)}
     log = build_event_log([vid[v] for v in vlist], {vid[v]: list(v) for v in vlist})
@@ -207,7 +209,7 @@ def growth(tree, tr, clean_ids, grid):
 
 
 def grid_for(n_loop):
-    """loop가 L개일 때: 한 trace가 여러 loop를 1회씩 지나면 loop_total >= L 이 필요하다 (D004)."""
+    """With L loops, a trace that passes each loop once needs loop_total >= L."""
     L = max(1, n_loop)
     g = []
     for n in (1, 2, 3, 4):
@@ -244,7 +246,7 @@ def main():
     (OUT / "derived_copy_manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     print({k: v for k, v in manifest.items() if k != "restored_case_ids"}, flush=True)
 
-    pick = random.Random(42).sample(sorted(anom_r), 200)  # 05 script와 같은 sample (ids 정렬 후 seed 42)
+    pick = random.Random(42).sample(sorted(anom_r), 200)  # fixed sample: sorted ids, seed 42
     res = {}
     for name, tr, lab, clean, anom in (("A_raw", tr_r, lab_r, clean_r, anom_r), ("B_dedup", tr_d, lab_d, clean_d, anom_d)):
         print(f"\n[{name}] discovery", flush=True)

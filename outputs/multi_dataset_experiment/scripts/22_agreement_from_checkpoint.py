@@ -1,17 +1,17 @@
-"""22_agreement_from_checkpoint.py — 기존 all-optimal checkpoint의 B optimal set을 재사용해 B-X agreement 계산 (탐색 없음)
+"""B-X agreement from the B optimal sets stored in an existing all-optimal checkpoint (no search).
 
-왜 (BPIC 2017 B-C+PN, 2026-11-17):
-  07_pub_all_optimal_agreement.py는 case마다 B의 optimal repaired-trace 집합(native / tau-excluded)을 exact search로 구한 뒤
-  X(C 또는 C+PN)의 repaired trace가 그 집합에 속하는지만 본다. B의 집합은 X와 무관하므로, BPIC B-C 계산(약 21.5 h, 메모리 사고 1회)
-  때 checkpoint에 저장된 집합을 그대로 재사용하면 같은 탐색을 다시 할 필요가 없다. 판정 정의는 07과 동일하다.
+07_pub_all_optimal_agreement.py computes, per case, the set of optimal B repaired traces (native / tau-excluded) by
+exact search and then checks whether the repaired trace of X (C or C+PN) belongs to it. The B sets do not depend on X,
+so the sets stored in the checkpoint can be reused without repeating the search. Same decision definition as 07:
   - exact                 : X trace == B trace
-  - native all-optimal    : X trace ∈ B native optimal set
-  - tau-excluded all-opt. : X trace ∈ B tau-excluded optimal set
-  - state-limit / resource-limit case: checkpoint의 집합이 비어 있으므로 불일치 (공식 하한). 상한 = 하한 + limit case 수.
-검증: --check 를 주면 같은 checkpoint의 C log로 B-C를 다시 계산해 checkpoint 자체의 C_* 열 및 agreement_summary.json과
-      일치하는지 확인한다 (Road: B-C+PN 2293 / 2297 / 2354 재현, BPIC: B-C 926 / 983 / 998 재현).
+  - native all-optimal    : X trace in the B native optimal set
+  - tau-excluded all-opt. : X trace in the B tau-excluded optimal set
+  - state-limit / resource-limit cases: the stored set is empty -> disagreement (official lower bound);
+    upper bound = lower bound + number of limited cases.
+Check: --check recomputes B-C from the C column of the same checkpoint and verifies it against the checkpoint's own
+C_* columns and agreement_summary.json.
 
-실행: python 22_agreement_from_checkpoint.py --ckpt-run <run1 dir> --x-log <repaired log> --label CPN --gt <gt csv> --out <dir> [--check]
+Usage: python 22_agreement_from_checkpoint.py --ckpt-run <run1 dir> --x-log <repaired log> --label CPN --gt <gt csv> --out <dir> [--check]
 """
 import argparse
 import json
@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_ckpt(run_dir):
-    """checkpoint/*.jsonl -> {case_id: (row, native_set, tau_set)} ; 중복 case는 내용이 같은지 확인."""
+    """checkpoint/*.jsonl -> {case_id: (row, native_set, tau_set)}; duplicate cases must have identical content."""
     out = {}
     for f in sorted((run_dir / "checkpoint").glob("*.jsonl")):
         for ln in f.read_text(encoding="utf-8").splitlines():
@@ -96,7 +96,7 @@ def main():
     ref = run / "agreement_summary.json"
     if a.check and ref.exists():
         rs = json.loads(ref.read_text(encoding="utf-8"))
-        # 1) checkpoint 자체의 C 열로 B-C 재계산 == checkpoint C_* 열 == agreement_summary B-C counts
+        # 1) B-C recomputed from the checkpoint's own C column == checkpoint C_* columns == agreement_summary B-C counts
         ctr = {cid: r["C"] for cid, (r, _, _) in ck.items()}
         Tc, sc = agreement(ck, ctr, None, "C")
         own = {k: int(sum(bool(r.get(k)) for r, _, _ in ck.values())) for k in ("C_exact_eq_B", "C_in_native_set", "C_in_tau_excl_set")}
@@ -106,7 +106,7 @@ def main():
                        "detail": {"recomputed": got, "checkpoint_columns": own}})
         rc = rs["agreement"]["B-C"]["counts"]
         checks.append({"check": "B-C from checkpoint sets == agreement_summary.json B-C", "ok": got == rc, "detail": {"recomputed": got, "summary": rc}})
-        # 2) summary에 B-<label>가 이미 있으면(Road) 그것도 재현해야 함
+        # 2) if the summary already contains B-<label>, it must be reproduced as well
         key = f"B-{a.label}"
         if key in rs["agreement"]:
             rr = rs["agreement"][key]["counts"]

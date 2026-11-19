@@ -1,12 +1,13 @@
-"""19_memory_watchdog.py — agreement shard 실행 중 메모리 기록 + 위험 시 중단 (실험 정의와 무관한 운영 도구)
+"""Memory watchdog for all-optimal agreement runs (operational tool; does not affect the experiment definition).
 
-왜: BPIC 2017 all-optimal agreement 4-shard 실행이 가상 메모리 부족(Windows Event 2004, python.exe 하나가 ~59 GB)으로
-    PC 전체를 멈추게 했다 (2026-11-16). 같은 일이 다시 생기지 않도록 다음을 한다.
-    - 60초마다 시스템 available / used 메모리와, 감시 대상 PID(및 자식)의 RSS / peak working set을 csv에 기록
-    - available이 --min-avail-gb 아래로 떨어지면 감시 대상 process를 종료 (완료 case는 07의 checkpoint에 이미 저장됨)
-    - 감시 대상이 모두 끝나면 종료
+The exhaustive all-optimal search can exhaust system memory when several heavy cases run at the same time.
+    - every 60 s: log system available / used memory and the RSS / peak working set of the monitored PIDs
+      (and their children) to a csv
+    - if available memory drops below --min-avail-gb: terminate the monitored processes
+      (finished cases are already stored in the checkpoint of 07)
+    - exit when all monitored processes have finished
 
-실행: python 19_memory_watchdog.py --pids 123,456 --labels shard0,shard1 --out <csv> [--min-avail-gb 4]
+Usage: python 19_memory_watchdog.py --pids 123,456 --labels shard0,shard1 --out <csv> [--min-avail-gb 4]
 """
 import argparse
 import csv

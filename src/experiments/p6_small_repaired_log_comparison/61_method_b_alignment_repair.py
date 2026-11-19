@@ -1,46 +1,30 @@
-"""
-EXP-061 - Method B: Petri Net Alignment Repair -> Repaired Log B (D032)
+"""Method B: Petri-net alignment repair -> repaired log B.
 
-왜 이 실험을 하는가:
-    Method A(RP-BEAR, EXP-060)와 비교할 Method B의 repaired log를 만든다.
-    Method B는 정상 case로 Process Model을 찾고, 이상 trace를 그 모델에
-    alignment하여 "모델이 허용하는 가장 가까운 trace"로 수리한다.
+Method B discovers a process model from the clean cases and aligns each anomalous trace to it, so
+the trace is repaired to the closest trace allowed by the model:
+    clean cases of the anomaly log -> Inductive Miner (noise threshold 0) -> process tree -> Petri net
+    -> alignment -> repaired log B
 
-    Small_1.00.csv의 정상 case (type_res_trace 비어 있음, 11,453개)
-    -> Inductive Miner (noise threshold 0) -> Process Tree -> Petri Net
-    -> Alignment -> Repaired Log B
+Repair rule, with alignment move = (log label, model label):
+    - synchronous move   (a, a)       -> keep a
+    - log move           (a, '>>')    -> delete
+    - visible model move ('>>', b)    -> insert b
+    - tau model move     ('>>', None) -> skip (invisible transitions do not produce events)
+Cases are linked by case id, not by the position in the alignment result. If the alignment fails,
+the original anomalous trace is kept and a failure flag is set; only successfully aligned cases
+are guaranteed to be model-conformant.
 
-기대 결과:
-    - discovered model이 Small의 정상 6 variants를 정확히 재현하고,
-      정상 log fitness = 1.0
-    - test 524 cases (EXP-060 Run 1과 동일) + val 523 cases 수리
-    - 같은 조건으로 2회 실행하면 결과가 완전히 같다 (결정적)
+The ground truth is not used here. This script stores alignment diagnostics (cost, fitness, number
+of moves), which are not repair accuracy.
 
-Repair rule (D032):
-    alignment move = (log label, model label)
-    - synchronous move  (a, a)      -> a 유지
-    - log move          (a, '>>')   -> 삭제
-    - visible model move('>>', b)   -> b 삽입
-    - tau model move    ('>>', None)-> 제외
-    case는 alignment 결과의 위치가 아니라 case ID로 직접 연결한다.
-    alignment 실패 시 원래 anomalous trace를 그대로 두고 failure flag를 남긴다.
-    -> alignment가 성공한 case의 repaired trace만 model-conformant하다.
+The multi-dataset pipeline imports align_case / repair_from_alignment / load_case_traces /
+build_event_log from this file by path (utils/alignment_utils.py, utils/timing_utils.py).
 
-주의:
-    - Ground truth(Small.csv)는 이 script에서 사용하지 않는다 (EXP-062 평가 단계 전용).
-    - Repair accuracy(Exact Match Rate 등)는 EXP-062에서 계산한다. 이 script는
-      alignment diagnostic(cost, fitness, move 수)만 저장하며, 이는 repair
-      accuracy가 아니다.
-
-실행 방법 (프로젝트 루트, pm4py가 설치된 .venv):
-    .venv\\Scripts\\python src\\experiments\\p6_small_repaired_log_comparison\\61_method_b_alignment_repair.py --dry_run      (모델/입력 검사만)
-    .venv\\Scripts\\python src\\experiments\\p6_small_repaired_log_comparison\\61_method_b_alignment_repair.py --run_id 1     (공식 Repaired Log B)
-    .venv\\Scripts\\python src\\experiments\\p6_small_repaired_log_comparison\\61_method_b_alignment_repair.py --run_id 2     (재현성 확인용)
-    .venv\\Scripts\\python src\\experiments\\p6_small_repaired_log_comparison\\61_method_b_alignment_repair.py --compare_runs (Run 1 vs Run 2 비교)
-
-결과 해석 방법:
-    outputs/exp061_method_b_alignment/run1/ 의 repaired log가 공식 Repaired Log B이다.
-    alignment_per_case.csv의 cost / fitness는 Method B 전용 diagnostic이다.
+Standalone usage (Small, from the repository root, PM4Py environment .venv):
+    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --dry_run       (model / input checks only)
+    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --run_id 1      (official repaired log B)
+    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --run_id 2      (reproducibility run)
+    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --compare_runs  (run 1 vs run 2)
 """
 
 import argparse
@@ -62,23 +46,22 @@ from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments_
 from pm4py.objects.log.obj import Event, EventLog, Trace
 from pm4py.objects.process_tree.obj import Operator
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]  # REF-002: src/experiments/<phase>/<file>.py -> project root
+PROJECT_ROOT = Path(__file__).resolve().parents[3]  # src/experiments/<phase>/<file>.py -> repository root
 
 
 # ============================================================
-# 1. Experiment Settings (D032)
+# 1. Experiment settings
 # ============================================================
 
 DATA_NAME = "Small"
 ANOMALY_LOG_PATH = PROJECT_ROOT / "data" / "raw" / "Small_1.00.csv"
 NOISE_THRESHOLD = 0.0
 
-# 단일 trace alignment의 pm4py 기본 variant (최적 alignment, A* + state equation).
-# cost가 같은 최적 alignment가 여러 개일 때 어느 것을 고르는지는 variant에 따라
-# 달라질 수 있으므로 명시적으로 고정하고 기록한다.
+# PM4Py default variant for single-trace alignment (optimal alignment, A* + state equation).
+# Which of several equally optimal alignments is returned can depend on the variant, so it is fixed and recorded.
 ALIGNMENT_VARIANT = alignments_algo.Variants.VERSION_STATE_EQUATION_A_STAR
 
-# Method A 공식 split (EXP-060 Run 1)
+# train/test split of the official Small run
 METHOD_A_RUN1_DIR = PROJECT_ROOT / "outputs" / "exp060_repaired_log_a" / "run1"
 TEST_IDS_PATH = METHOD_A_RUN1_DIR / "Small_1000_ppm0.0_valratio0.5_seed42_run1_test_case_ids.txt"
 VAL_IDS_PATH = METHOD_A_RUN1_DIR / "Small_1000_ppm0.0_valratio0.5_seed42_run1_val_case_ids.txt"
@@ -98,12 +81,10 @@ def run_file(run_id, suffix):
 
 
 # ============================================================
-# 2. 데이터 로드
+# 2. Data loading
 # ============================================================
-#
-# pm4py의 dataframe 변환은 timestamp 기준 정렬을 할 수 있으므로,
-# 파일에 기록된 event 순서(Method A가 보는 순서와 동일)를 그대로 유지하기 위해
-# EventLog를 직접 만든다.
+# PM4Py dataframe conversion may re-sort events by timestamp, so the EventLog is built directly
+# to keep the event order of the file (the order RP-BEAR sees).
 
 def load_case_traces():
     df = pd.read_csv(ANOMALY_LOG_PATH, usecols=["Case", "Activity", "type_res_trace"])
@@ -130,11 +111,10 @@ def read_ids(path):
 
 
 # ============================================================
-# 3. Process Tree 언어 나열 (모델이 정상 variants를 재현하는지 검증용)
+# 3. Process-tree language enumeration (checks that the model reproduces the clean variants)
 # ============================================================
-#
-# SEQUENCE / XOR / PARALLEL / tau만 있는 tree는 언어가 유한하므로 모두 나열한다.
-# LOOP 등 다른 operator가 있으면 None을 반환한다 (유한 나열 불가).
+# Trees with only SEQUENCE / XOR / PARALLEL / tau have a finite language, which is enumerated in full.
+# Other operators (e.g. LOOP) return None.
 
 def interleave(a, b):
     if not a:
@@ -179,7 +159,7 @@ def count_operators(node, counter=None):
 
 
 # ============================================================
-# 4. Alignment 1건 -> repaired trace (D032 repair rule)
+# 4. One alignment -> repaired trace
 # ============================================================
 
 def repair_from_alignment(alignment):
@@ -187,17 +167,17 @@ def repair_from_alignment(alignment):
     n_sync = n_log = n_model_visible = n_tau = 0
     for log_label, model_label in alignment:
         if log_label != ">>" and model_label != ">>":
-            # synchronous move: 유지
+            # synchronous move: keep
             repaired.append(model_label)
             n_sync += 1
         elif model_label == ">>":
-            # log move: 삭제
+            # log move: delete
             n_log += 1
         elif model_label is None:
-            # tau(invisible) model move: 제외
+            # invisible (tau) model move: skip
             n_tau += 1
         else:
-            # visible model move: 삽입
+            # visible model move: insert
             repaired.append(model_label)
             n_model_visible += 1
     return repaired, {"n_sync_moves": n_sync, "n_log_moves": n_log, "n_model_moves_visible": n_model_visible, "n_tau_moves": n_tau}
@@ -211,7 +191,7 @@ def align_case(trace_obj, net, im, fm):
 
 
 # ============================================================
-# 5. Discovery + 모델 검사 (dry run과 공식 run 공통)
+# 5. Discovery + model checks (shared by the dry run and the official run)
 # ============================================================
 
 def discover_and_check(traces, clean_ids):
@@ -227,8 +207,8 @@ def discover_and_check(traces, clean_ids):
     language = enumerate_tree_language(tree)
     language_set = None if language is None else set(tuple(t) for t in language)
 
-    # 정상 log fitness: 같은 variant는 alignment 결과가 같으므로 variant별로 1회 alignment 후
-    # case 수로 가중 평균한다.
+    # clean-log fitness: identical variants have identical alignments, so each variant is aligned once
+    # and the result is weighted by its number of cases.
     variant_rows = []
     for variant, count in clean_variants.most_common():
         trace_obj = Trace()
@@ -272,7 +252,7 @@ def discover_and_check(traces, clean_ids):
 
 
 # ============================================================
-# 6. 실행 전 검사
+# 6. Pre-run checks
 # ============================================================
 
 def check_split(anomalous_ids):
@@ -332,7 +312,7 @@ def environment_text():
 
 
 # ============================================================
-# 7. Dry run: 모델 / 입력 검사만 (alignment repair는 하지 않음)
+# 7. Dry run: model / input checks only (no alignment repair)
 # ============================================================
 
 def dry_run():
@@ -369,7 +349,7 @@ def dry_run():
 
 
 # ============================================================
-# 8. 공식 run: discovery + alignment repair
+# 8. Official run: discovery + alignment repair
 # ============================================================
 
 def execute_run(run_id):
@@ -405,7 +385,7 @@ def execute_run(run_id):
     run_file(run_id, "model_check.json").write_text(json.dumps(model_check, indent=2, ensure_ascii=False), encoding="utf-8")
     pm4py.write_pnml(net, im, fm, str(run_file(run_id, "petri_net.pnml")))
 
-    # ----- alignment repair: test 524 + val 523, case ID로 직접 연결 -----
+    # ----- alignment repair of test + val cases, linked by case id -----
     rows_log, rows_case = [], []
     align_start = time.time()
     for case_type, ids in [("test", test_ids), ("val", val_ids)]:
@@ -420,7 +400,7 @@ def execute_run(run_id):
                 diag = {"alignment_cost": res["cost"], "fitness": res["fitness"],
                         "visited_states": res.get("visited_states"), "queued_states": res.get("queued_states")}
             except Exception as e:
-                # fallback: 원래 anomalous trace 보존 + failure flag
+                # fallback: keep the original anomalous trace and set the failure flag
                 repaired, failed, error = list(original), True, repr(e)
                 moves = {"n_sync_moves": None, "n_log_moves": None, "n_model_moves_visible": None, "n_tau_moves": None}
                 diag = {"alignment_cost": None, "fitness": None, "visited_states": None, "queued_states": None}
@@ -448,7 +428,7 @@ def execute_run(run_id):
     repaired_df = pd.DataFrame(rows_log)
     per_case = pd.DataFrame(rows_case)
     repaired_df.to_csv(run_file(run_id, "repaired_log_b.csv"), index=False)
-    # align_ms는 실행마다 달라지므로 재현성 비교용 파일에서는 분리한다
+    # align_ms differs between runs, so it is stored separately from the reproducibility files
     per_case.drop(columns=["align_ms"]).to_csv(run_file(run_id, "alignment_per_case.csv"), index=False)
     per_case[["case:concept:name", "type", "align_ms"]].to_csv(run_file(run_id, "alignment_timing.csv"), index=False)
     run_file(run_id, "test_case_ids.txt").write_text("\n".join(test_ids) + "\n", encoding="utf-8")
@@ -467,7 +447,7 @@ def execute_run(run_id):
         "n_alignment_failed_test": int(test_rows["alignment_failed"].sum()),
         "n_alignment_failed_val": int(per_case.loc[per_case["type"] == "val", "alignment_failed"].sum()),
         "n_model_conformant_test": int((test_rows["model_conformant"] == True).sum()),  # noqa: E712
-        # 아래는 Method B 전용 diagnostic (repair accuracy 아님)
+        # Method B diagnostics below (not repair accuracy)
         "diag_test_mean_alignment_cost": float(test_rows["alignment_cost"].mean()),
         "diag_test_mean_fitness": float(test_rows["fitness"].mean()),
         "diag_test_total_log_moves": float(test_rows["n_log_moves"].sum()),
@@ -489,7 +469,7 @@ def execute_run(run_id):
 
 
 # ============================================================
-# 9. 재현성 비교: Run 1 vs Run 2
+# 9. Reproducibility comparison: run 1 vs run 2
 # ============================================================
 
 DETERMINISTIC_FILES = ["repaired_log_b.csv", "alignment_per_case.csv", "model_check.json", "petri_net.pnml",
@@ -515,7 +495,7 @@ def compare_runs():
 
 
 # ============================================================
-# 10. Entry Point
+# 10. Entry point
 # ============================================================
 
 if __name__ == "__main__":

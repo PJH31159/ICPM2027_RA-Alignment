@@ -20,7 +20,7 @@ my_path = os.path.abspath('')
 
 def discover_NBG(clean, vis=False):
 
-    # trace variant와 빈도 계산
+    # trace variants and their frequencies
     traces = clean.groupby('case:concept:name', observed=True)['concept:name'] \
                   .transform(lambda x: '>>'.join(x))
 
@@ -28,7 +28,7 @@ def discover_NBG(clean, vis=False):
     variant_freq['var_id'] = ['var_' + str(i) for i in range(len(variant_freq))]
     variant_freq['element'] = variant_freq['trace'].apply(lambda x: list(x.split('>>')))
 
-    # 그래프 생성을 위한 데이터 준비
+    # prepare the data for graph construction
     clean2 = clean[['case:concept:name', 'concept:name', 'order']] \
         .rename(columns={"concept:name": "from", "order": "level"}, copy=False)
     clean2['FROM'] = clean2['from'].astype(str) + '_' + clean2['level'].astype(str)
@@ -53,7 +53,7 @@ def discover_NBG(clean, vis=False):
         cat_2a = cat_2.groupby('var_id')['level']
         cat_2['level'] = cat_2a.cumcount() - cat_2a.transform(lambda x: (x.values).argmax())
 
-        # 동일 activity가 한 trace 안에 여러 번 등장하는 경우 처리
+        # handle activities that occur several times in one trace
         if sum(cat_1['duplicate'] > 1) > 0:
             for _, row in cat_1[cat_1['duplicate'] > 1].iterrows():
                 temp1 = cat_2[cat_2['var_id'] == str(row['var_id'])]
@@ -154,14 +154,14 @@ def discover_pattern(episode_history):
     df_explain['predict_patterns'] = ''
     df_explain['predict_patterns_simple'] = ''
 
-    # remove -> insert 패턴으로 해석
+    # interpret as a remove -> insert pattern
     loc_insert = (df_explain['action'] == 'remove')
     if sum(loc_insert) > 0:
         df_explain.loc[loc_insert, 'predict_patterns'] = \
             df_explain.loc[loc_insert, ['loc', 'label']] \
                       .apply(lambda x: 'insert_' + str(x[0]) + '_' + str(x[1]), axis=1)
 
-    # inject -> skip 패턴으로 해석
+    # interpret as an inject -> skip pattern
     loc_skip = (df_explain['action'] == 'inject')
     if sum(loc_skip) > 0:
         df_explain.loc[loc_skip, 'predict_patterns'] = \
@@ -211,8 +211,8 @@ def discover_pattern(episode_history):
 
 
 # ────────────────────────────────────────────────────────────
-# process_case_id_wrapper - 메모리 처리는 main에서 담당하므로 여기서는
-# 단일 case에 대해 RL 학습(또는 추론)만 충실히 수행합니다.
+# process_case_id_wrapper: RL training (or inference) for a single case.
+# The repair memory is handled by the caller (sim._process_case_with_memory).
 # ────────────────────────────────────────────────────────────
 def process_case_id_wrapper(
     case_id_for_processing,
@@ -223,16 +223,16 @@ def process_case_id_wrapper(
     p_NBGs,
     p_num_epi,
     alpha,
-    agent,                  # ← main.py에서 생성한 공유 agent를 주입받음
-    train_mode=True,        # ← True=validation(학습), False=test(추론)
-    case_type='val',        # ← 결과 CSV의 type 열 값 ('val' 또는 'test')
-    max_step=8              # ← 최대 탐색 스텝
+    agent,                  # shared agent created by the caller
+    train_mode=True,        # True = training ('validation') phase, False = test phase
+    case_type='val',        # value of the 'type' column in the result CSV ('val' or 'test')
+    max_step=8              # maximum number of steps per episode
 ):
 
     obs_case = p_anomaly_nolabel.loc[p_anomaly_nolabel['case:concept:name'] == case_id_for_processing].reset_index(drop=True)
     env = P_BEAR_RL(obs_case, p_actset, p_filtered_actset, p_NBGs, alpha=alpha)
 
-    # 추론 모드(test)일 경우 에피소드는 1회만 실행하고 종료
+    # training: num_epi episodes; test: at most 100 episodes, stopping at the first success (see below)
     episodes = p_num_epi if train_mode else 100 
     
     all_episode_histories = []
@@ -245,15 +245,15 @@ def process_case_id_wrapper(
         episode_history = []
 
         while not done and not game_over:
-            # 행동 선택 (train_mode에 따라 epsilon-greedy 또는 순수 greedy)
-            action = agent.select_action(state, greedy_only=0)  # greedy_only=not train_mode
+            # action selection: epsilon-greedy in both phases (greedy_only=0)
+            action = agent.select_action(state, greedy_only=0)
 
             next_state, reward, done, game_over, info, loc, label_act, rework = env.step(action,
                 max_step=max_step,
-                deterministic=0 #not train_mode 
+                deterministic=0
             )
 
-            # validation(train_mode=True)일 때만 Q-table 업데이트
+            # Q-table update only in the training phase (train_mode=True)
             if train_mode:
                 agent.update_q_value(state, action, reward, next_state)
                 agent.decay_exploration_rate()
@@ -281,7 +281,7 @@ def process_case_id_wrapper(
     if len(all_episode_histories) > 0:
         check_clean = [h[0] for h in all_episode_histories]
 
-        # steps-1 > 0 인 것 중 최소 step episode 선택
+        # among episodes with steps-1 >= 0, select those with the fewest steps
         positive_histories = [hist for hist in all_episode_histories if hist[0] >= 0]
 
         if len(positive_histories) > 0:
@@ -312,7 +312,7 @@ def process_case_id_wrapper(
         rl_steps = 0
         rl_success = 0
 
-    # 결과 데이터에 메타데이터 기록 (타입, 성공여부, 스텝 수)
+    # record metadata in the result (type, success flag, number of steps)
     case_result_df['type'] = case_type
     case_result_df['rl_steps'] = rl_steps
     case_result_df['rl_success'] = rl_success
@@ -328,7 +328,7 @@ class P_BEAR_RL:
         self.filtered_actset = filtered_actset
         self.actset = actset
         self.alpha = alpha
-        self.action_space = list(range(len(filtered_actset) + 2))  # 0~1 remove, 2~ inject
+        self.action_space = list(range(len(filtered_actset) + 2))  # 0-1: remove, 2-: inject
         self.action_labels = ["remove_A", "remove_B"] + [f'inject_{item}' for item in filtered_actset]
         self.current_step = 0
         self.NBGs = NBGs
@@ -386,14 +386,14 @@ class P_BEAR_RL:
         return self.state
 
     def _select_loc(self, indices_greater_than_one, mode='left'):
-        # test 단계에서 랜덤 대신 고정된 규칙으로 이상 위치 선택
+        # deterministic location rule (used only when deterministic=True)
         if len(indices_greater_than_one) == 0:
             return None
 
         if mode == 'left':
-            return min(indices_greater_than_one)    # 가장 앞쪽 이상 위치
+            return min(indices_greater_than_one)    # first anomaly location
         elif mode == 'right':
-            return max(indices_greater_than_one)    # 가장 뒤쪽 이상 위치
+            return max(indices_greater_than_one)    # last anomaly location
         else:
             return min(indices_greater_than_one)
 
@@ -513,7 +513,7 @@ class QLearningAgent:
         exploration_decay_rate=0.0001
     ):
         self.filtered_actset = filtered_actset
-        self.action_space = list(range(len(filtered_actset) + 2))  # 0~1 remove, 2~ inject
+        self.action_space = list(range(len(filtered_actset) + 2))  # 0-1: remove, 2-: inject
         self.act_freq = act_freq
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
@@ -549,16 +549,16 @@ class QLearningAgent:
     def select_action(self, state, greedy_only=False):
 
         if greedy_only:
-            # test 전용: Q값 최대 행동만 선택 (탐험 완전 차단)
+            # greedy only: action with the highest Q-value (no exploration)
             q_values = [self.get_q_value(state, a) for a in self.action_space]
             return int(np.argmax(q_values))
 
-        # validation: 기존 epsilon-greedy 그대로 유지
+        # default: epsilon-greedy
         if random.random() < self.exploration_rate:
             if random.random() < 0.5:
                 return random.choice([0, 1])
             else:
-                # inject action을 activity frequency 기반으로 샘플링
+                # sample the inject action by activity frequency
                 return random.choices(
                     range(2, len(self.filtered_actset) + 2),
                     weights=self.act_freq.prob,
