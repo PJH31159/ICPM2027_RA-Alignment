@@ -47,7 +47,7 @@ def main():
     ap.add_argument("--check-road", action="store_true")
     a = ap.parse_args()
     res = {"label": f"B-{a.label}", "b_dir": a.b_dir, "x_log": a.x_log, **exact(a.b_dir, a.x_log),
-           "definition": "exact agreement = official X repaired trace == official B repaired trace (07과 같은 정의)"}
+           "definition": 'exact agreement = official X repaired trace == official B repaired trace (same definition as 07)'}
     if a.check_road:
         rd = "outputs/simulation/RoadTraffic/threshold_0p20"
         s = json.loads((PROJECT_ROOT / rd / "alignment_all_optimal_analysis/run1/agreement_summary.json").read_text(encoding="utf-8"))

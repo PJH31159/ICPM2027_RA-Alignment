@@ -151,7 +151,7 @@ def _load_and_prepare_data(data_name: str, input_paths: dict | None = None):
             .to_dict()
         )
     except Exception as e:
-        print(f"[경고] 정상 데이터({normal_data_path})를 불러오지 못했습니다. 실시간 정확도 계산이 생략됩니다. 오류: {e}")
+        print(f"[WARNING] could not load the normal data ({normal_data_path}); the running accuracy is skipped. Error: {e}")
 
     # add 'Start' and 'End' activities
     data["order"] = data.groupby("case:concept:name", observed=True).cumcount() + 1
@@ -245,12 +245,12 @@ def _report_progress(result, case_id, gt_traces, idx, total, success_count, case
         else:
             method_label = "Greedy" if is_run else "Mem   "
 
-        status = "성공(O)" if is_correct else "실패(X)"
+        status = 'success(O)' if is_correct else 'failure(X)'
         acc_rate = (success_count / idx) * 100
 
         print(
             f"[{case_type.capitalize()} {idx:4d}/{total}] Case: {str(case_id):12s} | "
-            f"방식: {method_label} | 수리: {status} | 실시간 p.anomaly: {acc_rate:6.2f}% "
+            f"path: {method_label} | repair: {status} | running p.anomaly: {acc_rate:6.2f}% "
             f"({success_count}/{idx})"
         )
 
@@ -436,7 +436,7 @@ def run_rpbear(
 
     if verbose:
         print("\n" + "=" * 70)
-        print("RP-BEAR-RL 시작 (sim.run_rpbear, Method A)")
+        print('RP-BEAR-RL start (sim.run_rpbear, Method A)')
         print(
             f"data={data_name} | num_epi={num_epi} | alpha={alpha} | "
             f"val_ratio={val_ratio} | seed={seed} | max_step={max_step} | "
@@ -473,7 +473,7 @@ def run_rpbear(
         # Training phase ('validation' in the code; train_mode=True, Q-table updated)
         # ------------------------------------------------------
         if verbose:
-            print("\n[1/2] Validation phase 시작...")
+            print('\n[1/2] Validation phase start...')
 
         val_results, val_rl_count, val_success_count, val_total_ms, val_per_case_ms, val_timing = _run_phase(
             caseids=val_caseids,
@@ -498,7 +498,7 @@ def run_rpbear(
         )
 
         if verbose:
-            print(f"\n[INFO] Validation 완료: total={val_total_ms:.2f} ms | per_case={val_per_case_ms:.2f} ms")
+            print(f"\n[INFO] Validation finished: total={val_total_ms:.2f} ms | per_case={val_per_case_ms:.2f} ms")
 
         model_path = None
         if save_outputs:
@@ -514,13 +514,13 @@ def run_rpbear(
             agent.q_table = shared_q_table
 
             if verbose:
-                print(f"[INFO] Agent 저장 완료 -> {model_path}")
+                print(f"[INFO] Agent saved -> {model_path}")
 
         # ------------------------------------------------------
         # Test phase (train_mode=False, no Q-table update)
         # ------------------------------------------------------
         if verbose:
-            print("\n[2/2] Test phase 시작...")
+            print('\n[2/2] Test phase start...')
 
         test_results, test_rl_count, test_success_count, test_total_ms, test_per_case_ms, test_timing = _run_phase(
             caseids=test_caseids,
@@ -545,7 +545,7 @@ def run_rpbear(
         )
 
         if verbose:
-            print(f"\n[INFO] Test 완료: total={test_total_ms:.2f} ms | per_case={test_per_case_ms:.2f} ms")
+            print(f"\n[INFO] Test finished: total={test_total_ms:.2f} ms | per_case={test_per_case_ms:.2f} ms")
 
         # read the Q-table size while the manager is still alive (before shutdown)
         q_table_size = len(agent.q_table)
@@ -606,15 +606,15 @@ def run_rpbear(
         pd.DataFrame([stats]).to_csv(output_dir / f"{base_name}_repaired_log_a_stats.csv", index=False)
 
         if verbose:
-            print(f"\n결과 저장 완료 -> {output_dir / (base_name + '_repaired_log_a.csv')}")
-            print(f"통계 저장 완료 -> {output_dir / (base_name + '_repaired_log_a_stats.csv')}")
+            print(f"\nResults saved -> {output_dir / (base_name + '_repaired_log_a.csv')}")
+            print(f"Statistics saved -> {output_dir / (base_name + '_repaired_log_a_stats.csv')}")
 
     if verbose:
         print("\n" + "=" * 70)
-        print("run_rpbear 완료 (Method A)")
+        print('run_rpbear finished (Method A)')
         print(f"Validation p.anomaly: {stats['val_p_anomaly'] * 100:.2f}%")
         print(f"Test p.anomaly      : {stats['test_p_anomaly'] * 100:.2f}%")
-        print(f"전체 실행 시간       : {total_execution_sec:.4f} sec")
+        print(f"Total run time       : {total_execution_sec:.4f} sec")
         print("=" * 70)
 
     if return_case_timing:

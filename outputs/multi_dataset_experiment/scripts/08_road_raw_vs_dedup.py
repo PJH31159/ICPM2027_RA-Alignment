@@ -264,7 +264,7 @@ def main():
         pm4py.write_pnml(net, im, fm, str(OUT / f"{name}_petri_net.pnml"))
         res[name] = s
 
-    print("\n[R_old_xes] reference: EXP-039~058 XES model (pm4py.discover_process_tree_inductive(read_xes) default)", flush=True)
+    print('\n[R_old_xes] reference: model from the original Road Traffic XES (pm4py.discover_process_tree_inductive(read_xes) default)', flush=True)
     t0 = time.time()
     xdf = pm4py.read_xes(str(XES))
     xtree = pm4py.discover_process_tree_inductive(xdf)

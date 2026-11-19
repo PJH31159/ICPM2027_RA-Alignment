@@ -151,9 +151,9 @@ def main():
     if a.merge:
         missing = [c for c in ids if c not in done]
         if missing:
-            print(f"[ERROR] merge: {len(missing)}/{len(ids)} case 미완료 (예: {missing[:5]})")
+            print(f"[ERROR] merge: {len(missing)}/{len(ids)} cases unfinished (e.g. {missing[:5]})")
             sys.exit(2)
-    print(f"checkpoint: {len(done)} case 완료됨, 이번 대상 {sum(c not in done for c in todo)}/{len(todo)}", flush=True)
+    print(f"checkpoint: {len(done)} cases done, to do in this run {sum(c not in done for c in todo)}/{len(todo)}", flush=True)
     res_skip = set()
     if a.resource_skip and Path(a.resource_skip).exists():
         res_skip = {ln.split("	")[0].strip() for ln in Path(a.resource_skip).read_text(encoding="utf-8").splitlines() if ln.strip()}
@@ -228,7 +228,7 @@ def main():
         print(f"[shard {a.shard}] done -> {ck_file}")
         return
     if len(rows) != len(ids):
-        print(f"[ERROR] {len(rows)}/{len(ids)} case만 있음")
+        print(f"[ERROR] {len(rows)}/{len(ids)} cases present")
         sys.exit(2)
     T = pd.DataFrame(rows)
     T.to_csv(out / "case_summary.csv", index=False)
@@ -236,7 +236,7 @@ def main():
     n = len(T)
     summ = {"cases": n, "lp_solver_in_process": lp_solver.DEFAULT_LP_SOLVER_VARIANT, "b_dir": a.b_dir,
             "c_log": a.c_log, "cpn_log": a.cpn_log, "total_sec": round(elapsed_prev + time.time() - t_all, 2),
-            "total_sec_note": "checkpoint case 시간의 합 + 이번 실행 시간 (shard 병렬 실행이면 wall time이 아니라 CPU 순차 합에 가까움)",
+            "total_sec_note": 'sum of checkpointed case times + this run (with parallel shards this is closer to the sequential CPU sum than to wall time)',
             "checks": {"exact_cost_eq_B": int(T.exact_cost_eq_B.sum()), "B_in_native_set": int(T.B_in_native_set.sum()),
                        "B_in_tau_excl_set": int(T.B_in_tau_excl_set.sum()), "native_subset_of_tau_excl": int(T.native_subset_of_tau_excl.sum()),
                        "state_limit_hit": int(T.state_limit_hit.sum()), "gen_less_memory_eq_native": int((T.gen_less_memory_eq_native == True).sum()),  # noqa: E712

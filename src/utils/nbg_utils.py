@@ -210,7 +210,7 @@ def build_expanded_nbgs(clean, model_only_log_path, actset):
     if mismatches:
         raise NBGValidationError(f"Expanded New NBG ordering mismatch: {mismatches}")
     info = {
-        "nbg_input": "original_plus_model_only (W2, D039)",
+        "nbg_input": 'original_plus_model_only (W2)',
         "observed_clean_cases": int(obs_tr.size), "observed_clean_variants": int(obs_tr.nunique()),
         "model_only_traces": int(gen_tr.size),
         "anchor_match": f"{len(actset)}/{len(actset)}",

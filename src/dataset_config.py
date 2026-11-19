@@ -57,7 +57,7 @@ DATASETS = {
     "Small": {
         "file_stem": "Small",
         "identity_confirmed": True,
-        "identity_note": "EXP-060~063에서 사용한 Small (data/raw와 P-BEAR-RL 파일이 byte 동일)",
+        "identity_note": 'Small from P-BEAR-RL Full_input (byte-identical to the data/raw copy)',
         "trace_generation": {"strategy": "exhaustive_acyclic"},  # acyclic model: enumerate the full model language
         "expected_model": {  # regression check of the Small pipeline
             "n_places": 16, "n_transitions": 20, "n_invisible_transitions": 0, "n_arcs": 40,
@@ -92,7 +92,7 @@ DATASETS = {
     "Medium": {
         "file_stem": "Medium",
         "identity_confirmed": True,
-        "identity_note": "P-BEAR-RL Full_input의 Medium (아직 이 프로젝트에서 사용한 적 없음)",
+        "identity_note": 'Medium from P-BEAR-RL Full_input',
         # No LOOP / PARALLEL / cycle and model language = observed variants, so exhaustive enumeration is
         # allowed (the generate stage checks this again).
         "trace_generation": {"strategy": "exhaustive_acyclic"},
@@ -101,8 +101,7 @@ DATASETS = {
     "Large": {
         "file_stem": "Large",
         "identity_confirmed": True,
-        "identity_note": "정상 log Large.csv는 data/raw와 P-BEAR-RL이 byte 동일 (Phase 2에서 사용). "
-                         "이상 log Large_1.00.csv는 P-BEAR-RL에만 있음",
+        "identity_note": 'Large from P-BEAR-RL Full_input (normal log byte-identical to the data/raw copy)',
         # same generation definition as Small (acyclic model)
         "trace_generation": {"strategy": "exhaustive_acyclic"},
         "expected_model": None,
@@ -110,7 +109,7 @@ DATASETS = {
     "Wide": {
         "file_stem": "Wide",
         "identity_confirmed": True,
-        "identity_note": "P-BEAR-RL Full_input의 Wide (아직 이 프로젝트에서 사용한 적 없음)",
+        "identity_note": 'Wide from P-BEAR-RL Full_input',
         # No LOOP / PARALLEL / cycle and model language = observed variants, so exhaustive enumeration is
         # allowed (the generate stage checks this again).
         "trace_generation": {"strategy": "exhaustive_acyclic"},
@@ -119,8 +118,7 @@ DATASETS = {
     "Credit": {
         "file_stem": "credit-card",
         "identity_confirmed": False,
-        "identity_note": "TODO: 교수님이 말한 'Credit'이 P-BEAR-RL의 credit-card인지 재확인 필요 "
-                         "(README에서는 Credit으로 표기)",
+        "identity_note": "credit-card from P-BEAR-RL Full_input; named Credit in the paper (P-BEAR-RL README: 'credit-card, mccloud (named as Credit, Pub in our paper)')",
         # loop model: bounded generation with the official loop bound (5,7)
         "trace_generation": {
             "strategy": "bounded_loop", "loop_num": 5, "loop_total": 7,
@@ -141,8 +139,7 @@ DATASETS = {
     "Pub": {
         "file_stem": "mccloud",
         "identity_confirmed": True,
-        "identity_note": "P-BEAR-RL README 'credit-card, mccloud (named as Credit, Pub in our paper)' + 교수님 확인 "
-                         "(2026-11-10). normal = encoded_normal/mccloud.csv, anomaly = encoded_anomaly/mccloud_1.00.csv",
+        "identity_note": "mccloud from P-BEAR-RL Full_input; named Pub in the paper (P-BEAR-RL README: 'credit-card, mccloud (named as Credit, Pub in our paper)'). normal = encoded_normal/mccloud.csv, anomaly = encoded_anomaly/mccloud_1.00.csv",
         # One LOOP -> loop_total = loop_num. Main bound (4,4): from (4,4) to (5,5) the generated traces grow
         # from 6,339 to 14,907 while clean coverage only goes from 99.98% to 100% (elbow). (3,3) / (5,5) are sensitivity bounds.
         "trace_generation": {"strategy": "bounded_loop", "loop_num": 4, "loop_total": 4, "reference_traces": None},
@@ -153,10 +150,7 @@ DATASETS = {
     "Road": {
         "file_stem": "Road_Traffic",
         "identity_confirmed": False,
-        "identity_note": "TODO: 교수님이 말한 'Road'가 P-BEAR-RL의 Road_Traffic인지 재확인 필요. "
-                         "또한 이 Road_Traffic CSV가 EXP-039~058에서 사용한 Road Traffic XES와 "
-                         "같은 source/process인지 이름만으로 가정하지 않는다. Road 단계 전에 "
-                         "dataset identity 검증이 먼저 필요하다.",
+        "identity_note": 'Legacy entry (raw Road_Traffic); the experiments use the RoadTraffic configuration.',
         "expected_model": None,
     },
     # Road / BPIC: Method C unchanged; the Petri net is simplified via the discovery noise_threshold.
@@ -165,9 +159,7 @@ DATASETS = {
         "file_stem": "Road_Traffic",
         "run_name": "Road_Traffic_dedup",
         "identity_confirmed": True,
-        "identity_note": "P-BEAR-RL Full_input Road_Traffic. Road exploratory preprocessing: duplicate-event derived copy "
-                         "(08_road_raw_vs_dedup.py: clean case 중 모든 event가 정확히 두 번씩 들어간 475건을 한 번씩으로 복원, "
-                         "anomaly case는 그대로). 원본 raw 파일은 수정하지 않는다. 교수님의 명시적 dedup 승인은 아직 없음",
+        "identity_note": 'P-BEAR-RL Full_input Road_Traffic, duplicate-event derived copy (08_road_raw_vs_dedup.py: the 475 clean cases in which every event occurs exactly twice are restored to single occurrences; anomalous cases unchanged). The raw file is not modified.',
         "anomaly_log_override": "outputs/simulation/RoadTraffic/exploratory_dedup/derived_data/Road_Traffic_1.00_dedup.csv",
         # the loop bound depends on the threshold (13_noise_threshold_sweep.py); set it with --loop-bound
         "trace_generation": {"strategy": "bounded_loop", "loop_num": 1, "loop_total": 1, "reference_traces": None},

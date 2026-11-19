@@ -22,21 +22,21 @@ def decide_strategy(tg_cfg, model_check):
     s = model_check["structure"]
     reasons = []
     if strategy is None:
-        reasons.append("trace_generation.strategy가 설정되지 않음 (TODO: 모델 구조를 보고 결정)")
+        reasons.append('trace_generation.strategy is not set; choose a strategy from the model structure')
     elif strategy not in SUPPORTED_STRATEGIES:
-        reasons.append(f"지원하지 않는 strategy '{strategy}' (구현된 것: {SUPPORTED_STRATEGIES})")
+        reasons.append(f"unsupported strategy '{strategy}' (implemented: {SUPPORTED_STRATEGIES})")
     else:
         if s["n_loop_operators"] > 0:
-            reasons.append(f"Process Tree에 LOOP {s['n_loop_operators']}개 -> exhaustive 금지, bounded 설계 필요")
+            reasons.append(f"process tree has {s['n_loop_operators']} LOOP operators -> exhaustive enumeration not allowed, bounded generation required")
         if s["n_other_operators"] > 0:
-            reasons.append(f"Process Tree에 지원하지 않는 operator {s['n_other_operators']}개")
+            reasons.append(f"process tree has {s['n_other_operators']} unsupported operators")
         if s["petri_net_has_cycle"]:
-            reasons.append("Petri Net에 cycle 있음 -> exhaustive 금지")
+            reasons.append('Petri net has a cycle -> exhaustive enumeration not allowed')
         est = s["estimated_raw_tree_language_size"]
         if est is None:
-            reasons.append("예상 언어 크기를 계산할 수 없음")
+            reasons.append('expected language size cannot be computed')
         elif est > tg_cfg["safety_max_traces"]:
-            reasons.append(f"예상 raw 언어 크기 {est} > safety_max_traces {tg_cfg['safety_max_traces']}")
+            reasons.append(f"expected raw language size {est} > safety_max_traces {tg_cfg['safety_max_traces']}")
     return {"allowed": not reasons, "strategy": strategy, "reasons": reasons}
 
 

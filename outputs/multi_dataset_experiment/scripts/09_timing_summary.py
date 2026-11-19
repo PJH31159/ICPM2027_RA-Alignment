@@ -28,11 +28,10 @@ SIM = PROJECT_ROOT / "outputs/simulation"
 OUT = PROJECT_ROOT / "outputs/multi_dataset_experiment"
 
 SCOPE = {
-    "rl_train": "validation(학습) phase wall-clock, sim.py val_total_ms (data load / NBG / save / test 제외)",
-    "rl_test_official": "mean / median = case별 timer (official run, 15 workers multiprocessing의 worker 안 perf_counter, CPU 공유 영향 포함); "
-                        "test_wall_ms_per_case = test phase wall-clock / test cases (병렬 throughput, 원본 논문 산식)",
-    "rl_test_replay": "D037 sequential test-only replay (학습된 agent, 1 process); mean/median = case별 timer, all cases (RL + memory 재사용)",
-    "b_test": "case별 align_case + repair_from_alignment (perf_counter, 1 process 순차), test cases",
+    "rl_train": "training ('validation') phase wall-clock, sim.py val_total_ms (excludes data load / NBG / save / test)",
+    "rl_test_official": 'mean / median = per-case timer (official run, perf_counter inside the workers of 15-worker multiprocessing, includes CPU sharing); test_wall_ms_per_case = test phase wall-clock / test cases (parallel throughput, original paper formula)',
+    "rl_test_replay": 'sequential test-only replay (trained agent, 1 process); mean/median = per-case timer, all cases (RL + memory reuse)',
+    "b_test": 'per-case align_case + repair_from_alignment (perf_counter, 1 process, sequential), test cases',
 }
 
 
@@ -69,9 +68,8 @@ def rl_official(ds, method, d, solver_note):
         "test_scope": SCOPE["rl_test_official"], "num_cores": st.get("num_cores"), "num_epi": st.get("num_epi"),
         "q_table_size": st.get("q_table_size"), "discovery_ms": None, **pre(ds), "nbg_build_ms": None,
         "nbg_ms_in_run": st.get("nbg_ms"), "source": rel(one(d, "*_stats.json")) + " ; " + rel(one(d, "*_case_timing.csv")),
-        "note": "nbg_ms_in_run=0: Method C/C+PN은 nbg stage에서 만든 NBG를 override로 받아 run 안에서 NBG를 만들지 않음. "
-                "nbg stage의 NBG 생성 시간은 저장되지 않음" if method != "A" else
-                "Method A: run 안에서 Original NBG를 만든 시간 = nbg_ms_in_run",
+        "note": 'nbg_ms_in_run=0: Method C/C+PN receive the NBGs built by the nbg stage as override and build no NBG inside the run; the nbg-stage build time is not stored' if method != "A" else
+                'Method A: time to build the Original NBG inside the run = nbg_ms_in_run',
     }
 
 
@@ -81,7 +79,7 @@ def b_official(ds, d, solver_note):
     te = tm[tm.type == "test"]
     return {
         "dataset": ds, "method": "B", "run_id": 1, "timing_source": "official_run", "solver": solver_note,
-        "train_cases": None, "test_cases": int(st["n_test"]), "training_ms": None, "training_scope": "N/A (RL 학습 없음)",
+        "train_cases": None, "test_cases": int(st["n_test"]), "training_ms": None, "training_scope": 'N/A (no RL training)',
         "test_repair_total_ms": round(float(te.align_ms.sum()), 4),
         "test_wall_ms_per_case": round(float(te.align_ms.sum()) / len(te), 4),
         "test_repair_mean_ms_per_case": round(float(te.align_ms.mean()), 4),
@@ -89,7 +87,7 @@ def b_official(ds, d, solver_note):
         "test_scope": SCOPE["b_test"], "num_cores": 1, "num_epi": None, "q_table_size": None,
         "discovery_ms": round(st["discovery_sec"] * 1000, 4), "generation_ms": None, "nbg_build_ms": None, "nbg_ms_in_run": None,
         "source": rel(one(d, "*_stats.json")) + " ; " + rel(one(d, "*_alignment_timing.csv")),
-        "note": "discovery_ms = IM discovery + Petri Net 변환 (preprocessing, training 아님)",
+        "note": 'discovery_ms = IM discovery + Petri-net conversion (preprocessing, not training)',
     }
 
 
@@ -105,13 +103,13 @@ def replay(ds, method, f):
         rl_n, rl_mean = t["test_case_ms_rl_n"], t["test_case_ms_rl_mean"]
     return {"dataset": ds, "method": method, "run_id": 1, "timing_source": f"sequential_replay_{f.parent.name.split('_')[0]}",
             "solver": "cvxopt" if method == "B" else None, "train_cases": None, "test_cases": n, "training_ms": None,
-            "training_scope": "replay는 학습하지 않음 (official training_ms 행 참고)", "test_repair_total_ms": total,
+            "training_scope": 'the replay does not train (see the official training_ms row)', "test_repair_total_ms": total,
             "test_wall_ms_per_case": round(total / n, 4) if total else None,
             "test_repair_mean_ms_per_case": mean, "test_repair_median_ms_per_case": med,
             "test_rl_path_cases": rl_n, "test_rl_path_timer_mean_ms": rl_mean,
             "test_scope": SCOPE["b_test"] if method == "B" else SCOPE["rl_test_replay"], "num_cores": 1,
             "num_epi": None, "q_table_size": None, "discovery_ms": None, "generation_ms": None, "nbg_build_ms": None,
-            "nbg_ms_in_run": None, "source": rel(f), "note": "D037 timing 전용 재실행 (accuracy 결과 아님)"}
+            "nbg_ms_in_run": None, "source": rel(f), "note": 'timing-only replay (not an accuracy result)'}
 
 
 def main():
@@ -132,10 +130,10 @@ def main():
                 rows.append(replay("Credit", m, f))
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "timing_summary.csv", index=False)
-    missing = ["Pub: D037 sequential test-only replay (A/B/C/C+PN) 없음 -> 미측정 (official run 값만 있음)",
-               "Pub: Method A official run 없음",
-               "Credit / Pub: nbg stage의 NBG 생성 시간(nbg_build_ms)은 저장되지 않음",
-               "Credit / Pub: generate stage의 discovery 시간은 generate_summary에 없음 (Method B stats의 discovery_sec만 있음)"]
+    missing = ['Pub: no sequential test-only replay (A/B/C/C+PN) -> not measured (official run values only)',
+               'Pub: no Method A official run',
+               'Credit / Pub: the nbg-stage NBG build time (nbg_build_ms) is not stored',
+               'Credit / Pub: the discovery time of the generate stage is not in generate_summary (only discovery_sec of the Method B stats)']
     (OUT / "timing_summary.json").write_text(json.dumps({
         "definition": {"training_ms": SCOPE["rl_train"] + "; Method B = N/A",
                        "test_repair_mean_ms_per_case": {"official_run (A/C/C+PN)": SCOPE["rl_test_official"],

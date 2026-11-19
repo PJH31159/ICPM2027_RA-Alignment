@@ -276,12 +276,12 @@ def check_split(anomalous_ids):
 def preflight(run_id=None):
     problems = []
     if not hasattr(pm4py, "discover_process_tree_inductive"):
-        problems.append("pm4py가 없거나 버전이 맞지 않습니다")
+        problems.append('pm4py is missing or has the wrong version')
     for p in [ANOMALY_LOG_PATH, TEST_IDS_PATH, VAL_IDS_PATH]:
         if not p.exists():
-            problems.append(f"입력 파일이 없습니다: {p}")
+            problems.append(f"input file not found: {p}")
     if run_id is not None and run_dir(run_id).exists():
-        problems.append(f"run 디렉터리가 이미 있습니다: {run_dir(run_id)}")
+        problems.append(f"run directory already exists: {run_dir(run_id)}")
     return problems
 
 
@@ -345,7 +345,7 @@ def dry_run():
     pm4py.write_pnml(net, im, fm, str(out / f"{FILE_PREFIX}_petri_net.pnml"))
 
     print(json.dumps(report, indent=2, ensure_ascii=False))
-    print(f"\n[DRY RUN] 저장 위치: {out}")
+    print(f"\n[DRY RUN] output: {out}")
 
 
 # ============================================================
@@ -369,7 +369,7 @@ def execute_run(run_id):
 
     wall_start = time.time()
     started_at = datetime.now()
-    log(f"EXP-061 Method B Run {run_id} start {started_at.isoformat(timespec='seconds')}")
+    log(f"Method B Run {run_id} start {started_at.isoformat(timespec='seconds')}")
 
     traces, labels, clean_ids, anomalous_ids = load_case_traces()
     split, test_ids, val_ids = check_split(anomalous_ids)
@@ -436,7 +436,7 @@ def execute_run(run_id):
 
     test_rows = per_case[per_case["type"] == "test"]
     stats = {
-        "experiment": "EXP-061",
+        "experiment": 'Method B alignment repair',
         "run_id": run_id,
         "official": run_id == 1,
         "data": DATA_NAME,
@@ -465,7 +465,7 @@ def execute_run(run_id):
 
     log(json.dumps(stats, indent=2))
     run_file(run_id, "execution_log.txt").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
-    print(f"\nEXP-061 Run {run_id} 완료 -> {out}")
+    print(f"\nMethod B Run {run_id} finished -> {out}")
 
 
 # ============================================================
@@ -491,7 +491,7 @@ def compare_runs():
             print(f"  {suffix:28s} identical: {same}")
         sa = {k: v for k, v in json.loads(run_file(a, "stats.json").read_text()).items() if k not in TIMING_KEYS}
         sb = {k: v for k, v in json.loads(run_file(b, "stats.json").read_text()).items() if k not in TIMING_KEYS}
-        print(f"  stats.json (timing 제외)      identical: {sa == sb}")
+        print(f"  stats.json (without timing)   identical: {sa == sb}")
 
 
 # ============================================================

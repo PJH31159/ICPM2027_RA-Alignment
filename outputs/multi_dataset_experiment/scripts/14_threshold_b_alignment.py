@@ -121,15 +121,14 @@ def align(ds, th, n_sample=None, timeout=None):
     allv = df["repair_time_ms"]
     summ = {"dataset": ds, "noise_threshold": th, "net": {"places": len(net.places), "transitions": len(net.transitions),
                                                           "arcs": len(net.arcs)},
-            "scope": "per case: PM4Py state-equation A* alignment + repair_from_alignment (EXP-061 code); "
-                     "sequential, 1 process, scipy LP (shim). excludes discovery / loading / PNML read",
+            "scope": 'per case: PM4Py state-equation A* alignment + repair_from_alignment (Method B code); sequential, 1 process, scipy LP (shim). excludes discovery / loading / PNML read',
             "cases": "all test cases" if n_sample is None else f"fixed random sample {n_sample} of {len(test)} test cases (seed 42)",
             "per_case_timeout_sec": timeout, "n": len(df), "n_ok": int(len(ok)), "n_timeout_or_failed": int(len(df) - len(ok)),
             "mean_ms": round(float(allv.mean()), 4), "median_ms": round(float(allv.median()), 4),
             "p95_ms": round(float(np.percentile(allv, 95)), 4), "total_ms": round(float(allv.sum()), 4),
             "max_ms": round(float(allv.max()), 4),
             "mean_ms_ok_only": round(float(ok.mean()), 4) if len(ok) else None, "phase_wall_ms": round(wall, 4),
-            "note": "timeout case는 timeout까지 걸린 시간으로 mean에 포함 (실제 alignment 시간보다 작게 잡힘 = 하한)"}
+            "note": 'timed-out cases enter the mean with the time until the timeout (below the true alignment time = lower bound)'}
     (d / "summary.json").write_text(json.dumps(summ, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(summ, ensure_ascii=False), flush=True)
 

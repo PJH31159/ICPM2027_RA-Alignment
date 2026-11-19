@@ -301,12 +301,11 @@ def main():
     S = sweep_rows()
     S[SWEEP_COLS].to_csv(MD / "threshold_sweep_summary.csv", index=False)
     md = ["# Threshold sweep summary (Road Traffic / BPIC 2017)", "",
-          "- noise_threshold = PM4Py Inductive Miner noise threshold (0 = IM, > 0 = IMf; PM4Py 2.7.23.6). ADM alpha와 다른 값.",
-          "- 모든 threshold는 PYTHONHASHSEED=0으로 discovery (IMf 결정성).",
-          "- LoopBound 규칙 (모든 threshold 동일): clean case coverage >= 95%를 만족하는 Pareto-minimal bound 중 language가 가장 작은 것;"
-          " 95%가 불가능하면 도달 가능한 최대 coverage의 bound. language > 2,000,000이면 생성하지 않고 INFEASIBLE.",
-          "- timing 단위 ms. B Alignment = 순차 1 process, scipy LP, align + repair (discovery 제외).",
-          "- N/A = output에 값이 없음 (추정하지 않음).", ""]
+          '- noise_threshold = PM4Py Inductive Miner noise threshold (0 = IM, > 0 = IMf; PM4Py 2.7.23.6). Not the ADM alpha.',
+          '- Discovery for every threshold uses PYTHONHASHSEED=0 (IMf determinism).',
+          '- LoopBound rule (same for every threshold): the Pareto-minimal bound with the smallest language among those with clean-case coverage >= 95%; if 95% is unreachable, the bound with the maximal reachable coverage. If language > 2,000,000, no traces are generated (INFEASIBLE).',
+          '- Timings in ms. B Alignment = sequential, 1 process, scipy LP, align + repair (discovery excluded).',
+          '- N/A = value not present in the outputs (not estimated).', ""]
     for ds in ("RoadTraffic", "BPIC2017"):
         md += [f"## {ds}", "", md_table(S[S.Dataset == ds], SWEEP_COLS[1:]), ""]
     (MD / "threshold_sweep_summary.md").write_text("\n".join(md), encoding="utf-8")
@@ -318,7 +317,7 @@ def main():
                  "Loop Bound", "Generated Traces", "Language Size (analytic)", "Clean Coverage (%)"]
     M.to_csv(MD / "paper_threshold_model_table.csv", index=False)
     (MD / "paper_threshold_model_table.md").write_text(
-        "# Threshold → Petri Net / language\n\nGenerated Traces = 실제 생성 수 (생성하지 않은 경우 N/A, language size는 enumeration-free 계산값).\n\n"
+        '# Threshold → Petri Net / language\n\nGenerated Traces = number actually generated (N/A if not generated; language size = enumeration-free computation).\n\n'
         + md_table(M) + "\n", encoding="utf-8")
 
     # 2) timing table
@@ -330,11 +329,7 @@ def main():
                  "C+PN Training ms", "C+PN Repair Mean ms/case", "Status", "C Speedup vs B", "C+PN Speedup vs B"]
     T.to_csv(MD / "paper_threshold_timing_table.csv", index=False)
     (MD / "paper_threshold_timing_table.md").write_text(
-        "# Threshold → timing (ms)\n\nspeedup = B mean / C mean (1.0 = 동일, > 1.0 = C가 더 빠름, < 1.0 = B가 더 빠름).\n"
-        "B, C, C+PN repair = 모두 순차 Test-only 측정. C 계열은 선택 threshold에서만 실행.\n"
-        "B 열은 threshold 간 비교를 위해 모두 sweep Petri Net으로 같은 방식(14_threshold_b_alignment.py)으로 잰 값이다 "
-        "(일부는 다른 작업과 동시에 측정되어 약 10% 오차; 같은 모델인 Road 0.20 / 0.30이 55.92 / 61.29). "
-        "main result table의 Road B 값은 공식 run-b Petri Net으로 다른 작업 없이 다시 잰 순차 replay(seq_B, 48.83 ms/case)이다.\n\n"
+        '# Threshold → timing (ms)\n\nspeedup = B mean / C mean (1.0 = equal, > 1.0 = C faster, < 1.0 = B faster).\nB, C, C+PN repair = all sequential test-only measurements. The C variants run only at the selected threshold.\nThe B column is measured for every threshold in the same way with the sweep Petri net (14_threshold_b_alignment.py) for comparison across thresholds (some values were measured concurrently with other jobs, about 10% error; Road 0.20 / 0.30, the same model, give 55.92 / 61.29). The Road B value of the main result table is a sequential replay with the official run-b Petri net without concurrent jobs (seq_B, 48.83 ms/case).\n\n'
         + md_table(T) + "\n", encoding="utf-8")
 
     # 3) agreement table
@@ -347,7 +342,7 @@ def main():
                        "Status": r.Status} for r in S.itertuples()])
     A.to_csv(MD / "paper_threshold_agreement_table.csv", index=False)
     (MD / "paper_threshold_agreement_table.md").write_text(
-        "# Threshold → agreement\n\nrepair accuracy는 main 표에서 제외 (교수님 지시).\n"
+        '# Threshold → agreement\n\nRepair accuracy is not part of the main table.\n'
         + "".join(f"- {r.Dataset} {r.NoiseThreshold:.2f}: {n}\n" for r in S.itertuples()
                   if (n := state_limit_note(SIM / r.Dataset / tag(r.NoiseThreshold))))
         + "\n" + md_table(A) + "\n", encoding="utf-8")
@@ -377,23 +372,7 @@ def main():
                        "Decision": decision(r)} for r in S.itertuples()])
     D.to_csv(MD / "paper_threshold_tradeoff_table.csv", index=False)
     rationale = (
-        "\n## Threshold selection rationale\n\n"
-        "규칙 (모든 threshold 공통): 같은 loop-bound 규칙(clean coverage ≥ 95%인 Pareto-minimal bound 중 language 최소)을 "
-        "적용한 뒤, Method C를 실행할 수 있는(생성 language ≤ 2M) threshold 중 coverage ≥ 90%(가능하면 ≥ 95%)를 유지하면서 "
-        "language가 가장 작은 지점을 고른다. Credit / Pub는 0.00에서 이미 실행 가능하므로 0.00 그대로 쓴다.\n\n"
-        "**Road Traffic → 0.20 (2,2).** 0.00은 1,344,244 traces (95.11%)로 W2 NBG가 1시간 안에 끝나지 않았다. "
-        "0.05는 241,528 traces / 99.42%로 실행은 가능하지만 language가 0.20보다 6.7배 크다. "
-        "0.10 / 0.15는 최대 coverage 94.13%로 95%에 못 미친다(language는 작음). "
-        "0.20은 36,174 traces로 99.16%를 유지해 language가 급격히 줄어드는 elbow이며, 0.30은 0.20과 같은 모델이다. "
-        "0.40은 activity h, i, j가 모델에서 빠지고 coverage가 81.03%로 떨어진다.\n\n"
-        "**BPIC 2017 → 0.10 (1,9), best executable trade-off.** 위 95% 규칙으로는 어떤 threshold도 실행 가능한 bound가 없다 "
-        "(0.00은 95%에 약 10^21 traces; threshold > 0은 unbounded 최대 coverage도 90% 미만: 0.05 87.80%, 0.15–0.30 58.57%, 0.40 2.05%). "
-        "교수님 방향 수정(2026-11-12)에 따라 BPIC는 coverage 기준을 버리고, 현재 PC에서 기존 B / C / C+PN을 수정 없이 실행할 수 있는 "
-        "조건 중 clean coverage가 가장 높은 조건을 고른다 (paper_bpic_threshold_tradeoff.md, bpic_candidate_feasibility.md). "
-        "threshold 0.05는 language를 키우면 coverage가 더 높지만((1,10) 97,056 traces / 47.82%), 같은 50k budget에서는 "
-        "(1,8) 20,032 traces / 40.09%로 0.10 (1,9) 31,440 traces / 43.49%보다 낮다. 0.15–0.30은 39.71%에서 포화된다. "
-        "따라서 0.10 (1,9)가 trade-off에서 가장 적절하다. coverage 43.49%는 clean case의 절반 미만이므로 Road와 같은 수준의 "
-        "모델 coverage로 해석하면 안 된다. BPIC 2017 C+PN: In progress (pending final C+PN result).\n")
+        '\n## Threshold selection rationale\n\nRule (same for every threshold): apply the same loop-bound rule (Pareto-minimal bound with the smallest language among those with clean coverage ≥ 95%), then choose, among the thresholds at which Method C can run (generated language ≤ 2M), the point with the smallest language that keeps coverage ≥ 90% (≥ 95% if possible). Credit / Pub are already executable at 0.00, so 0.00 is kept.\n\n**Road Traffic → 0.20 (2,2).** 0.00 gives 1,344,244 traces (95.11%) and the W2 NBG did not finish within one hour. 0.05 gives 241,528 traces / 99.42%, executable but with a language 6.7 times larger than 0.20. 0.10 / 0.15 reach at most 94.13%, below 95% (small language). 0.20 keeps 99.16% with 36,174 traces, the elbow where the language drops sharply; 0.30 is the same model as 0.20. At 0.40 the activities h, i, j disappear from the model and coverage drops to 81.03%.\n\n**BPIC 2017 → 0.10 (1,9), best executable trade-off.** With the 95% rule above no threshold has an executable bound (0.00 needs about 10^21 traces for 95%; for thresholds > 0 even the unbounded maximal coverage is below 90%: 0.05 87.80%, 0.15–0.30 58.57%, 0.40 2.05%). BPIC 2017 therefore drops the coverage criterion and uses the condition with the highest clean coverage among those under which B / C / C+PN run unchanged (paper_bpic_threshold_tradeoff.md, bpic_candidate_feasibility.md). Threshold 0.05 reaches higher coverage with a larger language ((1,10) 97,056 traces / 47.82%), but within the same 50k budget (1,8) gives 20,032 traces / 40.09%, below 0.10 (1,9) with 31,440 traces / 43.49%. 0.15–0.30 saturate at 39.71%. Hence 0.10 (1,9) is the best trade-off. A coverage of 43.49% is below half of the clean cases and must not be read as model coverage comparable to Road. BPIC 2017 C+PN: In progress (pending final C+PN result).\n')
     (MD / "paper_threshold_tradeoff_table.md").write_text("# Threshold trade-off\n\n" + md_table(D) + "\n" + rationale,
                                                            encoding="utf-8")
 
@@ -479,12 +458,7 @@ def main():
            "Status", "Notes"]]  # column order + Status / Notes
     P.to_csv(MD / "paper_result_table.csv", index=False)
     (MD / "paper_result_table.md").write_text(
-        "# Main result table (selected condition per dataset)\n\n"
-        "- Agreement = B–C+PN tau-excluded all-optimal agreement (count / test cases). "
-        "BPIC 2017: C+PN in progress -> N/A; B–C agreement is in Notes and paper_threshold_agreement_table.md.\n"
-        "- Training = RP-BEAR validation(학습) phase ms (official run, 15 workers). Repair = 순차 Test-only mean ms/case.\n"
-        "- B = Alignment (PM4Py state-equation A*), 순차, scipy LP (모든 dataset 동일 solver). Training N/A.\n"
-        "- speedup = B mean / C mean (> 1.0 = C가 더 빠름).\n\n" + md_table(P) + "\n", encoding="utf-8")
+        "# Main result table (selected condition per dataset)\n\n- Agreement = B–C+PN tau-excluded all-optimal agreement (count / test cases). BPIC 2017: C+PN in progress -> N/A; B–C agreement is in Notes and paper_threshold_agreement_table.md.\n- Training = RP-BEAR training ('validation') phase ms (official run, 15 workers). Repair = sequential test-only mean ms/case.\n- B = Alignment (PM4Py state-equation A*), sequential, scipy LP (same solver for every dataset). Training N/A.\n- speedup = B mean / C mean (> 1.0 = C faster).\n\n" + md_table(P) + "\n", encoding="utf-8")
 
     # 7) validation
     checks = []

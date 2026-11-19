@@ -83,20 +83,20 @@ def execute_official_run(data_name, input_paths, params, method, run_dir, file_p
 
     problems = []
     if ".venv-rpbear" not in sys.prefix:
-        problems.append(f"환경이 .venv-rpbear가 아님: {sys.prefix}")
+        problems.append(f"environment is not .venv-rpbear: {sys.prefix}")
     if not pd.__version__.startswith("2."):
-        problems.append(f"pandas 2.x 필요 (현재 {pd.__version__})")
+        problems.append(f"pandas 2.x required (current {pd.__version__})")
     if Path(run_dir).exists():
-        problems.append(f"run 디렉터리가 이미 있음 (덮어쓰지 않음): {run_dir}")
+        problems.append(f"run directory already exists (not overwritten): {run_dir}")
     for path in fixed.values():
         if path.exists():
-            problems.append(f"sim 고정 출력 파일이 이미 있음 (다른 실행과 섞일 수 있음): {path}")
+            problems.append(f"fixed sim output file already exists (could mix with another run): {path}")
     if method == "C" and nbgs_override is None:
-        problems.append("Method C에는 New NBG(nbgs_override)가 필요")
+        problems.append('Method C requires New NBGs (nbgs_override)')
     if method == "A" and nbgs_override is not None:
-        problems.append("Method A는 nbgs_override=None이어야 함")
+        problems.append('Method A requires nbgs_override=None')
     if problems:
-        print("[ABORT] 실행 전 검사 실패:")
+        print('[ABORT] pre-run checks failed:')
         for p in problems:
             print("  -", p)
         return 1
@@ -124,14 +124,14 @@ def execute_official_run(data_name, input_paths, params, method, run_dir, file_p
                 verbose=True, nbgs_override=nbgs_override, input_paths=input_paths,
                 return_case_timing=True)
         except Exception:  # noqa: BLE001
-            print("[FAILED] run_rpbear 실행 중 오류:")
+            print('[FAILED] error during run_rpbear:')
             traceback.print_exc(file=sys.stdout)
             return 1
         wall = time.time() - t0
 
         missing = [n for n, p in fixed.items() if not p.exists() or p.stat().st_size == 0]
         if missing:
-            print(f"[FAILED] 생성되지 않은 출력: {missing}")
+            print(f"[FAILED] outputs not created: {missing}")
             return 1
         moved = {"repaired_log.csv": METHOD_FILE_SUFFIX[method], "stats.csv": "stats.csv", "agent.pkl": "agent.pkl"}
         for key, path in fixed.items():

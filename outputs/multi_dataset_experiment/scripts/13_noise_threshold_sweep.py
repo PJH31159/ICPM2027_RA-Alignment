@@ -195,7 +195,7 @@ def run(ds, th):
 def main():
     import os
     if os.environ.get("PYTHONHASHSEED") != "0":
-        sys.exit("PYTHONHASHSEED=0 으로 실행하세요 (PM4Py IMf는 hash 순서에 따라 process마다 다른 tree를 낼 수 있음)")
+        sys.exit('Run with PYTHONHASHSEED=0 (PM4Py IMf can return different trees in different processes depending on the hash order)')
     OUT.mkdir(parents=True, exist_ok=True)
     which = [x for x in sys.argv[1:]] or ["Road", "BPIC"]
     rows = []
