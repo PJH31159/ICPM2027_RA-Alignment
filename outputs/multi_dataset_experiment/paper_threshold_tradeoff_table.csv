@@ -8,7 +8,7 @@ RoadTraffic,0.3,"(2,2)",99.16,36174.0,27,61.2936,,,Same model as 0.20
 RoadTraffic,0.4,"(12,12)",81.03,700362.0,21,46.4894,,,Coverage loss
 BPIC2017,0.0,"(10,14)",95.11,(est. 1e+21),75,15582.5277,,,TOO_LARGE (BPIC rule; 95%-rule status INFEASIBLE)
 BPIC2017,0.05,"(8,39)",87.8,(est. 9.73e+27),78,1797.7748,,,dominated (lower coverage at same budget) (BPIC rule; 95%-rule status INFEASIBLE)
-BPIC2017,0.1,"(1,9)",43.49,31440.0,76,1716.2534,6015.296,,**SELECTED**
+BPIC2017,0.1,"(1,9)",43.49,31440.0,76,1716.2534,6015.296,47.63,**SELECTED**
 BPIC2017,0.15,"(8,33)",58.57,(est. 1.06e+22),71,1536.6609,,,dominated (lower coverage at same budget) (BPIC rule; 95%-rule status INFEASIBLE)
 BPIC2017,0.2,"(8,33)",58.57,(est. 1.15e+22),71,1828.9163,,,dominated (lower coverage at same budget) (BPIC rule; 95%-rule status INFEASIBLE)
 BPIC2017,0.3,"(8,33)",58.57,(est. 1.15e+22),71,1828.9163,,,dominated (lower coverage at same budget) (BPIC rule; 95%-rule status INFEASIBLE)

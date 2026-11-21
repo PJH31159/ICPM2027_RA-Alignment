@@ -42,9 +42,9 @@ outputs/simulation/**/runs/**/*.pnml
 outputs/simulation/**/optimal_repaired_traces.csv
 outputs/simulation/**/case_summary.csv
 
-# in-progress run outputs (BPIC 2017 C+PN)
-outputs/simulation/BPIC2017/threshold_0p10/C_PN_Gate/
-outputs/simulation/BPIC2017/threshold_0p10/pn_gate_analysis/
+# BPIC 2017 C+PN: the official run finished (2026-11-20). Only its summaries are tracked; agent pickles, repaired logs,
+# per-case timing, logs and stage state stay excluded by the general rules above. The gate smoke run is not published.
+outputs/simulation/BPIC2017/threshold_0p10/pn_gate_analysis/smoke/
 
 # private / internal notes
 CLAUDE.md

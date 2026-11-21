@@ -2,8 +2,9 @@
 
 This repository contains the implementation and experimental materials for our paper submitted to ICPM-BPI 2027.
 
-> **Status: snapshot for code reference (private).** Some results are still being computed. Items marked
-> **TODO** are not final yet. Raw event logs and trained models are **not** included (see [Data](#5-data)).
+> **Status: snapshot for code reference (private).** All official runs reported here are finished (BPIC 2017 C+PN
+> included). Items marked **TODO** are not final yet. Raw event logs and trained models are **not** included
+> (see [Data](#5-data) and [Pretrained models](#11-pretrained-models)).
 
 ---
 
@@ -83,9 +84,13 @@ Scripts in `outputs/multi_dataset_experiment/scripts/`:
 | `18_exact_agreement.py` | Fast exact agreement from official repaired logs |
 | `19_memory_watchdog.py`, `20_agreement_driver.py` | Memory-safe single-process driver for `07` (records resource-limit cases) |
 | `22_agreement_from_checkpoint.py` | Re-uses B's optimal sets from a `07` checkpoint to evaluate another method (no search) |
+| `24_bpic_complex_trace_timing.py` | BPIC 2017 case study: repeated B / C / C+PN timing on 4 traces with the longest all-optimal search (supplementary) |
+| `25_bpic_complex_trace_candidates.py` | BPIC 2017 case study: rule-based selection and repeated verification of 10 further candidates (reuses `24`) |
+| `26_bpic_complex_trace_tables.py` | Tables (PNG / Excel) of the case study from its stored CSV files |
 
-Scripts `07`, `15`, `17`, `18`, `22` read **full** run outputs (per-case repaired logs). Those are not part
-of this snapshot, so the scripts only work after the corresponding stages have been run locally.
+Scripts `07`, `15`, `17`, `18`, `22`, `24`, `25` read **full** run outputs (per-case repaired logs, checkpoints, per-case
+timings, agents). Those are not part of this snapshot, so the scripts only work after the corresponding stages have been
+run locally (see [Pretrained models](#11-pretrained-models) for the planned distribution of these assets).
 
 ## 5. Data
 
@@ -119,9 +124,26 @@ On Linux/macOS, use `bin/python` instead of `Scripts/python`. Stages that use `.
 
 ## 7. How to run (one dataset)
 
-Example: BPIC 2017 with the selected condition. Run from the repository root.
+### Official arguments per dataset
+
+The official noise threshold and loop bound of Road Traffic and BPIC 2017 are passed on the command line.
+The `trace_generation` values stored for these two datasets in `src/dataset_config.py` are exploratory defaults
+(threshold 0.0) and are **not** the official conditions. With `--noise-threshold`, outputs go to
+`outputs/simulation/<Dataset>/threshold_0pXX/`. A noise threshold > 0 requires `PYTHONHASHSEED=0`, because the PM4Py
+IMf result can depend on Python's hash order.
+
+| Dataset | Arguments | Notes |
+|---|---|---|
+| Small, Medium, Large, Wide | `--dataset <name>` | exhaustive enumeration (acyclic models), threshold 0.0 |
+| Credit | `--dataset Credit` | threshold 0.0, loop bound (5,7) from `dataset_config.py` |
+| Pub | `--dataset Pub` | threshold 0.0, loop bound (4,4) from `dataset_config.py` |
+| Road Traffic | `--dataset RoadTraffic --noise-threshold 0.2 --loop-bound 2,2` | run `08_road_raw_vs_dedup.py` first to create the derived input log; `PYTHONHASHSEED=0` |
+| BPIC 2017 | `--dataset BPIC2017 --noise-threshold 0.1 --loop-bound 1,9` | `PYTHONHASHSEED=0` |
+
+Example: BPIC 2017 with the official condition. Run from the repository root.
 
 ```bash
+export PYTHONHASHSEED=0   # required for --noise-threshold > 0
 A="--dataset BPIC2017 --noise-threshold 0.1 --loop-bound 1,9 --data-root <DATA_ROOT>"
 VP=.venv/Scripts/python; RP=.venv-rpbear/Scripts/python; SH=outputs/multi_dataset_experiment/scripts/shim_simulation.py
 
@@ -175,6 +197,20 @@ In the code, "validation" means the RP-BEAR **training** phase: the Q-table is u
 set: the Q-table is not updated. Test cases whose anomalous trace is identical to a training trace reuse the repair
 from RP-BEAR's repair memory.
 
+Test inference as implemented in the official runs (`src/rpbear/func_rpbear_final.py`, unchanged RP-BEAR code):
+
+- Actions are chosen epsilon-greedily (`select_action(state, greedy_only=0)`) with the exploration rate stored in the
+  trained agent. For the BPIC 2017 C and C+PN agents the stored value is recorded as 0.5 (the initial value): during the
+  multiprocessing training the decay is applied to the agent copies in the worker processes, not to the saved agent.
+  The other agents were trained through the same code path, but their stored value was not recorded. The rate is not
+  decayed during test inference.
+- The repair location is drawn at random among the anomalous positions (`deterministic=0`).
+- Up to 100 episodes are run per test case; the first episode that ends with a normal trace is kept.
+- Results therefore depend on the random seed; the case study in `complex_trace_timing/` repeats runs with 5 seeds.
+
+Whether this matches the description of test inference in the paper text is still being checked (see
+[Known open issues](#known-open-issues)).
+
 ## 9. Dataset conditions
 
 | Dataset | file_stem | Discovery noise_threshold | Loop bound `(loop_num, loop_total)` | NBG input (Method C) | Test cases |
@@ -190,8 +226,10 @@ from RP-BEAR's repair memory.
 
 Notes:
 
-- **Road Traffic:** a derived copy is used. Clean cases in which every event appears exactly twice are restored to one
-  occurrence each (`08_road_raw_vs_dedup.py`). Anomalous cases are unchanged.
+- **Road Traffic:** a derived copy is used; the source log is not modified. In 475 clean cases of the source log every
+  event occurs exactly twice in a row; this pattern strongly affected process discovery (11 self-loops instead of 1) and
+  trace-generation complexity. In the derived copy these 475 clean cases are restored to one occurrence per event
+  (`08_road_raw_vs_dedup.py`). Anomalous cases are unchanged.
 - **BPIC 2017:** with `(0.10, (1,9))` the bounded language covers only 43.49 % of clean cases. This is the best executable
   trade-off found, not a coverage-≥ 90 % condition. Its results are not directly comparable with the other datasets.
 - **Small–Wide:** results come from an earlier experiment. All-optimal agreement and C+PN were not evaluated (N/A).
@@ -212,13 +250,68 @@ Notes:
 
 Per-case repaired logs, smoke outputs, execution logs, checkpoints and agents are not included.
 
-**TODO (BPIC 2017 C+PN):** the C+PN run for BPIC 2017 is still in progress. In this snapshot its C+PN cells are
-N/A and the notes say "In progress (pending final C+PN result)". They will be replaced by the measured values when the run finishes.
+### BPIC 2017 final results (official run, `(0.10, (1,9))`, 2,360 test cases)
+
+The BPIC 2017 C+PN run is finished and the paper tables contain its measured values
+(`paper_result_table.*`, `paper_threshold_agreement_table.*`, `paper_threshold_timing_table.*`).
+
+| Metric | Method C | Method C+PN |
+|---|---:|---:|
+| Exact agreement with B | 926 / 2360 (39.24 %) | 1041 / 2360 (44.11 %) |
+| Native all-optimal agreement (lower bound) | 983 / 2360 (41.65 %) | 1104 / 2360 (46.78 %) |
+| Tau-excluded all-optimal agreement (lower bound) | 998 / 2360 (42.29 %) | 1124 / 2360 (47.63 %) |
+| Training (official run, 15 workers) | 154,322,800.54 ms (≈ 42.9 h) | 152,211,578.58 ms (≈ 42.3 h) |
+| Sequential test repair, mean over all test cases | 6,015.30 ms/case | 17,953.16 ms/case |
+
+- Method B sequential test repair (alignment + repair, all 2,360 test cases): 4,887.86 ms/case.
+- The all-optimal search did not finish for 81 test cases (49 hit `--max-states`, 32 stopped at the memory limit;
+  `alignment_all_optimal_analysis/run1/resource_limit_cases.tsv` lists the 32). They are counted as disagreement, so both
+  all-optimal values are lower bounds. B–C+PN reuses the B optimal sets of the B–C run
+  (`22_agreement_from_checkpoint.py`, `alignment_all_optimal_analysis/bcpn_from_checkpoint/agreement_summary.json`).
+- Clean-case coverage of the bounded language is 43.49 % (best executable trade-off, see Section 9).
+- Training time, sequential test repair time, the multiprocessing test throughput of the official runs and the
+  all-optimal evaluation time are different measurements; the tables state which one each column uses.
+
+### Supplementary: BPIC 2017 complex-trace case study
+
+`outputs/simulation/BPIC2017/threshold_0p10/complex_trace_timing/` contains a case study of test traces whose
+all-optimal search was especially hard: 4 traces with the longest search, and 10 further candidates selected by a rule
+fixed in advance, each repaired 5 times (seeds 42–46) by B, C and C+PN with the official models. It is a case study of
+selected traces, **not** an average over BPIC 2017; see its README for the selection rule, all runs (including the
+failed candidates), the tables and the limitations.
 
 ## 11. Pretrained models
 
-Trained RP-BEAR agents (`*_agent.pkl`) are not included because of their size. **TODO:** pretrained models will be
-added later, for example as release assets.
+The official trained agents (`*_agent.pkl`, RP-BEAR `QLearningAgent` objects saved with pickle) exist for 12 runs but
+are not included in this repository because of their size (1.41 GB in total). **TODO:** they will be published
+separately (for example as release assets) together with a manifest and SHA-256 checksums.
+
+| Dataset | Method C | Method C+PN |
+|---|---|---|
+| Small | 69.0 MB (EXP-063 run 1) | not evaluated |
+| Medium | 43.4 MB | not evaluated |
+| Large | 109.9 MB | not evaluated |
+| Wide | 43.1 MB | not evaluated |
+| Credit | 29.1 MB | 29.1 MB |
+| Pub | 43.3 MB | 43.4 MB |
+| Road Traffic (0.20, (2,2)) | 50.2 MB | 50.0 MB |
+| BPIC 2017 (0.10, (1,9)) | 451.5 MB | 450.0 MB |
+
+A model file alone is not enough to run inference without retraining. The test-only stages
+(`--stage test-timing`, `--stage test-timing-pngate`) also need:
+
+- the data root (anomaly and normal logs, P-BEAR-RL `Full_input` layout; for Road Traffic the derived copy made by `08`);
+- the official repaired log of the run (`*_repaired_log_c.csv` / `*_repaired_log_cpn.csv`), from which the train / test
+  split and the validation repair memory are rebuilt;
+- the generate-stage output (`generate/model_only_generated_log.csv`) to rebuild the W2 NBG (its edge digest is stored in
+  `*_stats.json` as `nbg_edge_set_digest`);
+- for C+PN, the discovered Petri net (`discover/petri_net.pnml`);
+- the `.venv-rpbear` environment (Python 3.13.9, pandas 2.3.3, numpy 2.3.5): the pickles reference
+  `rpbear.func_rpbear_final.QLearningAgent` and pandas / numpy 2.x internals, so `src/` must stay importable as is;
+- `PYTHONHASHSEED=0` and the official parameters of Section 8.
+
+Pickle files can execute code when they are loaded. Only load model files from the official release and check their
+SHA-256 checksum first.
 
 ## 12. License and third-party code
 
@@ -226,3 +319,13 @@ added later, for example as release assets.
 
 - `src/rpbear/` is the RP-BEAR implementation. Its provenance and license must be confirmed before any public release.
 - This project uses PM4Py (AGPL-3.0) as a dependency.
+
+## Known open issues
+
+- **Test inference vs. paper text (to be confirmed):** the official runs use epsilon-greedy test inference with the
+  stored exploration rate (recorded as 0.5 for BPIC 2017), a random repair location and up to 100 episodes (Section 8). If the paper describes
+  greedy inference (epsilon = 0), the two descriptions differ; the code and the reported results are not changed until
+  this is decided.
+- **Method naming:** the mapping between the method names used here (B, C, C+PN) and the names used in the paper is not
+  fixed in this repository yet; the tables keep the names B, C and C+PN.
+- **License and data redistribution:** see Sections 5 and 12.

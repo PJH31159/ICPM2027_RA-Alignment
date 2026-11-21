@@ -30,7 +30,8 @@ SELECTED = {"RoadTraffic": 0.20, "BPIC2017": 0.10}
 # BPIC 2017: the coverage >= 90 % criterion is not reachable -> "best executable trade-off".
 # The loop bound comes from the candidate search of 17_bpic_feasibility_tables.py (maximal coverage within a
 # 50k-trace language), not from the 95 % rule.
-# BPIC 2017 C+PN: in progress (pending final C+PN result); reported as N/A until the final values exist.
+# BPIC 2017 C+PN: the official run finished (2026-11-18 to 11-20). BPIC_CPN_NOTE is added only when the C+PN output
+# does not exist; B-C+PN all-optimal agreement comes from 22_agreement_from_checkpoint.py (same B optimal sets).
 BPIC_BOUND = "(1,9)"
 BPIC_CPN_NOTE = "C+PN: In progress (pending final C+PN result)"
 SAME_MODEL = {("RoadTraffic", 0.30): 0.20, ("BPIC2017", 0.30): 0.20}  # same process tree as 0.20 (md5 checked)
@@ -143,6 +144,10 @@ def agreement(base):
     for m, key in (("C", "B-C"), ("CPN", "B-CPN")):
         c = s["agreement"].get(key, {}).get("counts")
         out[m] = c
+    if out["CPN"] is None:  # BPIC 2017: script 07 computed B-C only -> B-C+PN from 22_agreement_from_checkpoint.py
+        s2 = rj(base / "alignment_all_optimal_analysis/bcpn_from_checkpoint/agreement_summary.json")
+        if s2 and s2["cases"] == s["cases"]:
+            out["CPN"] = s2["agreement"]["B-CPN"]["counts"]
     return out
 
 
@@ -179,14 +184,15 @@ def sweep_rows():
                      EstimatedLanguageSize=gs["generated_unique_trace_count"])
             gen, cov_cnt = r["GeneratedTraces"], r["CleanCaseCoverageCount"]
             notes.append("BPIC bound rule: best executable trade-off (coverage >= 90% abandoned); see paper_bpic_threshold_tradeoff")
-            notes.append(BPIC_CPN_NOTE)
+            if cpn["training_ms"] is None:
+                notes.append(BPIC_CPN_NOTE)
         if cov_cnt is None:  # not generated: coverage from the analytic (enumeration-free) values
             cov_cnt = round(r["AnalyticCoverage"] * tot)
             notes.append("coverage = enumeration-free analytic value (traces not generated)")
         # status
         if bpic_sel:
             status = "SELECTED" if c["training_ms"] is not None else "SELECTED (C run pending)"
-            reason = BPIC_CPN_NOTE
+            reason = BPIC_CPN_NOTE if cpn["training_ms"] is None else None
         elif r["Status"] == "INFEASIBLE":
             status = "INFEASIBLE"
             reason = (f"bounded language for coverage target at {r['LoopBound']} = {r['EstimatedLanguageSize']:.3g} "
@@ -329,7 +335,13 @@ def main():
                  "C+PN Training ms", "C+PN Repair Mean ms/case", "Status", "C Speedup vs B", "C+PN Speedup vs B"]
     T.to_csv(MD / "paper_threshold_timing_table.csv", index=False)
     (MD / "paper_threshold_timing_table.md").write_text(
-        '# Threshold → timing (ms)\n\nspeedup = B mean / C mean (1.0 = equal, > 1.0 = C faster, < 1.0 = B faster).\nB, C, C+PN repair = all sequential test-only measurements. The C variants run only at the selected threshold.\nThe B column is measured for every threshold in the same way with the sweep Petri net (14_threshold_b_alignment.py) for comparison across thresholds (some values were measured concurrently with other jobs, about 10% error; Road 0.20 / 0.30, the same model, give 55.92 / 61.29). The Road B value of the main result table is a sequential replay with the official run-b Petri net without concurrent jobs (seq_B, 48.83 ms/case).\n\n'
+        '# Threshold → timing (ms)\n\nspeedup = B mean / C mean (1.0 = equal, > 1.0 = C faster, < 1.0 = B faster).\nB, C, C+PN repair = all sequential test-only measurements. The C variants run only at the selected threshold.\nThe B column is measured for every threshold in the same way with the sweep Petri net (14_threshold_b_alignment.py) for comparison across thresholds (some values were measured concurrently with other jobs, about 10% error; Road 0.20 / 0.30, the same model, give 55.92 / 61.29). The Road B value of the main result table is a sequential replay with the official run-b Petri net without concurrent jobs (seq_B, 48.83 ms/case).\n'
+        '**The BPIC 2017 B column is a random sample of 30 test cases (seed 42, 60 s timeout per case; B Cases = 30).** '
+        'The C / C+PN columns are sequential measurements over all 2,360 test cases, so the BPIC speedups in this table compare '
+        'different measurement scopes and are not used for the main comparison. The main BPIC timing is in paper_result_table.md '
+        '(seq_B, all 2,360 test cases, sequential, 4,887.86 ms/case).\n'
+        'Training = RP-BEAR training (validation) phase of the official run (multiprocessing, 15 workers). Repair = sequential '
+        'test inference. The multiprocessing test time (throughput) of the official run is not used in this table.\n\n'
         + md_table(T) + "\n", encoding="utf-8")
 
     # 3) agreement table
@@ -372,8 +384,14 @@ def main():
                        "Decision": decision(r)} for r in S.itertuples()])
     D.to_csv(MD / "paper_threshold_tradeoff_table.csv", index=False)
     rationale = (
-        '\n## Threshold selection rationale\n\nRule (same for every threshold): apply the same loop-bound rule (Pareto-minimal bound with the smallest language among those with clean coverage ≥ 95%), then choose, among the thresholds at which Method C can run (generated language ≤ 2M), the point with the smallest language that keeps coverage ≥ 90% (≥ 95% if possible). Credit / Pub are already executable at 0.00, so 0.00 is kept.\n\n**Road Traffic → 0.20 (2,2).** 0.00 gives 1,344,244 traces (95.11%) and the W2 NBG did not finish within one hour. 0.05 gives 241,528 traces / 99.42%, executable but with a language 6.7 times larger than 0.20. 0.10 / 0.15 reach at most 94.13%, below 95% (small language). 0.20 keeps 99.16% with 36,174 traces, the elbow where the language drops sharply; 0.30 is the same model as 0.20. At 0.40 the activities h, i, j disappear from the model and coverage drops to 81.03%.\n\n**BPIC 2017 → 0.10 (1,9), best executable trade-off.** With the 95% rule above no threshold has an executable bound (0.00 needs about 10^21 traces for 95%; for thresholds > 0 even the unbounded maximal coverage is below 90%: 0.05 87.80%, 0.15–0.30 58.57%, 0.40 2.05%). BPIC 2017 therefore drops the coverage criterion and uses the condition with the highest clean coverage among those under which B / C / C+PN run unchanged (paper_bpic_threshold_tradeoff.md, bpic_candidate_feasibility.md). Threshold 0.05 reaches higher coverage with a larger language ((1,10) 97,056 traces / 47.82%), but within the same 50k budget (1,8) gives 20,032 traces / 40.09%, below 0.10 (1,9) with 31,440 traces / 43.49%. 0.15–0.30 saturate at 39.71%. Hence 0.10 (1,9) is the best trade-off. A coverage of 43.49% is below half of the clean cases and must not be read as model coverage comparable to Road. BPIC 2017 C+PN: In progress (pending final C+PN result).\n')
-    (MD / "paper_threshold_tradeoff_table.md").write_text("# Threshold trade-off\n\n" + md_table(D) + "\n" + rationale,
+        '\n## Threshold selection rationale\n\nRule (same for every threshold): apply the same loop-bound rule (Pareto-minimal bound with the smallest language among those with clean coverage ≥ 95%), then choose, among the thresholds at which Method C can run (generated language ≤ 2M), the point with the smallest language that keeps coverage ≥ 90% (≥ 95% if possible). Credit / Pub are already executable at 0.00, so 0.00 is kept.\n\n**Road Traffic → 0.20 (2,2).** 0.00 gives 1,344,244 traces (95.11%) and the W2 NBG did not finish within one hour. 0.05 gives 241,528 traces / 99.42%, executable but with a language 6.7 times larger than 0.20. 0.10 / 0.15 reach at most 94.13%, below 95% (small language). 0.20 keeps 99.16% with 36,174 traces, the elbow where the language drops sharply; 0.30 is the same model as 0.20. At 0.40 the activities h, i, j disappear from the model and coverage drops to 81.03%.\n\n**BPIC 2017 → 0.10 (1,9), best executable trade-off.** With the 95% rule above no threshold has an executable bound (0.00 needs about 10^21 traces for 95%; for thresholds > 0 even the unbounded maximal coverage is below 90%: 0.05 87.80%, 0.15–0.30 58.57%, 0.40 2.05%). BPIC 2017 therefore drops the coverage criterion and uses the condition with the highest clean coverage among those under which B / C / C+PN run unchanged (paper_bpic_threshold_tradeoff.md, bpic_candidate_feasibility.md). Threshold 0.05 reaches higher coverage with a larger language ((1,10) 97,056 traces / 47.82%), but within the same 50k budget (1,8) gives 20,032 traces / 40.09%, below 0.10 (1,9) with 31,440 traces / 43.49%. 0.15–0.30 saturate at 39.71%. Hence 0.10 (1,9) is the best trade-off. A coverage of 43.49% is below half of the clean cases and must not be read as model coverage comparable to Road. '
+        + ("BPIC 2017 C+PN: In progress (pending final C+PN result).\n"
+           if S.loc[(S.Dataset == "BPIC2017") & (S.Status == "SELECTED"), "CPNTrainingMs"].isna().all() else
+           "BPIC 2017 C+PN was run afterwards (measured training time: see the timing table).\n"))
+    tnote = ("- Alignment ms/case = threshold-sweep measurement (14_threshold_b_alignment.py, sequential). "
+             "BPIC 2017 uses a 30-case test sample, Road all test cases. Not the main timing (main = paper_result_table.md).\n"
+             "- C ms/case = sequential measurement over all test cases (run only at the selected threshold).\n\n")
+    (MD / "paper_threshold_tradeoff_table.md").write_text("# Threshold trade-off\n\n" + tnote + md_table(D) + "\n" + rationale,
                                                            encoding="utf-8")
 
     # 5) relation tables
@@ -443,9 +461,11 @@ def main():
                           "Status": r.Status, "Notes": "; ".join(x for x in (
                               "Road exploratory preprocessing: duplicate-event derived copy" if ds == "RoadTraffic" else None,
                               "best executable trade-off (coverage >= 90% abandoned); clean coverage < 50%" if ds == "BPIC2017" else None,
-                              BPIC_CPN_NOTE if ds == "BPIC2017" else None,
+                              BPIC_CPN_NOTE if ds == "BPIC2017" and to_py(r.CPNTrainingMs) is None else None,
                               (f"B-C exact {cnt(to_py(r.BCExactAgreement), n_test)}, B-C tau-excluded all-optimal "
-                               f"{cnt(to_py(r.BCAllOptimalAgreement), n_test)} (C+PN in progress, so B-C is reported instead)")
+                               f"{cnt(to_py(r.BCAllOptimalAgreement), n_test)} "
+                               + ("(C+PN in progress, so B-C is reported instead)" if to_py(r.BCPNAllOptimalAgreement) is None else
+                                  f"(for comparison; B-C+PN exact {cnt(to_py(r.BCPNExactAgreement), n_test)})"))
                               if ds == "BPIC2017" and to_py(r.BCExactAgreement) is not None else None,
                               state_limit_note(base)) if x) or None})
     P = pd.DataFrame(main_rows)
@@ -458,7 +478,15 @@ def main():
            "Status", "Notes"]]  # column order + Status / Notes
     P.to_csv(MD / "paper_result_table.csv", index=False)
     (MD / "paper_result_table.md").write_text(
-        "# Main result table (selected condition per dataset)\n\n- Agreement = B–C+PN tau-excluded all-optimal agreement (count / test cases). BPIC 2017: C+PN in progress -> N/A; B–C agreement is in Notes and paper_threshold_agreement_table.md.\n- Training = RP-BEAR training ('validation') phase ms (official run, 15 workers). Repair = sequential test-only mean ms/case.\n- B = Alignment (PM4Py state-equation A*), sequential, scipy LP (same solver for every dataset). Training N/A.\n- speedup = B mean / C mean (> 1.0 = C faster).\n\n" + md_table(P) + "\n", encoding="utf-8")
+        "# Main result table (selected condition per dataset)\n\n- Agreement = B–C+PN tau-excluded all-optimal agreement (count / test cases). "
+        + ("BPIC 2017: C+PN in progress -> N/A; B–C agreement is in Notes and paper_threshold_agreement_table.md.\n"
+           if P.loc[P.Dataset == "BPIC2017", "B-C+PN Agreement"].isna().all() else
+           "BPIC 2017: B–C+PN computed from the B optimal sets of the B–C all-optimal run (22_agreement_from_checkpoint.py); "
+           "B–C agreement is in Notes and paper_threshold_agreement_table.md.\n")
+        + "- Training = RP-BEAR training ('validation') phase ms (official run, 15 workers). Repair = sequential test-only mean ms/case.\n"
+        "- Repair ms/case is a sequential (one process) measurement over all test cases for every dataset (B seq_B, C seq_C, "
+        "C+PN seq_CPN; Credit: mean of 3 replays). The multiprocessing test time (throughput) of the official runs and the "
+        "30-case BPIC sweep sample are not used.\n- B = Alignment (PM4Py state-equation A*), sequential, scipy LP (same solver for every dataset). Training N/A.\n- speedup = B mean / C mean (> 1.0 = C faster).\n\n" + md_table(P) + "\n", encoding="utf-8")
 
     # 7) validation
     checks = []

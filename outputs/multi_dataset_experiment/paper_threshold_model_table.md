@@ -1,6 +1,6 @@
 # Threshold → Petri Net / language
 
-Generated Traces = 실제 생성 수 (생성하지 않은 경우 N/A, language size는 enumeration-free 계산값).
+Generated Traces = number actually generated (N/A if not generated; language size = enumeration-free computation).
 
 | Dataset | Threshold | Places | Transitions | Tau | Loops | Nested Loops | Parallel | Loop Bound | Generated Traces | Language Size (analytic) | Clean Coverage (%) |
 |---|---|---|---|---|---|---|---|---|---|---|---|

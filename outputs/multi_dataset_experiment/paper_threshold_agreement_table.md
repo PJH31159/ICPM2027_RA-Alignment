@@ -1,6 +1,6 @@
 # Threshold → agreement
 
-repair accuracy는 main 표에서 제외 (교수님 지시).
+Repair accuracy is not part of the main table.
 - RoadTraffic 0.20: all-optimal search hit max_states for 11/2752 cases (counted as disagreement; all-optimal agreement is a lower bound, upper bound +11)
 - BPIC2017 0.10: all-optimal search hit max_states for 49/2360 cases and stopped at the memory limit for 32 cases (resource-limit) (counted as disagreement; all-optimal agreement is a lower bound, upper bound +81)
 
@@ -15,7 +15,7 @@ repair accuracy는 main 표에서 제외 (교수님 지시).
 | RoadTraffic | 0.40 | N/A | N/A | N/A | N/A | N/A | N/A | COVERAGE_LOSS |
 | BPIC2017 | 0.00 | N/A | N/A | N/A | N/A | N/A | N/A | INFEASIBLE |
 | BPIC2017 | 0.05 | N/A | N/A | N/A | N/A | N/A | N/A | INFEASIBLE |
-| BPIC2017 | 0.10 | 2,360 | 926 / 2360 (39.24%) | 998 / 2360 (42.29%) | N/A | N/A | N/A | SELECTED |
+| BPIC2017 | 0.10 | 2,360 | 926 / 2360 (39.24%) | 998 / 2360 (42.29%) | 1041 / 2360 (44.11%) | 1104 / 2360 (46.78%) | 1124 / 2360 (47.63%) | SELECTED |
 | BPIC2017 | 0.15 | N/A | N/A | N/A | N/A | N/A | N/A | INFEASIBLE |
 | BPIC2017 | 0.20 | N/A | N/A | N/A | N/A | N/A | N/A | INFEASIBLE |
 | BPIC2017 | 0.30 | N/A | N/A | N/A | N/A | N/A | N/A | INFEASIBLE |

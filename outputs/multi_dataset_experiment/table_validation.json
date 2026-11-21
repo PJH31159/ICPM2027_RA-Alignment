@@ -1,6 +1,6 @@
 {
  "all_ok": true,
- "n_checks": 68,
+ "n_checks": 73,
  "n_failed": 0,
  "checks": [
   {
@@ -128,6 +128,11 @@
   },
   {
    "check": "BPIC2017 0.1: BCAllOptimalAgreementPercent == count / test",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "check": "BPIC2017 0.1: BCPNAllOptimalAgreementPercent == count / test",
    "ok": true,
    "detail": null
   },
@@ -313,6 +318,16 @@
    "detail": null
   },
   {
+   "check": "main BPIC2017: C+PN Speedup vs B == B / C+PN Repair (ms/case)",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "check": "main BPIC2017: agreement % == count / test",
+   "ok": true,
+   "detail": null
+  },
+  {
    "check": "main BPIC2017: B Alignment Repair (ms/case) is a per-case ms value (0 < v < 600,000)",
    "ok": true,
    "detail": 4887.8574
@@ -323,9 +338,19 @@
    "detail": 6015.296
   },
   {
+   "check": "main BPIC2017: C+PN Repair (ms/case) is a per-case ms value (0 < v < 600,000)",
+   "ok": true,
+   "detail": 17953.1601
+  },
+  {
    "check": "main BPIC2017: C Training (ms) > 1,000 ms (not seconds)",
    "ok": true,
    "detail": 154322800.54
+  },
+  {
+   "check": "main BPIC2017: C+PN Training (ms) > 1,000 ms (not seconds)",
+   "ok": true,
+   "detail": 152211578.58
   },
   {
    "check": "selected threshold RoadTraffic 0.2 exists in sweep",

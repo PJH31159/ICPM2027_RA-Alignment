@@ -161,7 +161,9 @@ DATASETS = {
         "identity_confirmed": True,
         "identity_note": 'P-BEAR-RL Full_input Road_Traffic, duplicate-event derived copy (08_road_raw_vs_dedup.py: the 475 clean cases in which every event occurs exactly twice are restored to single occurrences; anomalous cases unchanged). The raw file is not modified.',
         "anomaly_log_override": "outputs/simulation/RoadTraffic/exploratory_dedup/derived_data/Road_Traffic_1.00_dedup.csv",
-        # the loop bound depends on the threshold (13_noise_threshold_sweep.py); set it with --loop-bound
+        # The loop bound depends on the noise threshold (13_noise_threshold_sweep.py) and is passed on the command line.
+        # Official run: PYTHONHASHSEED=0 ... --noise-threshold 0.2 --loop-bound 2,2  (see README, "Official arguments").
+        # The value below is an exploratory default (threshold 0.0) and is not the official condition.
         "trace_generation": {"strategy": "bounded_loop", "loop_num": 1, "loop_total": 1, "reference_traces": None},
         "new_nbg_input": "original_plus_model_only",  # W2, same as Credit / Pub
         "expected_preparation": None,
@@ -172,6 +174,8 @@ DATASETS = {
         "identity_confirmed": True,
         "identity_note": "P-BEAR-RL Full_input b17 (BPI Challenge 2017). normal = encoded_normal/b17.csv, "
                          "anomaly = encoded_anomaly/b17_1.00.csv",
+        # Official run: PYTHONHASHSEED=0 ... --noise-threshold 0.1 --loop-bound 1,9  (see README, "Official arguments").
+        # The value below is an exploratory default (threshold 0.0) and is not the official condition.
         "trace_generation": {"strategy": "bounded_loop", "loop_num": 1, "loop_total": 4, "reference_traces": None},
         "new_nbg_input": "original_plus_model_only",
         "expected_preparation": None,
