@@ -1,9 +1,8 @@
 """RP-BEAR execution engine.
 
 sim.py runs RP-BEAR once: data loading, NBG, train/test split, Q-learning training and test-phase
-repair; it returns the repaired log. src/simulation.py is the orchestrator that applies the research
-pipeline (discover -> generate -> nbg -> smoke -> run -> evaluate) to each dataset and calls
-run_rpbear() from here.
+repair; it returns the repaired log. RA-Alignment training (utils/pn_gate_utils.py, tutorial 2) and
+inference (tutorial 4) reuse its data loading, split and per-case functions.
 
 The RP-BEAR core (NBG discovery, ADM, QLearningAgent, P_BEAR_RL) is imported unchanged from
 src/rpbear/func_rpbear_final.py. This module does not implement a new RP-BEAR; it reproduces the

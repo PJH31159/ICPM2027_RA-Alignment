@@ -1,4 +1,4 @@
-# Method A (RP-BEAR) dedicated environment: .venv-rpbear (D031)
+# RP-BEAR environment (.venv-rpbear): tutorials 2, 4 (RA-Alignment training and inference)
 #
 # Python: 3.13.9 (python -m venv .venv-rpbear)
 # Versions are pinned to the environment that passed VAL-A01

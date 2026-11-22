@@ -1,2 +1,0 @@
-reps,rl_n,rl_mean_avg,rl_mean_sd,rl_mean_cv_pct,rl_mean_min,rl_mean_max,rl_median_avg,per_rep_rl_mean,per_rep_rl_median,seq_wall_per_case_avg,official_mp_test_per_case_ms,replay_trace_agreement
-3,152,566.06,4.08,0.72,563.49,570.76,214.25,"[570.7609, 563.9317, 563.4856]","[216.9482, 210.6245, 215.1743]",409.75,50.7,"['164/210', '164/210', '164/210']"

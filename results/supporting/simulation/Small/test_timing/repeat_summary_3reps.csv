@@ -1,5 +1,0 @@
-condition,reps,rl_n,rl_mean_avg,rl_mean_sd,rl_mean_min,rl_mean_max,rl_median_avg,rl_median_sd,rl_median_min,rl_median_max,seq_wall_per_case_avg,official_mp_test_per_case_ms,repaired_output_identical_across_reps,identical_to_previous_single_run,per_rep_rl_mean,per_rep_rl_median
-A_alpha0,3,267,192.73,2.32,190.12,194.56,71.98,2.15,69.8,74.11,98.26,25.28,True,True,193.53; 190.12; 194.56,72.03; 69.80; 74.11
-C_alpha0,3,267,208.89,4.02,205.84,213.44,77.48,3.04,74.8,80.79,106.49,28.46,True,True,213.44; 205.84; 207.38,80.79; 74.80; 76.85
-A_alpha0.15,3,267,170.99,1.63,169.74,172.83,95.2,3.35,92.04,98.72,87.18,25.63,True,True,170.38; 169.74; 172.83,92.04; 94.83; 98.72
-C_alpha0.15,3,267,440.78,5.1,434.96,444.42,121.77,6.61,117.59,129.39,224.65,52.17,True,True,444.42; 434.96; 442.97,118.35; 117.59; 129.39

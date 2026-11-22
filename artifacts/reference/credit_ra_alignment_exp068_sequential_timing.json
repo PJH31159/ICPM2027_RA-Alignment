@@ -1,0 +1,46 @@
+{
+ "label": "seq_CPN_LNonly",
+ "method": "C+PN (L_N-only NBG)",
+ "timing_summary": {
+  "test_case_ms_all_n": 210,
+  "test_case_ms_all_mean": 334.826,
+  "test_case_ms_all_median": 73.628,
+  "test_case_ms_all_std": 703.4537,
+  "test_case_ms_all_min": 0.0764,
+  "test_case_ms_all_max": 4003.7957,
+  "test_case_ms_rl_n": 152,
+  "test_case_ms_rl_mean": 462.5479,
+  "test_case_ms_rl_median": 152.5318,
+  "test_case_ms_rl_std": 790.8639,
+  "test_case_ms_rl_min": 5.4261,
+  "test_case_ms_rl_max": 4003.7957,
+  "test_case_ms_mem_n": 58,
+  "test_case_ms_mem_mean": 0.1064,
+  "test_case_ms_mem_median": 0.1097,
+  "test_case_ms_mem_std": 0.0142,
+  "test_case_ms_mem_min": 0.0764,
+  "test_case_ms_mem_max": 0.1617,
+  "test_phase_wall_ms": 70314.6056,
+  "test_phase_wall_ms_per_case": 334.8315,
+  "rl_share": 0.7238
+ },
+ "repair_memory": {
+  "validation_cases": 210,
+  "memory_traces": 188,
+  "conflicting_traces": 0,
+  "note": "rebuilt from official repaired log validation rows (first occurrence per trace)"
+ },
+ "agent_exploration_rate": 0.5,
+ "checks": [
+  {
+   "check": "NBG digest == training run",
+   "passed": true,
+   "detail": ""
+  },
+  {
+   "check": "Q-table unchanged by test replay",
+   "passed": true,
+   "detail": ""
+  }
+ ]
+}

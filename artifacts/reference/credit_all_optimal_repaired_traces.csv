@@ -1,0 +1,666 @@
+case_id,set,trace,gen_n_alignments,is_B_official,is_GT,is_C,is_CPN
+3,exact_pm4py_cost,a b c d e l b j k b j k b j k b j k b c d h i f,,True,True,False,False
+3,deviation_only,a b c d e l b j k b j k b j k b j k b c d h i f,,True,True,False,False
+3,pm4py_generator,a b c d e l b j k b j k b j k b j k b c d h i f,1.0,True,True,False,False
+17,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+17,deviation_only,a b c d e f g,,True,True,False,True
+17,pm4py_generator,a b c d e f g,3.0,True,True,False,True
+55,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+55,deviation_only,a b c d e f g,,True,True,True,True
+55,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+72,exact_pm4py_cost,a b c d h i f,,True,True,False,True
+72,deviation_only,a b c d h i f,,True,True,False,True
+72,pm4py_generator,a b c d h i f,1.0,True,True,False,True
+100,exact_pm4py_cost,a b c d e l b c d f g,,True,False,True,True
+100,deviation_only,a b c d e l b c d f g,,True,False,True,True
+100,pm4py_generator,a b c d e l b c d f g,4.0,True,False,True,True
+112,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,True,True
+112,deviation_only,a b c d e l b c d e f g,,True,True,True,True
+112,pm4py_generator,a b c d e l b c d e f g,1.0,True,True,True,True
+122,exact_pm4py_cost,a b j k b c d e h i f g,,True,False,False,False
+122,deviation_only,a b j k b c d e f g,,False,True,False,True
+122,deviation_only,a b j k b c d e h i f g,,True,False,False,False
+122,pm4py_generator,a b j k b c d e h i f g,1.0,True,False,False,False
+150,exact_pm4py_cost,a b c d e l b c d h i f,,True,True,True,True
+150,deviation_only,a b c d e l b c d h i f,,True,True,True,True
+150,pm4py_generator,a b c d e l b c d h i f,2.0,True,True,True,True
+154,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+154,deviation_only,a b c d h i f,,True,True,True,True
+154,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+197,exact_pm4py_cost,a b c d e l b j k b c d e h i f g,,True,False,False,False
+197,deviation_only,a b c d e l b j k b c d e f g,,False,True,True,False
+197,deviation_only,a b c d e l b j k b c d e h i f g,,True,False,False,False
+197,pm4py_generator,a b c d e l b j k b c d e h i f g,1.0,True,False,False,False
+203,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+203,deviation_only,a b c d e f g,,True,True,False,True
+203,pm4py_generator,a b c d e f g,12.0,True,True,False,True
+213,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+213,deviation_only,a b c d e f g,,True,True,True,True
+213,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+221,exact_pm4py_cost,a b c d l b c d e f g,,True,False,True,True
+221,deviation_only,a b c d l b c d e f g,,True,False,True,True
+221,pm4py_generator,a b c d l b c d e f g,1.0,True,False,True,True
+313,exact_pm4py_cost,a b j k b c d e l b c d e f g,,True,True,False,False
+313,deviation_only,a b j k b c d e l b c d e f g,,True,True,False,False
+313,pm4py_generator,a b j k b c d e l b c d e f g,2.0,True,True,False,False
+316,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,False
+316,deviation_only,a b j k b c d h i f,,True,True,False,False
+316,pm4py_generator,a b j k b c d h i f,1.0,True,True,False,False
+363,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,True
+363,exact_pm4py_cost,a b j k b c e d f g,,False,False,False,False
+363,deviation_only,a b j k b c d e f g,,True,True,False,True
+363,deviation_only,a b j k b c e d f g,,False,False,False,False
+363,pm4py_generator,a b j k b c e d f g,2.0,False,False,False,False
+387,exact_pm4py_cost,a b j k b j k b c d e f,,True,False,False,False
+387,deviation_only,a b j k b j k b c d e f,,True,False,False,False
+387,pm4py_generator,a b j k b j k b c d e f,8.0,True,False,False,False
+396,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,False,False
+396,exact_pm4py_cost,a b j k b c e d l b c d h i f,,False,False,False,False
+396,deviation_only,a b j k b c d e l b c d h i f,,True,True,False,False
+396,deviation_only,a b j k b c e d l b c d h i f,,False,False,False,False
+396,pm4py_generator,a b j k b c e d l b c d h i f,1.0,False,False,False,False
+399,exact_pm4py_cost,a e b j k b c d e f g,,True,False,False,False
+399,deviation_only,a e b j k b c d e f g,,True,False,False,False
+399,pm4py_generator,a e b j k b c d e f g,1.0,True,False,False,False
+433,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+433,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+433,pm4py_generator,a b j k b j k b c d e f g,2.0,True,True,True,True
+495,exact_pm4py_cost,a b c d e f g,,True,True,True,False
+495,deviation_only,a b c d e f g,,True,True,True,False
+495,pm4py_generator,a b c d e f g,4.0,True,True,True,False
+529,exact_pm4py_cost,a b c d e l b c d h i f,,True,True,True,True
+529,deviation_only,a b c d e l b c d h i f,,True,True,True,True
+529,pm4py_generator,a b c d e l b c d h i f,4.0,True,True,True,True
+531,exact_pm4py_cost,a b c d f g,,True,False,True,True
+531,deviation_only,a b c d f g,,True,False,True,True
+531,pm4py_generator,a b c d f g,1.0,True,False,True,True
+564,exact_pm4py_cost,a b c d h i f g,,True,False,True,False
+564,deviation_only,a b c d f g,,False,False,False,False
+564,deviation_only,a b c d h i f g,,True,False,True,False
+564,pm4py_generator,a b c d h i f g,1.0,True,False,True,False
+566,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+566,deviation_only,a b c d e f g,,True,True,True,True
+566,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+576,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+576,deviation_only,a b c d e f g,,True,True,True,True
+576,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+598,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,True,True
+598,deviation_only,a b c d e l b c d e f g,,True,True,True,True
+598,pm4py_generator,a b c d e l b c d e f g,1.0,True,True,True,True
+651,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+651,deviation_only,a b c d e f g,,True,True,True,True
+651,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+704,exact_pm4py_cost,a e b c d e f g,,True,False,True,True
+704,deviation_only,a e b c d e f g,,True,False,True,True
+704,pm4py_generator,a e b c d e f g,1.0,True,False,True,True
+706,exact_pm4py_cost,a b c d h i f,,True,True,False,True
+706,deviation_only,a b c d h i f,,True,True,False,True
+706,pm4py_generator,a b c d h i f,1.0,True,True,False,True
+707,exact_pm4py_cost,a b c d h i f,,True,True,False,True
+707,deviation_only,a b c d h i f,,True,True,False,True
+707,pm4py_generator,a b c d h i f,3.0,True,True,False,True
+717,exact_pm4py_cost,a b j k b j k b j k b j k b c d h i f,,True,True,False,False
+717,deviation_only,a b j k b j k b j k b j k b c d f,,False,False,True,True
+717,deviation_only,a b j k b j k b j k b j k b c d h i f,,True,True,False,False
+717,pm4py_generator,a b j k b j k b j k b j k b c d h i f,3.0,True,True,False,False
+772,exact_pm4py_cost,a b c d e e f g,,True,False,True,True
+772,deviation_only,a b c d e e f g,,True,False,True,True
+772,pm4py_generator,a b c d e e f g,1.0,True,False,True,True
+792,exact_pm4py_cost,a b c d e e l b j k b j k b c d h i f,,True,False,False,False
+792,deviation_only,a b c d e e l b j k b j k b c d h i f,,True,False,False,False
+792,pm4py_generator,a b c d e e l b j k b j k b c d h i f,1.0,True,False,False,False
+812,exact_pm4py_cost,a b c d e e f g,,True,False,True,True
+812,deviation_only,a b c d e e f g,,True,False,True,True
+812,pm4py_generator,a b c d e e f g,1.0,True,False,True,True
+815,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+815,deviation_only,a b c d e f g,,True,True,False,True
+815,pm4py_generator,a b c d e f g,4.0,True,True,False,True
+837,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+837,deviation_only,a b c d h i f,,True,True,True,True
+837,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+884,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+884,deviation_only,a b c d h i f,,True,True,False,False
+884,pm4py_generator,a b c d h i f,3.0,True,True,False,False
+886,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+886,deviation_only,a b c d f,,False,False,True,True
+886,deviation_only,a b c d h i f,,True,True,False,False
+886,pm4py_generator,a b c d h i f,4.0,True,True,False,False
+889,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+889,deviation_only,a b j k b c d h i f,,True,True,True,True
+889,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+905,exact_pm4py_cost,a b c d f g,,True,False,True,True
+905,deviation_only,a b c d f g,,True,False,True,True
+905,pm4py_generator,a b c d f g,1.0,True,False,True,True
+969,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+969,deviation_only,a b c d h i f,,True,True,True,True
+969,pm4py_generator,a b c d h i f,4.0,True,True,True,True
+1000,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1000,deviation_only,a b c d h i f,,True,True,True,True
+1000,pm4py_generator,a b c d h i f,3.0,True,True,True,True
+1010,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+1010,deviation_only,a b c d e f g,,True,True,True,True
+1010,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+1028,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,False
+1028,deviation_only,a b j k b c d h i f,,True,True,True,False
+1028,pm4py_generator,a b j k b c d h i f,2.0,True,True,True,False
+1079,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1079,deviation_only,a b c d h i f,,True,True,True,True
+1079,pm4py_generator,a b c d h i f,2.0,True,True,True,True
+1118,exact_pm4py_cost,a b c d e h i f g,,True,False,True,False
+1118,deviation_only,a b c d e f g,,False,True,False,False
+1118,deviation_only,a b c d e h i f g,,True,False,True,False
+1118,pm4py_generator,a b c d e h i f g,1.0,True,False,True,False
+1125,exact_pm4py_cost,a b j k b j k b j k b c d e f g,,True,True,True,False
+1125,deviation_only,a b j k b j k b j k b c d e f g,,True,True,True,False
+1125,pm4py_generator,a b j k b j k b j k b c d e f g,2.0,True,True,True,False
+1134,exact_pm4py_cost,a b c d h i f g,,True,False,True,False
+1134,deviation_only,a b c d f g,,False,False,False,True
+1134,deviation_only,a b c d h i f g,,True,False,True,False
+1134,pm4py_generator,a b c d h i f g,1.0,True,False,True,False
+1146,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,False
+1146,deviation_only,a b j k b j k b c d e f g,,True,True,True,False
+1146,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,True,False
+1152,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1152,deviation_only,a b c d h i f,,True,True,True,True
+1152,pm4py_generator,a b c d h i f,2.0,True,True,True,True
+1177,exact_pm4py_cost,a b j k b c d e f,,True,False,True,True
+1177,deviation_only,a b j k b c d e f,,True,False,True,True
+1177,pm4py_generator,a b j k b c d e f,2.0,True,False,True,True
+1186,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,False
+1186,deviation_only,a b j k b c d e f g,,True,True,False,False
+1186,pm4py_generator,a b j k b c d e f g,1.0,True,True,False,False
+1196,exact_pm4py_cost,a b c d h i f g,,True,False,True,True
+1196,deviation_only,a b c d h i f g,,True,False,True,True
+1196,pm4py_generator,a b c d h i f g,1.0,True,False,True,True
+1210,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1210,deviation_only,a b c d h i f,,True,True,True,True
+1210,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+1271,exact_pm4py_cost,a b j k b j k b c d e l b c d e f g,,True,True,False,False
+1271,deviation_only,a b j k b j k b c d e l b c d e f g,,True,True,False,False
+1271,pm4py_generator,a b j k b j k b c d e l b c d e f g,5.0,True,True,False,False
+1326,exact_pm4py_cost,a b e j k b c d h i f,,True,False,True,False
+1326,deviation_only,a b e j k b c d h i f,,True,False,True,False
+1326,pm4py_generator,a b e j k b c d h i f,1.0,True,False,True,False
+1348,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,True,False
+1348,deviation_only,a b c d e l b c d e f g,,True,True,True,False
+1348,pm4py_generator,a b c d e l b c d e f g,4.0,True,True,True,False
+1395,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+1395,deviation_only,a b c d e f g,,True,True,False,True
+1395,pm4py_generator,a b c d e f g,1.0,True,True,False,True
+1398,exact_pm4py_cost,a b c d h i f,,True,True,True,False
+1398,deviation_only,a b c d f,,False,False,False,True
+1398,deviation_only,a b c d h i f,,True,True,True,False
+1398,pm4py_generator,a b c d h i f,3.0,True,True,True,False
+1435,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,False,True
+1435,deviation_only,a b j k b c d e l b c d h i f,,True,True,False,True
+1435,pm4py_generator,a b j k b c d e l b c d h i f,1.0,True,True,False,True
+1445,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+1445,deviation_only,a b c d e f g,,True,True,False,True
+1445,pm4py_generator,a b c d e f g,2.0,True,True,False,True
+1466,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1466,deviation_only,a b c d h i f,,True,True,True,True
+1466,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+1478,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+1478,deviation_only,a b j k b c d h i f,,True,True,True,True
+1478,pm4py_generator,a b j k b c d h i f,5.0,True,True,True,True
+1487,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+1487,deviation_only,a b c d e f g,,True,True,True,True
+1487,pm4py_generator,a b c d e f g,3.0,True,True,True,True
+1529,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,False,False
+1529,deviation_only,a b j k b j k b j k b c d h i f,,True,True,False,False
+1529,pm4py_generator,a b j k b j k b j k b c d h i f,2.0,True,True,False,False
+1552,exact_pm4py_cost,a b c d e f,,True,False,False,True
+1552,deviation_only,a b c d e f,,True,False,False,True
+1552,pm4py_generator,a b c d e f,2.0,True,False,False,True
+1564,exact_pm4py_cost,a b c d e l b j k b j k b c d e f g,,True,True,True,True
+1564,deviation_only,a b c d e l b j k b j k b c d e f g,,True,True,True,True
+1564,pm4py_generator,a b c d e l b j k b j k b c d e f g,1.0,True,True,True,True
+1565,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+1565,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+1565,pm4py_generator,a b j k b j k b c d e f g,3.0,True,True,True,True
+1566,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+1566,deviation_only,a b c d f,,False,False,True,True
+1566,deviation_only,a b c d h i f,,True,True,False,False
+1566,pm4py_generator,a b c d h i f,2.0,True,True,False,False
+1626,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+1626,deviation_only,a b c d e f g,,True,True,False,True
+1626,pm4py_generator,a b c d e f g,2.0,True,True,False,True
+1670,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1670,deviation_only,a b c d h i f,,True,True,True,True
+1670,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+1708,exact_pm4py_cost,a b e c d f g,,True,False,True,True
+1708,deviation_only,a b e c d f g,,True,False,True,True
+1708,pm4py_generator,a b e c d f g,1.0,True,False,True,True
+1721,exact_pm4py_cost,a b c d e f,,True,False,True,True
+1721,deviation_only,a b c d e f,,True,False,True,True
+1721,pm4py_generator,a b c d e f,1.0,True,False,True,True
+1737,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+1737,deviation_only,a b c d e f g,,True,True,True,True
+1737,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+1869,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,False
+1869,deviation_only,a b j k b c d f,,False,False,True,True
+1869,deviation_only,a b j k b c d h i f,,True,True,False,False
+1869,pm4py_generator,a b j k b c d h i f,3.0,True,True,False,False
+1890,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,True
+1890,deviation_only,a b j k b c d e f g,,True,True,False,True
+1890,pm4py_generator,a b j k b c d e f g,1.0,True,True,False,True
+1904,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,True
+1904,deviation_only,a b j k b c d h i f,,True,True,False,True
+1904,pm4py_generator,a b j k b c d h i f,1.0,True,True,False,True
+1943,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+1943,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+1943,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,True,True
+1967,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+1967,deviation_only,a b c d h i f,,True,True,True,True
+1967,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2137,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+2137,deviation_only,a b j k b c d h i f,,True,True,True,True
+2137,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+2153,exact_pm4py_cost,a b c d e l b c d h i f,,True,True,True,True
+2153,deviation_only,a b c d e l b c d h i f,,True,True,True,True
+2153,pm4py_generator,a b c d e l b c d h i f,3.0,True,True,True,True
+2271,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2271,deviation_only,a b c d e f g,,True,True,True,True
+2271,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+2274,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,False,True
+2274,deviation_only,a b j k b j k b j k b c d h i f,,True,True,False,True
+2274,pm4py_generator,a b j k b j k b j k b c d h i f,1.0,True,True,False,True
+2303,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+2303,deviation_only,a b j k b c d e f g,,True,True,True,True
+2303,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,True
+2310,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2310,deviation_only,a b c d h i f,,True,True,True,True
+2310,pm4py_generator,a b c d h i f,3.0,True,True,True,True
+2340,exact_pm4py_cost,a b c d e l b j k b c d h i f,,True,True,True,True
+2340,deviation_only,a b c d e l b j k b c d h i f,,True,True,True,True
+2340,pm4py_generator,a b c d e l b j k b c d h i f,4.0,True,True,True,True
+2341,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+2341,deviation_only,a b j k b c d e f g,,True,True,True,True
+2341,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,True
+2351,exact_pm4py_cost,a b c d e l b c d h i f,,True,True,True,False
+2351,deviation_only,a b c d e l b c d h i f,,True,True,True,False
+2351,pm4py_generator,a b c d e l b c d h i f,1.0,True,True,True,False
+2358,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2358,deviation_only,a b c d e f g,,True,True,True,True
+2358,pm4py_generator,a b c d e f g,4.0,True,True,True,True
+2366,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2366,deviation_only,a b c d h i f,,True,True,True,True
+2366,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2374,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+2374,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+2374,pm4py_generator,a b j k b j k b c d e f g,3.0,True,True,True,True
+2387,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2387,deviation_only,a b c d e f g,,True,True,True,True
+2387,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+2392,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+2392,exact_pm4py_cost,a b c e d f g,,False,False,False,False
+2392,deviation_only,a b c d e f g,,True,True,False,True
+2392,deviation_only,a b c e d f g,,False,False,False,False
+2392,pm4py_generator,a b c e d f g,4.0,False,False,False,False
+2431,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,False,False
+2431,deviation_only,a b j k b j k b c d h i f,,True,True,False,False
+2431,pm4py_generator,a b j k b j k b c d h i f,1.0,True,True,False,False
+2434,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,True,True
+2434,deviation_only,a b j k b c d e l b c d h i f,,True,True,True,True
+2434,pm4py_generator,a b j k b c d e l b c d h i f,1.0,True,True,True,True
+2445,exact_pm4py_cost,a b c d e f g,,True,True,False,False
+2445,deviation_only,a b c d e f g,,True,True,False,False
+2445,pm4py_generator,a b c d e f g,2.0,True,True,False,False
+2459,exact_pm4py_cost,a b j k b j k b j k b c d e f g,,True,True,True,False
+2459,deviation_only,a b j k b j k b j k b c d e f g,,True,True,True,False
+2459,pm4py_generator,a b j k b j k b j k b c d e f g,2.0,True,True,True,False
+2503,exact_pm4py_cost,a b c d f g,,True,False,True,True
+2503,deviation_only,a b c d f g,,True,False,True,True
+2503,pm4py_generator,a b c d f g,1.0,True,False,True,True
+2509,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+2509,deviation_only,a b c d f,,False,False,True,True
+2509,deviation_only,a b c d h i f,,True,True,False,False
+2509,pm4py_generator,a b c d h i f,1.0,True,True,False,False
+2551,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,True,True
+2551,deviation_only,a b c d e l b c d e f g,,True,True,True,True
+2551,pm4py_generator,a b c d e l b c d e f g,2.0,True,True,True,True
+2577,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+2577,deviation_only,a b c d h i f,,True,True,False,False
+2577,pm4py_generator,a b c d h i f,4.0,True,True,False,False
+2581,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,False
+2581,deviation_only,a b j k b c d e f g,,True,True,False,False
+2581,pm4py_generator,a b j k b c d e f g,1.0,True,True,False,False
+2586,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2586,deviation_only,a b c d h i f,,True,True,True,True
+2586,pm4py_generator,a b c d h i f,3.0,True,True,True,True
+2602,exact_pm4py_cost,a b c d h i f,,True,True,False,True
+2602,deviation_only,a b c d h i f,,True,True,False,True
+2602,pm4py_generator,a b c d h i f,1.0,True,True,False,True
+2619,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2619,deviation_only,a b c d h i f,,True,True,True,True
+2619,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2637,exact_pm4py_cost,a b c d h i f,,True,True,True,False
+2637,deviation_only,a b c d h i f,,True,True,True,False
+2637,pm4py_generator,a b c d h i f,4.0,True,True,True,False
+2642,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,False
+2642,deviation_only,a b j k b c d e f g,,True,True,True,False
+2642,pm4py_generator,a b j k b c d e f g,3.0,True,True,True,False
+2662,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2662,deviation_only,a b c d e f g,,True,True,True,True
+2662,pm4py_generator,a b c d e f g,2.0,True,True,True,True
+2668,exact_pm4py_cost,a b j k b j k b c d e f,,True,False,True,True
+2668,deviation_only,a b j k b j k b c d e f,,True,False,True,True
+2668,pm4py_generator,a b j k b j k b c d e f,1.0,True,False,True,True
+2706,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,False
+2706,deviation_only,a b j k b c d h i f,,True,True,False,False
+2706,pm4py_generator,a b j k b c d h i f,3.0,True,True,False,False
+2715,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+2715,exact_pm4py_cost,a b c e d f g,,False,False,False,False
+2715,deviation_only,a b c d e f g,,True,True,False,True
+2715,deviation_only,a b c e d f g,,False,False,False,False
+2715,pm4py_generator,a b c e d f g,4.0,False,False,False,False
+2733,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,False
+2733,deviation_only,a b j k b c d e f g,,True,True,True,False
+2733,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,False
+2746,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,False,False
+2746,deviation_only,a b j k b c d e l b c d h i f,,True,True,False,False
+2746,pm4py_generator,a b j k b c d e l b c d h i f,2.0,True,True,False,False
+2776,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+2776,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+2776,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,True,True
+2795,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2795,deviation_only,a b c d e f g,,True,True,True,True
+2795,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+2804,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2804,deviation_only,a b c d h i f,,True,True,True,True
+2804,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2827,exact_pm4py_cost,a b c d e f,,True,False,False,True
+2827,deviation_only,a b c d e f,,True,False,False,True
+2827,pm4py_generator,a b c d e f,1.0,True,False,False,True
+2865,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+2865,deviation_only,a b j k b c d e f g,,True,True,True,True
+2865,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,True
+2893,exact_pm4py_cost,a b c d e f g,,True,True,False,False
+2893,exact_pm4py_cost,a b c e d f g,,False,False,False,True
+2893,deviation_only,a b c d e f g,,True,True,False,False
+2893,deviation_only,a b c e d f g,,False,False,False,True
+2893,pm4py_generator,a b c e d f g,2.0,False,False,False,True
+2910,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,False
+2910,deviation_only,a b j k b c d e f g,,True,True,True,False
+2910,pm4py_generator,a b j k b c d e f g,20.0,True,True,True,False
+2935,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+2935,deviation_only,a b c d h i f,,True,True,False,False
+2935,pm4py_generator,a b c d h i f,1.0,True,True,False,False
+2941,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2941,deviation_only,a b c d h i f,,True,True,True,True
+2941,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2946,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+2946,deviation_only,a b c d h i f,,True,True,True,True
+2946,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+2961,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2961,deviation_only,a b c d e f g,,True,True,True,True
+2961,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+2986,exact_pm4py_cost,a b j k b j k b j k b j k b c d h i f,,True,True,True,True
+2986,deviation_only,a b j k b j k b j k b j k b c d h i f,,True,True,True,True
+2986,pm4py_generator,a b j k b j k b j k b j k b c d h i f,4.0,True,True,True,True
+2998,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+2998,deviation_only,a b c d e f g,,True,True,True,True
+2998,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+2999,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,True,True
+2999,deviation_only,a b j k b j k b c d h i f,,True,True,True,True
+2999,pm4py_generator,a b j k b j k b c d h i f,1.0,True,True,True,True
+3006,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,True,True
+3006,deviation_only,a b j k b j k b j k b c d h i f,,True,True,True,True
+3006,pm4py_generator,a b j k b j k b j k b c d h i f,1.0,True,True,True,True
+3012,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3012,deviation_only,a b c d h i f,,True,True,True,True
+3012,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+3050,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,False,True
+3050,deviation_only,a b j k b j k b c d e f g,,True,True,False,True
+3050,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,False,True
+3052,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,False
+3052,deviation_only,a b j k b c d h i f,,True,True,False,False
+3052,pm4py_generator,a b j k b c d h i f,3.0,True,True,False,False
+3060,exact_pm4py_cost,a b c d h i f,,True,True,True,False
+3060,deviation_only,a b c d h i f,,True,True,True,False
+3060,pm4py_generator,a b c d h i f,3.0,True,True,True,False
+3062,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,False
+3062,deviation_only,a b j k b c d e f g,,True,True,False,False
+3062,pm4py_generator,a b j k b c d e f g,2.0,True,True,False,False
+3089,exact_pm4py_cost,a b c d e f g,,True,True,False,False
+3089,deviation_only,a b c d e f g,,True,True,False,False
+3089,pm4py_generator,a b c d e f g,2.0,True,True,False,False
+3141,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,False,False
+3141,deviation_only,a b j k b j k b c d h i f,,True,True,False,False
+3141,pm4py_generator,a b j k b j k b c d h i f,2.0,True,True,False,False
+3150,exact_pm4py_cost,a b j k b j k b j k b c d e f,,True,False,False,True
+3150,deviation_only,a b j k b j k b j k b c d e f,,True,False,False,True
+3150,pm4py_generator,a b j k b j k b j k b c d e f,2.0,True,False,False,True
+3184,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+3184,deviation_only,a b c d e f g,,True,True,True,True
+3184,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+3194,exact_pm4py_cost,a b c d e l b c d h i f,,True,True,True,True
+3194,deviation_only,a b c d e l b c d h i f,,True,True,True,True
+3194,pm4py_generator,a b c d e l b c d h i f,4.0,True,True,True,True
+3213,exact_pm4py_cost,a b j e k b c d h i f,,False,False,False,False
+3213,exact_pm4py_cost,a b j k e b c d h i f,,True,False,False,False
+3213,deviation_only,a b j e k b c d h i f,,False,False,False,False
+3213,deviation_only,a b j k e b c d h i f,,True,False,False,False
+3213,pm4py_generator,a b j e k b c d h i f,1.0,False,False,False,False
+3262,exact_pm4py_cost,a b j k b j k b j k b j k b c d h i f,,True,True,True,True
+3262,deviation_only,a b j k b j k b j k b j k b c d h i f,,True,True,True,True
+3262,pm4py_generator,a b j k b j k b j k b j k b c d h i f,1.0,True,True,True,True
+3365,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,True
+3365,deviation_only,a b j k b c d h i f,,True,True,False,True
+3365,pm4py_generator,a b j k b c d h i f,2.0,True,True,False,True
+3391,exact_pm4py_cost,a b j k b j k b j k b j k b c d h i f,,True,True,False,False
+3391,deviation_only,a b j k b j k b j k b j k b c d f,,False,False,True,True
+3391,deviation_only,a b j k b j k b j k b j k b c d h i f,,True,True,False,False
+3391,pm4py_generator,a b j k b j k b j k b j k b c d h i f,3.0,True,True,False,False
+3396,exact_pm4py_cost,a b c d e l b c d h i f,,False,True,False,False
+3396,exact_pm4py_cost,a b c e d l b c d h i f,,True,False,False,False
+3396,deviation_only,a b c d e l b c d h i f,,False,True,False,False
+3396,deviation_only,a b c e d l b c d h i f,,True,False,False,False
+3396,pm4py_generator,a b c e d l b c d h i f,3.0,True,False,False,False
+3401,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3401,deviation_only,a b c d h i f,,True,True,True,True
+3401,pm4py_generator,a b c d h i f,2.0,True,True,True,True
+3439,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,False,True
+3439,deviation_only,a b j k b j k b c d e f g,,True,True,False,True
+3439,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,False,True
+3444,exact_pm4py_cost,a b c d e f g,,True,True,False,True
+3444,deviation_only,a b c d e f g,,True,True,False,True
+3444,pm4py_generator,a b c d e f g,2.0,True,True,False,True
+3502,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3502,deviation_only,a b c d h i f,,True,True,True,True
+3502,pm4py_generator,a b c d h i f,24.0,True,True,True,True
+3528,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,False
+3528,deviation_only,a b j k b c d e f g,,True,True,False,False
+3528,pm4py_generator,a b j k b c d e f g,1.0,True,True,False,False
+3542,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+3542,deviation_only,a b j k b c d e f g,,True,True,True,True
+3542,pm4py_generator,a b j k b c d e f g,2.0,True,True,True,True
+3553,exact_pm4py_cost,a b c d f g,,True,False,True,True
+3553,deviation_only,a b c d f g,,True,False,True,True
+3553,pm4py_generator,a b c d f g,4.0,True,False,True,True
+3557,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+3557,deviation_only,a b j k b c d e f g,,True,True,True,True
+3557,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,True
+3595,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3595,deviation_only,a b c d h i f,,True,True,True,True
+3595,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+3598,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3598,deviation_only,a b c d h i f,,True,True,True,True
+3598,pm4py_generator,a b c d h i f,6.0,True,True,True,True
+3650,exact_pm4py_cost,a b j k b j k b j k b j k b c d h i f,,True,True,False,True
+3650,deviation_only,a b j k b j k b j k b j k b c d h i f,,True,True,False,True
+3650,pm4py_generator,a b j k b j k b j k b j k b c d h i f,1.0,True,True,False,True
+3685,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,True,True
+3685,deviation_only,a b j k b j k b j k b c d h i f,,True,True,True,True
+3685,pm4py_generator,a b j k b j k b j k b c d h i f,2.0,True,True,True,True
+3705,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,True
+3705,deviation_only,a b j k b c d f,,False,False,True,False
+3705,deviation_only,a b j k b c d h i f,,True,True,False,True
+3705,pm4py_generator,a b j k b c d h i f,2.0,True,True,False,True
+3735,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3735,deviation_only,a b c d h i f,,True,True,True,True
+3735,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+3749,exact_pm4py_cost,a b j k b j k b c d e f g,,True,True,True,True
+3749,deviation_only,a b j k b j k b c d e f g,,True,True,True,True
+3749,pm4py_generator,a b j k b j k b c d e f g,1.0,True,True,True,True
+3768,exact_pm4py_cost,a b c d e f,,True,False,True,True
+3768,deviation_only,a b c d e f,,True,False,True,True
+3768,pm4py_generator,a b c d e f,2.0,True,False,True,True
+3779,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+3779,deviation_only,a b c d e f g,,True,True,True,True
+3779,pm4py_generator,a b c d e f g,2.0,True,True,True,True
+3784,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3784,deviation_only,a b c d h i f,,True,True,True,True
+3784,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+3795,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,False,False
+3795,deviation_only,a b j k b j k b j k b c d h i f,,True,True,False,False
+3795,pm4py_generator,a b j k b j k b j k b c d h i f,1.0,True,True,False,False
+3821,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+3821,deviation_only,a b c d e f g,,True,True,True,True
+3821,pm4py_generator,a b c d e f g,2.0,True,True,True,True
+3889,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+3889,deviation_only,a b c d h i f,,True,True,True,True
+3889,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+3897,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,False,True
+3897,deviation_only,a b j k b j k b c d h i f,,True,True,False,True
+3897,pm4py_generator,a b j k b j k b c d h i f,1.0,True,True,False,True
+3947,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+3947,deviation_only,a b j k b c d h i f,,True,True,True,True
+3947,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+3951,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+3951,deviation_only,a b c d e f g,,True,True,True,True
+3951,pm4py_generator,a b c d e f g,2.0,True,True,True,True
+3996,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+3996,deviation_only,a b j k b c d h i f,,True,True,True,True
+3996,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+4002,exact_pm4py_cost,a b c d e f,,True,False,True,True
+4002,deviation_only,a b c d e f,,True,False,True,True
+4002,pm4py_generator,a b c d e f,4.0,True,False,True,True
+4005,exact_pm4py_cost,a b j k b j k b j k b c d e f g,,True,True,False,False
+4005,deviation_only,a b j k b j k b j k b c d e f g,,True,True,False,False
+4005,pm4py_generator,a b j k b j k b j k b c d e f g,2.0,True,True,False,False
+4010,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,True,True
+4010,deviation_only,a b c d e l b c d e f g,,True,True,True,True
+4010,pm4py_generator,a b c d e l b c d e f g,1.0,True,True,True,True
+4032,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+4032,deviation_only,a b c d e f g,,True,True,True,True
+4032,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+4043,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4043,deviation_only,a b j k b c d h i f,,True,True,True,True
+4043,pm4py_generator,a b j k b c d h i f,6.0,True,True,True,True
+4207,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,False
+4207,deviation_only,a b j k b c d h i f,,True,True,True,False
+4207,pm4py_generator,a b j k b c d h i f,2.0,True,True,True,False
+4252,exact_pm4py_cost,a b c d e e f g,,True,False,True,True
+4252,deviation_only,a b c d e e f g,,True,False,True,True
+4252,pm4py_generator,a b c d e e f g,1.0,True,False,True,True
+4265,exact_pm4py_cost,a b c d e f g,,True,True,False,False
+4265,exact_pm4py_cost,a b c e d f g,,False,False,False,False
+4265,deviation_only,a b c d e f g,,True,True,False,False
+4265,deviation_only,a b c e d f g,,False,False,False,False
+4265,pm4py_generator,a b c e d f g,4.0,False,False,False,False
+4320,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,True
+4320,deviation_only,a b j k b c d e f g,,True,True,False,True
+4320,pm4py_generator,a b j k b c d e f g,2.0,True,True,False,True
+4331,exact_pm4py_cost,a b j k b j k b j k b c d e f g,,True,True,False,False
+4331,deviation_only,a b j k b j k b j k b c d e f g,,True,True,False,False
+4331,pm4py_generator,a b j k b j k b j k b c d e f g,2.0,True,True,False,False
+4357,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4357,deviation_only,a b j k b c d h i f,,True,True,True,True
+4357,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+4372,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+4372,deviation_only,a b c d e f g,,True,True,True,True
+4372,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+4394,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,False
+4394,deviation_only,a b j k b c d e f g,,True,True,False,False
+4394,pm4py_generator,a b j k b c d e f g,1.0,True,True,False,False
+4417,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4417,deviation_only,a b c d h i f,,True,True,True,True
+4417,pm4py_generator,a b c d h i f,2.0,True,True,True,True
+4426,exact_pm4py_cost,a b c d h i f,,True,True,True,False
+4426,deviation_only,a b c d f,,False,False,False,True
+4426,deviation_only,a b c d h i f,,True,True,True,False
+4426,pm4py_generator,a b c d h i f,3.0,True,True,True,False
+4461,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,False,False
+4461,deviation_only,a b j k b j k b j k b c d f,,False,False,True,True
+4461,deviation_only,a b j k b j k b j k b c d h i f,,True,True,False,False
+4461,pm4py_generator,a b j k b j k b j k b c d h i f,2.0,True,True,False,False
+4467,exact_pm4py_cost,a b j k b j k b j k b c d h i f,,True,True,True,True
+4467,deviation_only,a b j k b j k b j k b c d h i f,,True,True,True,True
+4467,pm4py_generator,a b j k b j k b j k b c d h i f,2.0,True,True,True,True
+4468,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4468,deviation_only,a b c d h i f,,True,True,True,True
+4468,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+4482,exact_pm4py_cost,a b c d f g,,True,False,True,True
+4482,deviation_only,a b c d f g,,True,False,True,True
+4482,pm4py_generator,a b c d f g,1.0,True,False,True,True
+4488,exact_pm4py_cost,a b c d e l b c d e f g,,True,True,False,False
+4488,exact_pm4py_cost,a b c d e l b c e d f g,,False,False,False,True
+4488,deviation_only,a b c d e l b c d e f g,,True,True,False,False
+4488,deviation_only,a b c d e l b c e d f g,,False,False,False,True
+4488,pm4py_generator,a b c d e l b c e d f g,2.0,False,False,False,True
+4496,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,False,True
+4496,deviation_only,a b j k b j k b c d h i f,,True,True,False,True
+4496,pm4py_generator,a b j k b j k b c d h i f,1.0,True,True,False,True
+4498,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4498,deviation_only,a b j k b c d h i f,,True,True,True,True
+4498,pm4py_generator,a b j k b c d h i f,4.0,True,True,True,True
+4522,exact_pm4py_cost,a b j k b c d e f g,,True,True,False,True
+4522,deviation_only,a b j k b c d e f g,,True,True,False,True
+4522,pm4py_generator,a b j k b c d e f g,3.0,True,True,False,True
+4548,exact_pm4py_cost,a b j k b j k b c d h i f,,True,True,True,True
+4548,deviation_only,a b j k b j k b c d h i f,,True,True,True,True
+4548,pm4py_generator,a b j k b j k b c d h i f,1.0,True,True,True,True
+4588,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4588,deviation_only,a b c d h i f,,True,True,True,True
+4588,pm4py_generator,a b c d h i f,4.0,True,True,True,True
+4595,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,True
+4595,deviation_only,a b j k b c d h i f,,True,True,False,True
+4595,pm4py_generator,a b j k b c d h i f,1.0,True,True,False,True
+4653,exact_pm4py_cost,a b c d h i f,,True,True,False,False
+4653,deviation_only,a b c d f,,False,False,True,True
+4653,deviation_only,a b c d h i f,,True,True,False,False
+4653,pm4py_generator,a b c d h i f,4.0,True,True,False,False
+4695,exact_pm4py_cost,a b j k b c d e l b c d e f g,,True,True,True,True
+4695,deviation_only,a b j k b c d e l b c d e f g,,True,True,True,True
+4695,pm4py_generator,a b j k b c d e l b c d e f g,1.0,True,True,True,True
+4712,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4712,deviation_only,a b j k b c d h i f,,True,True,True,True
+4712,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+4723,exact_pm4py_cost,a b j k b c d e f g,,True,True,True,True
+4723,deviation_only,a b j k b c d e f g,,True,True,True,True
+4723,pm4py_generator,a b j k b c d e f g,1.0,True,True,True,True
+4726,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,False,False
+4726,deviation_only,a b j k b c d e l b c d h i f,,True,True,False,False
+4726,pm4py_generator,a b j k b c d e l b c d h i f,5.0,True,True,False,False
+4798,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4798,deviation_only,a b c d h i f,,True,True,True,True
+4798,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+4805,exact_pm4py_cost,a b c d e f g,,True,True,True,True
+4805,deviation_only,a b c d e f g,,True,True,True,True
+4805,pm4py_generator,a b c d e f g,1.0,True,True,True,True
+4829,exact_pm4py_cost,a b j k b c d h i f,,True,True,False,True
+4829,deviation_only,a b j k b c d h i f,,True,True,False,True
+4829,pm4py_generator,a b j k b c d h i f,1.0,True,True,False,True
+4880,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4880,deviation_only,a b j k b c d h i f,,True,True,True,True
+4880,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+4895,exact_pm4py_cost,a b j k b c d e l b c d h i f,,True,True,False,True
+4895,deviation_only,a b j k b c d e l b c d f,,False,False,True,False
+4895,deviation_only,a b j k b c d e l b c d h i f,,True,True,False,True
+4895,pm4py_generator,a b j k b c d e l b c d h i f,3.0,True,True,False,True
+4920,exact_pm4py_cost,a b c d h i f,,True,True,False,True
+4920,deviation_only,a b c d h i f,,True,True,False,True
+4920,pm4py_generator,a b c d h i f,10.0,True,True,False,True
+4935,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4935,deviation_only,a b c d h i f,,True,True,True,True
+4935,pm4py_generator,a b c d h i f,2.0,True,True,True,True
+4941,exact_pm4py_cost,a b c d h i f,,True,True,True,True
+4941,deviation_only,a b c d h i f,,True,True,True,True
+4941,pm4py_generator,a b c d h i f,1.0,True,True,True,True
+4980,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4980,deviation_only,a b j k b c d h i f,,True,True,True,True
+4980,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True
+4982,exact_pm4py_cost,a b j k b c d h i f,,True,True,True,True
+4982,deviation_only,a b j k b c d h i f,,True,True,True,True
+4982,pm4py_generator,a b j k b c d h i f,1.0,True,True,True,True

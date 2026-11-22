@@ -17,8 +17,7 @@ are guaranteed to be model-conformant.
 The ground truth is not used here. This script stores alignment diagnostics (cost, fitness, number
 of moves), which are not repair accuracy.
 
-The multi-dataset pipeline imports align_case / repair_from_alignment / load_case_traces /
-build_event_log from this file by path (utils/alignment_utils.py, utils/timing_utils.py).
+Tutorial 3 (Optimal Alignment) imports align_case / repair_from_alignment / ALIGNMENT_VARIANT from this file.
 These functions are dataset-independent and are used for every dataset (Small ... BPIC 2017).
 The settings block below (DATA_NAME, input / split / output paths) applies only to the standalone
 Small run. Output folder names (outputs/exp061_method_b_alignment) are kept as in the official run.
