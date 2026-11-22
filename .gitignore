@@ -40,3 +40,7 @@ Professor_*
 Thumbs.db
 .vscode/
 .idea/
+
+# pre-trained models other than Credit: distributed as GitHub Release assets (models-v1.0), not tracked
+artifacts/pretrained_models/*
+!artifacts/pretrained_models/credit_ra_alignment/

@@ -78,7 +78,8 @@ def main():
     rows = []
     for cid, g in rep.groupby("case:concept:name", sort=False):
         acts = [x for x in g["concept:name"] if x not in ("Start", "End")]
-        rows.append({"case_id": cid, "original_trace": C.space(prep["case_to_trace"][cid]), "repaired_trace": C.space(acts),
+        original = [x for x in prep["case_to_trace"][cid].split(">>") if x not in ("Start", "End")]  # ">>"-joined string
+        rows.append({"case_id": cid, "original_trace": C.space(original), "repaired_trace": C.space(acts),
                      "path": t_by[cid]["path"], "time_ms": t_by[cid]["repair_time_ms"],
                      "pn_gate_rejected_episodes": int(g["pn_gate_rejected_episodes"].iloc[0])
                      if "pn_gate_rejected_episodes" in g else None})

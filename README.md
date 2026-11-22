@@ -135,9 +135,37 @@ reproduce the paper run's test phase exactly. During that phase, the random (eps
 random streams of the parallel workers, and those streams were not saved. Instead, tutorial 4 reproduces a saved
 sequential reference run of the same model (210/210 identical traces).
 
-## Pre-trained model
+## Pre-trained models
 
-`artifacts/pretrained_models/credit_ra_alignment/` contains:
+The Credit model used by the tutorials is included in this repository (see below). The pre-trained models of all
+paper runs (Table 2) are distributed as assets of the GitHub Release **`models-v1.0`** of this repository (Releases
+page), one zip file per dataset, plus `SHA256SUMS.txt`.
+
+| Dataset | Release asset | NBG source | Petri-net gate |
+|---|---|---|---|
+| Small | `RA-Alignment_small.zip` | L_N only | no |
+| Medium | `RA-Alignment_medium.zip` | L_N only | no |
+| Large | `RA-Alignment_large.zip` | L_N only | no |
+| Wide | `RA-Alignment_wide.zip` | L_N only | no |
+| Credit | `RA-Alignment_credit.zip` (same model as in this repository) | L_N only | yes |
+| Pub | `RA-Alignment_pub.zip` | L_N only | yes |
+| Road Traffic | `RA-Alignment_road_traffic.zip` | L_N only | yes |
+| BPIC 2017 | not yet available | – | – |
+
+- For the acyclic Synthetic-1 models (Small–Wide), L_N is the complete model language. These models were trained
+  without the Petri-net gate.
+- **Install:** download a zip, check it against `SHA256SUMS.txt`, and extract it into `artifacts/pretrained_models/`.
+  This gives `artifacts/pretrained_models/<dataset>_ra_alignment/` with the same files as the Credit folder.
+- **`MODEL_INFO.json`:** each zip contains this file, which records:
+  - the model type, the NBG source and the gate;
+  - the settings (1,000 episodes, alpha 0, seed 42, at most 8 steps, learning rate 0.1, discount 0.9, exploration 0.5);
+  - the activity order;
+  - the SHA-256 of the input logs and of every file.
+- **To use a model other than Credit,** you also need:
+  - the dataset log (P-BEAR-RL benchmark data [1], not included here);
+  - its Petri net and L_N, which are not included either.
+
+The Credit folder `artifacts/pretrained_models/credit_ra_alignment/` contains:
 
 - `RA-Alignment_credit_agent.pkl`: the Q-table (490,039 entries), 29.6 MB;
 - the training statistics, the training-run repaired log (its training rows are the repair memory), and the
