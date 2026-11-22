@@ -1,7 +1,7 @@
 """Method B (Petri net + alignment repair) for every dataset.
 
 Re-uses align_case (PM4Py VERSION_STATE_EQUATION_A_STAR) and repair_from_alignment from
-src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py, loaded by path.
+src/alignment/exact_alignment.py, loaded by path.
 Repair rule: keep synchronous moves, delete log moves, insert visible model moves, skip tau moves.
 Per-case time covers align_case + repair_from_alignment only (perf_counter).
 """
@@ -11,7 +11,7 @@ import time
 
 from utils.validation_utils import PROJECT_ROOT
 
-EXP061_SCRIPT = PROJECT_ROOT / "src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py"
+EXP061_SCRIPT = PROJECT_ROOT / "src/alignment/exact_alignment.py"
 
 
 def load_exp061():

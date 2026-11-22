@@ -1524,7 +1524,7 @@ def stage_test_timing_b(ctx):
         test_ids = read_ids(test_ids_f[0])
         expected_n = len(read_ids(ctx.stage_dir("nbg") / "split_test_case_ids.txt")) if ctx.name != "Small" else 524
         rec.check(f"test cases == {expected_n}", len(test_ids) == expected_n, f"({len(test_ids)})")
-        script = PROJECT_ROOT / "src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py"
+        script = PROJECT_ROOT / "src/alignment/exact_alignment.py"
         from utils.data_utils import load_case_traces
 
         traces = load_case_traces(ctx.input_paths["anomaly_log"])[0]

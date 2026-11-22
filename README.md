@@ -64,7 +64,7 @@ The upper bound is the lower bound plus the number of limited cases.
 | `src/dataset_config.py` | Dataset settings and official RP-BEAR parameters |
 | `src/rpbear/func_rpbear_final.py` | RP-BEAR core (environment, Q-learning agent, NBG discovery). Not modified |
 | `src/utils/` | discovery, bounded generation, NBG building, alignment, PN gate, timing, evaluation, validation helpers |
-| `src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py` | Method B alignment and repair functions. Loaded by path from `utils/alignment_utils.py` and `utils/timing_utils.py`, so it must stay at this path |
+| `src/alignment/exact_alignment.py` | Method B (exact / optimal PM4Py alignment + repair): `align_case`, `repair_from_alignment`, used for every dataset. Loaded by path from `utils/alignment_utils.py`, `utils/timing_utils.py` (via `simulation.py`) and script `24`; keep this path or update those references. Its standalone CLI runs the Small reference run |
 | `outputs/simulation/Credit/alignment_all_optimal_analysis/scripts/credit_all_optimal.py` | All-optimal search definitions (`dev_optimal`, `repair_from_alignment`). Loaded by `07_pub_all_optimal_agreement.py` |
 | `outputs/credit_loop_bound_sensitivity/credit_loop_bound_final_traces.csv` | Credit reference trace set. The `generate` stage checks that bounded generation `(5,7)` reproduces it |
 | `outputs/multi_dataset_experiment/scripts/` | Reproduction and analysis scripts (see below) |

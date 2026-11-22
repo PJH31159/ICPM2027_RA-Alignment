@@ -19,12 +19,15 @@ of moves), which are not repair accuracy.
 
 The multi-dataset pipeline imports align_case / repair_from_alignment / load_case_traces /
 build_event_log from this file by path (utils/alignment_utils.py, utils/timing_utils.py).
+These functions are dataset-independent and are used for every dataset (Small ... BPIC 2017).
+The settings block below (DATA_NAME, input / split / output paths) applies only to the standalone
+Small run. Output folder names (outputs/exp061_method_b_alignment) are kept as in the official run.
 
 Standalone usage (Small, from the repository root, PM4Py environment .venv):
-    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --dry_run       (model / input checks only)
-    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --run_id 1      (official repaired log B)
-    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --run_id 2      (reproducibility run)
-    python src/experiments/p6_small_repaired_log_comparison/61_method_b_alignment_repair.py --compare_runs  (run 1 vs run 2)
+    python src/alignment/exact_alignment.py --dry_run       (model / input checks only)
+    python src/alignment/exact_alignment.py --run_id 1      (official repaired log B)
+    python src/alignment/exact_alignment.py --run_id 2      (reproducibility run)
+    python src/alignment/exact_alignment.py --compare_runs  (run 1 vs run 2)
 """
 
 import argparse
@@ -46,7 +49,7 @@ from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments_
 from pm4py.objects.log.obj import Event, EventLog, Trace
 from pm4py.objects.process_tree.obj import Operator
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]  # src/experiments/<phase>/<file>.py -> repository root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # src/alignment/<file>.py -> repository root
 
 
 # ============================================================
