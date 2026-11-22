@@ -16,9 +16,12 @@ data/
 *.xes.gz
 outputs/simulation/RoadTraffic/exploratory_dedup/derived_data/
 
-# trained models and large binaries
+# trained models and large binaries (pre-trained agents are distributed as GitHub Release assets, see models/README.md)
 *.pkl
-models/
+*.zip
+models/*
+!models/README.md
+!models/model_manifest.csv
 outputs/models/
 
 # logs, checkpoints, stage state

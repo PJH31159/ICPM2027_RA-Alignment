@@ -1,0 +1,16 @@
+{
+  "runs": {
+    "A": "outputs\\simulation\\Medium\\runs\\methodA_run1\\Medium_1000_ppm0.0_valratio0.5_seed42_methodA_run1_repaired_log_a.csv",
+    "B": "outputs\\simulation\\Medium\\runs\\methodB_run1\\Medium_IM_noise0_alignment_run1_repaired_log_b.csv",
+    "C": "outputs\\simulation\\Medium\\runs\\methodC_run1\\Medium_1000_ppm0.0_valratio0.5_seed42_methodC_run1_repaired_log_c.csv"
+  },
+  "test_split": "outputs\\simulation\\Medium\\nbg\\split_test_case_ids.txt",
+  "definition": "case_id 기준, activity sequence 전체 일치",
+  "checks": [
+    {
+      "check": "per-case rows == test cases",
+      "passed": true,
+      "detail": "(333)"
+    }
+  ]
+}

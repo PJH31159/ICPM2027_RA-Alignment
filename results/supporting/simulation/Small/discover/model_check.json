@@ -1,0 +1,109 @@
+{
+  "process_tree": "->( 'a', 'b', 'c', 'd', 'e', X( 'k', ->( 'f', 'g', 'h', 'i' ), ->( 'l', X( 'm', ->( 'q', 'r' ), ->( 's', 't' ), ->( 'o', 'p' ) ), 'n' ) ), 'j' )",
+  "tree_node_counts": {
+    "->": 6,
+    "activity": 20,
+    "X": 2
+  },
+  "n_places": 16,
+  "n_transitions": 20,
+  "n_visible_transitions": 20,
+  "n_invisible_transitions": 0,
+  "n_arcs": 40,
+  "visible_activities": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t"
+  ],
+  "n_clean_cases": 11453,
+  "n_clean_variants": 6,
+  "model_language_size": 6,
+  "model_language_equals_clean_variants": true,
+  "clean_variants_not_in_model": [],
+  "model_traces_not_in_clean": [],
+  "clean_log_fitness_alignment_weighted": 1.0,
+  "clean_variants": [
+    {
+      "variant": "a>>b>>c>>d>>e>>k>>j",
+      "n_cases": 3927,
+      "length": 7,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>f>>g>>h>>i>>j",
+      "n_cases": 3751,
+      "length": 10,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>l>>s>>t>>n>>j",
+      "n_cases": 980,
+      "length": 10,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>l>>m>>n>>j",
+      "n_cases": 977,
+      "length": 9,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>l>>q>>r>>n>>j",
+      "n_cases": 932,
+      "length": 10,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>l>>o>>p>>n>>j",
+      "n_cases": 886,
+      "length": 10,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    }
+  ],
+  "discovery_sec": 0.075,
+  "structure": {
+    "operator_kinds": {
+      "SEQUENCE": 6,
+      "activity": 20,
+      "XOR": 2
+    },
+    "n_loop_operators": 0,
+    "n_parallel_operators": 0,
+    "n_xor_operators": 2,
+    "n_other_operators": 0,
+    "n_tau_leaves": 0,
+    "petri_net_has_cycle": false,
+    "estimated_raw_tree_language_size": 6,
+    "tree_language_note": "enumerated"
+  },
+  "n_anomalous_cases": 1047
+}

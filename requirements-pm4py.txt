@@ -2,7 +2,7 @@
 # Python 3.13.9. Frozen 2026-11-12 from the environment used for all .venv stages.
 # Install: .venv\Scripts\python -m pip install -r requirements-pm4py.txt
 # Note: on the experiment PC, Windows Smart App Control blocks the cvxopt / lxml.objectify DLLs,
-# so .venv stages ran through outputs/multi_dataset_experiment/scripts/shim_simulation.py (LP solver = scipy).
+# so .venv stages ran through scripts/run_with_scipy_lp.py (LP solver = scipy).
 colorama==0.4.6
 contourpy==1.3.3
 cvxopt==1.3.3

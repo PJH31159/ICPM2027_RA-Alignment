@@ -161,7 +161,8 @@ DATASETS = {
         "identity_confirmed": True,
         "identity_note": 'P-BEAR-RL Full_input Road_Traffic, duplicate-event derived copy (08_road_raw_vs_dedup.py: the 475 clean cases in which every event occurs exactly twice are restored to single occurrences; anomalous cases unchanged). The raw file is not modified.',
         "anomaly_log_override": "outputs/simulation/RoadTraffic/exploratory_dedup/derived_data/Road_Traffic_1.00_dedup.csv",
-        # The loop bound depends on the noise threshold (13_noise_threshold_sweep.py) and is passed on the command line.
+        # The loop bound depends on the noise threshold (selected by a noise-threshold sweep in the research repository;
+        # the derived input copy is made by scripts/prepare_road_traffic.py) and is passed on the command line.
         # Official run: PYTHONHASHSEED=0 ... --noise-threshold 0.2 --loop-bound 2,2  (see README, "Official arguments").
         # The value below is an exploratory default (threshold 0.0) and is not the official condition.
         "trace_generation": {"strategy": "bounded_loop", "loop_num": 1, "loop_total": 1, "reference_traces": None},

@@ -1,0 +1,9 @@
+metric,same,total,rate,different,all_correct,some_correct,all_wrong
+A vs B,287,333,0.8619,46,,,
+A vs C,261,333,0.7838,72,,,
+B vs C,283,333,0.8498,50,,,
+category: A=B=C,256,333,0.7688,,252.0,0.0,4.0
+category: A=B only,31,333,0.0931,,0.0,27.0,4.0
+category: A=C only,5,333,0.015,,0.0,4.0,1.0
+category: B=C only,27,333,0.0811,,0.0,23.0,4.0
+category: all different,14,333,0.042,,0.0,12.0,2.0

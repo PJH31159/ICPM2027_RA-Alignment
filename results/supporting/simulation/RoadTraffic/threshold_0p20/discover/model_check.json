@@ -1,0 +1,2042 @@
+{
+  "process_tree": "->( 'a', +( X( tau, 'h' ), X( tau, 'b' ), ->( +( X( tau, *( 'e', tau ) ), X( tau, +( 'j', 'i' ), +( X( tau, 'g' ), ->( 'c', +( 'd', X( tau, 'k' ) ) ) ) ) ), X( tau, 'f' ) ) ) )",
+  "tree_node_counts": {
+    "->": 3,
+    "activity": 11,
+    "+": 5,
+    "X": 7,
+    "tau": 8,
+    "*": 1
+  },
+  "n_places": 25,
+  "n_transitions": 27,
+  "n_visible_transitions": 11,
+  "n_invisible_transitions": 16,
+  "n_arcs": 66,
+  "visible_activities": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k"
+  ],
+  "n_clean_cases": 144867,
+  "n_clean_variants": 248,
+  "model_language_size": null,
+  "model_language_equals_clean_variants": null,
+  "clean_variants_not_in_model": null,
+  "model_traces_not_in_clean": null,
+  "clean_log_fitness_alignment_weighted": 0.9985734257757907,
+  "clean_variants": [
+    {
+      "variant": "a>>b>>c>>d>>f",
+      "n_cases": 51802,
+      "length": 5,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e",
+      "n_cases": 45464,
+      "length": 2,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b",
+      "n_cases": 19998,
+      "length": 2,
+      "alignment_cost": 6,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e",
+      "n_cases": 8512,
+      "length": 5,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e",
+      "n_cases": 3470,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>e",
+      "n_cases": 3098,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e",
+      "n_cases": 3045,
+      "length": 3,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h",
+      "n_cases": 2272,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>f",
+      "n_cases": 1942,
+      "length": 5,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>f",
+      "n_cases": 1400,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e",
+      "n_cases": 522,
+      "length": 5,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>f",
+      "n_cases": 487,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h",
+      "n_cases": 384,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b",
+      "n_cases": 346,
+      "length": 3,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>e",
+      "n_cases": 128,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h",
+      "n_cases": 123,
+      "length": 4,
+      "alignment_cost": 10005,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e",
+      "n_cases": 110,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e",
+      "n_cases": 105,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>d>>h",
+      "n_cases": 92,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>d>>e",
+      "n_cases": 84,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>f",
+      "n_cases": 75,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>f",
+      "n_cases": 75,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>f",
+      "n_cases": 71,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e",
+      "n_cases": 62,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>e",
+      "n_cases": 56,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>e",
+      "n_cases": 55,
+      "length": 4,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e>>c>>d>>e",
+      "n_cases": 54,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>d>>f",
+      "n_cases": 45,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e",
+      "n_cases": 45,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>f",
+      "n_cases": 42,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>k",
+      "n_cases": 35,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e>>e",
+      "n_cases": 32,
+      "length": 4,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>h",
+      "n_cases": 31,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j",
+      "n_cases": 30,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k",
+      "n_cases": 27,
+      "length": 5,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>f",
+      "n_cases": 23,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>f",
+      "n_cases": 21,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j",
+      "n_cases": 20,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>e>>d>>e",
+      "n_cases": 19,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i",
+      "n_cases": 18,
+      "length": 7,
+      "alignment_cost": 10007,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>k>>e",
+      "n_cases": 17,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k>>e",
+      "n_cases": 17,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>e",
+      "n_cases": 17,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>k",
+      "n_cases": 16,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i",
+      "n_cases": 16,
+      "length": 7,
+      "alignment_cost": 10007,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e>>e",
+      "n_cases": 15,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e>>c>>d>>f",
+      "n_cases": 14,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k>>f",
+      "n_cases": 14,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>e",
+      "n_cases": 13,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>e",
+      "n_cases": 12,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j",
+      "n_cases": 12,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>e>>e",
+      "n_cases": 12,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>k",
+      "n_cases": 11,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>e",
+      "n_cases": 11,
+      "length": 3,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>e",
+      "n_cases": 11,
+      "length": 8,
+      "alignment_cost": 20009,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>e",
+      "n_cases": 10,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e",
+      "n_cases": 10,
+      "length": 8,
+      "alignment_cost": 13,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>e",
+      "n_cases": 9,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>d>>h",
+      "n_cases": 9,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>e>>d>>h",
+      "n_cases": 8,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i",
+      "n_cases": 8,
+      "length": 7,
+      "alignment_cost": 10007,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>c>>d>>h",
+      "n_cases": 8,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>f",
+      "n_cases": 8,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>f>>h",
+      "n_cases": 7,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j>>f>>h",
+      "n_cases": 7,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>h>>d>>i>>j>>f",
+      "n_cases": 7,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>k>>e",
+      "n_cases": 7,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>h",
+      "n_cases": 6,
+      "length": 7,
+      "alignment_cost": 10007,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>e>>d>>e",
+      "n_cases": 6,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>e>>e",
+      "n_cases": 6,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>e",
+      "n_cases": 6,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j",
+      "n_cases": 6,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>k",
+      "n_cases": 6,
+      "length": 3,
+      "alignment_cost": 10006,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>j>>d>>e",
+      "n_cases": 5,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>h>>i>>j>>f",
+      "n_cases": 5,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>d>>h>>i>>j>>f",
+      "n_cases": 5,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>e",
+      "n_cases": 5,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>f",
+      "n_cases": 5,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 5,
+      "length": 11,
+      "alignment_cost": 16,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>e>>e",
+      "n_cases": 5,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e>>f",
+      "n_cases": 5,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>e>>d>>f",
+      "n_cases": 5,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j>>e",
+      "n_cases": 5,
+      "length": 8,
+      "alignment_cost": 20009,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>i>>j>>e",
+      "n_cases": 4,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>j>>d>>f",
+      "n_cases": 4,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>h>>b",
+      "n_cases": 4,
+      "length": 4,
+      "alignment_cost": 10005,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>k>>f",
+      "n_cases": 4,
+      "length": 10,
+      "alignment_cost": 20005,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>k>>f",
+      "n_cases": 4,
+      "length": 10,
+      "alignment_cost": 20005,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>k",
+      "n_cases": 4,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>d>>e",
+      "n_cases": 3,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>e>>d>>e",
+      "n_cases": 3,
+      "length": 6,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>h>>d>>i",
+      "n_cases": 3,
+      "length": 7,
+      "alignment_cost": 10007,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e>>e",
+      "n_cases": 3,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e>>e>>e",
+      "n_cases": 3,
+      "length": 8,
+      "alignment_cost": 13,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>e>>e>>e",
+      "n_cases": 3,
+      "length": 8,
+      "alignment_cost": 13,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e>>c>>e>>d>>e",
+      "n_cases": 3,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>i>>h>>d>>j>>e",
+      "n_cases": 3,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h>>e",
+      "n_cases": 3,
+      "length": 5,
+      "alignment_cost": 10006,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>g>>h>>d>>e",
+      "n_cases": 3,
+      "length": 8,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>k>>b",
+      "n_cases": 3,
+      "length": 3,
+      "alignment_cost": 10006,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>e",
+      "n_cases": 3,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>g>>h",
+      "n_cases": 3,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>e>>e",
+      "n_cases": 3,
+      "length": 10,
+      "alignment_cost": 15,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h>>k",
+      "n_cases": 3,
+      "length": 5,
+      "alignment_cost": 20005,
+      "fitness": 0.6666666666666667,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>k>>g>>h",
+      "n_cases": 3,
+      "length": 5,
+      "alignment_cost": 20005,
+      "fitness": 0.6666666666666667,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>g>>h>>d>>i>>j",
+      "n_cases": 3,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>k>>f",
+      "n_cases": 3,
+      "length": 10,
+      "alignment_cost": 20005,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e>>e>>e>>e>>e>>e",
+      "n_cases": 3,
+      "length": 14,
+      "alignment_cost": 20013,
+      "fitness": 0.8666666666666667,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>e>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20010,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j>>k",
+      "n_cases": 2,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>g>>d>>h",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 6,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>i>>j>>e",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e>>e>>e>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 14,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>k",
+      "n_cases": 2,
+      "length": 5,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>i>>j>>f",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 20006,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>e",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>h>>j>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>j>>k>>e",
+      "n_cases": 2,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>h>>i>>d>>j>>f",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>h>>d>>i>>j>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>h>>d>>i>>j>>f",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>e>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 10009,
+      "fitness": 0.9,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>e>>f",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>e>>h",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>e",
+      "n_cases": 2,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>k>>e>>e",
+      "n_cases": 2,
+      "length": 11,
+      "alignment_cost": 20008,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>k>>d>>h",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 6,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>e",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 14,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j>>k>>h",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>j>>d>>k",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>g>>h>>d>>i>>j>>e",
+      "n_cases": 2,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k>>e>>e>>e",
+      "n_cases": 2,
+      "length": 8,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>f",
+      "n_cases": 2,
+      "length": 8,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>h",
+      "n_cases": 2,
+      "length": 4,
+      "alignment_cost": 10005,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>j>>e>>e",
+      "n_cases": 2,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>e>>d>>e",
+      "n_cases": 2,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>e>>e",
+      "n_cases": 2,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>e",
+      "n_cases": 2,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>k>>j",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>h>>f",
+      "n_cases": 2,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>e>>e",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>h>>d>>e",
+      "n_cases": 2,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>i>>j",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 20007,
+      "fitness": 0.7142857142857143,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>e>>i>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10010,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>j>>i>>f",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 20006,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>k>>f",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20005,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>d>>h>>i>>j>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>i>>d>>j>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>j>>h>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>k>>j>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>g>>h>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>h>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 16,
+      "alignment_cost": 17,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>h>>b>>c>>e>>d>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 15,
+      "alignment_cost": 18,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>g>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 6,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>g>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>k>>e",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>d>>e>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>i>>j>>k",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 17,
+      "alignment_cost": 20,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>e>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 15,
+      "alignment_cost": 18,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 12,
+      "alignment_cost": 17,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 16,
+      "alignment_cost": 19,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>i>>j>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 20009,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>k>>i",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 10008,
+      "fitness": 0.8571428571428572,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>k>>f",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>k>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 20,
+      "alignment_cost": 23,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>k>>b>>e",
+      "n_cases": 1,
+      "length": 4,
+      "alignment_cost": 10007,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 15,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>g>>h>>i>>j>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>g>>d>>h>>i>>j>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>d>>i>>j",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 20007,
+      "fitness": 0.7142857142857143,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>e>>d>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 11,
+      "alignment_cost": 16,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>e>>h",
+      "n_cases": 1,
+      "length": 5,
+      "alignment_cost": 10006,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>c>>b>>e>>d>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 14,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>k>>h",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 10009,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>d>>e>>f",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>i>>h>>d>>j>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>g>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>h>>j>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>c>>h>>d>>i>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>g>>d>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e>>e>>f",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>e>>j>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>k>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 10007,
+      "fitness": 0.9,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>e>>d>>f",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>e>>b>>c>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>k>>d>>h>>i>>j",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>k>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 6,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>k>>f>>h",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20005,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>h>>g>>d>>i>>j",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>h>>c>>g>>d>>i>>j",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 20008,
+      "fitness": 0.75,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>h>>d>>i>>j>>e>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>e>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>c>>h>>d>>i>>j>>f",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 12,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e>>k",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>d>>g>>h",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>e>>e>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>k>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 13,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 12,
+      "alignment_cost": 17,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>c>>h>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>b>>c>>h>>d>>e>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h>>i",
+      "n_cases": 1,
+      "length": 5,
+      "alignment_cost": 20005,
+      "fitness": 0.6666666666666667,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>e>>b",
+      "n_cases": 1,
+      "length": 4,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>e>>g>>h",
+      "n_cases": 1,
+      "length": 5,
+      "alignment_cost": 10006,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>e>>e",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 10009,
+      "fitness": 0.9,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>h>>b>>e",
+      "n_cases": 1,
+      "length": 5,
+      "alignment_cost": 10006,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>e>>f",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>i>>h>>d>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>k>>e>>e",
+      "n_cases": 1,
+      "length": 11,
+      "alignment_cost": 20008,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>c>>k>>h>>d>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>h>>i>>k",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10006,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>k>>j>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>k>>j",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20006,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>i>>j>>k>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 20009,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>k>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 10,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>k",
+      "n_cases": 1,
+      "length": 6,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>k>>h>>d>>i",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10006,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h>>c>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>g>>h>>b>>c>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>h>>i>>k>>j>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>k",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10006,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e>>e>>f",
+      "n_cases": 1,
+      "length": 11,
+      "alignment_cost": 20008,
+      "fitness": 0.8333333333333334,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>k>>h",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10006,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>i>>d>>j>>k>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 14,
+      "alignment_cost": 19,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>g>>i>>j>>k",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 20007,
+      "fitness": 0.7777777777777778,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>e>>e>>e>>e>>e>>e>>e>>e>>e>>f",
+      "n_cases": 1,
+      "length": 15,
+      "alignment_cost": 18,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>e>>b>>c>>g>>h>>d>>i>>j",
+      "n_cases": 1,
+      "length": 9,
+      "alignment_cost": 20008,
+      "fitness": 0.8,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>e>>d>>g>>h>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 9,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>i>>h>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>k>>d>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 11,
+      "alignment_cost": 14,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>i>>g>>h>>d>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 10008,
+      "fitness": 0.8888888888888888,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>k>>h>>d>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 12,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>e>>i>>j>>e",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20009,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>h>>c>>g>>d>>e",
+      "n_cases": 1,
+      "length": 7,
+      "alignment_cost": 8,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>d>>e>>e>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 11,
+      "fitness": 1.0,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>e>>f",
+      "n_cases": 1,
+      "length": 10,
+      "alignment_cost": 20007,
+      "fitness": 0.8181818181818181,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>c>>g>>h>>d>>i>>j>>k>>e>>e>>e>>e>>e>>e",
+      "n_cases": 1,
+      "length": 15,
+      "alignment_cost": 20012,
+      "fitness": 0.875,
+      "in_model_language": null
+    },
+    {
+      "variant": "a>>b>>g>>h>>c>>k>>d>>e",
+      "n_cases": 1,
+      "length": 8,
+      "alignment_cost": 7,
+      "fitness": 1.0,
+      "in_model_language": null
+    }
+  ],
+  "discovery_sec": 0.3554,
+  "structure": {
+    "operator_kinds": {
+      "SEQUENCE": 3,
+      "activity": 11,
+      "PARALLEL": 5,
+      "XOR": 7,
+      "tau": 8,
+      "LOOP": 1
+    },
+    "n_loop_operators": 1,
+    "n_parallel_operators": 5,
+    "n_xor_operators": 7,
+    "n_other_operators": 0,
+    "n_tau_leaves": 8,
+    "petri_net_has_cycle": true,
+    "estimated_raw_tree_language_size": null,
+    "tree_language_note": "not enumerated: tree has LOOP/other operator (infinite or unbounded language)"
+  },
+  "n_anomalous_cases": 5503
+}

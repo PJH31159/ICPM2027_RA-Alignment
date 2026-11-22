@@ -1,0 +1,273 @@
+{
+  "process_tree": "->( 'a', X( 'n', ->( 'r', 's', X( 'C', 'B', 't', 'w' ), 'u' ), ->( 'i', X( ->( 'j', 'k' ), ->( 'o', 'p' ), ->( 'x', X( 'y', 'F' ), 'z' ) ), 'l' ), ->( 'b', X( 'c', 'q', 'v', 'D' ), 'd', 'e', X( 'E', 'm', 'A', 'f' ), 'g' ) ), 'h' )",
+  "tree_node_counts": {
+    "->": 7,
+    "activity": 32,
+    "X": 6
+  },
+  "n_places": 18,
+  "n_transitions": 32,
+  "n_visible_transitions": 32,
+  "n_invisible_transitions": 0,
+  "n_arcs": 64,
+  "visible_activities": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z"
+  ],
+  "n_clean_cases": 11835,
+  "n_clean_variants": 25,
+  "model_language_size": 25,
+  "model_language_equals_clean_variants": true,
+  "clean_variants_not_in_model": [],
+  "model_traces_not_in_clean": [],
+  "clean_log_fitness_alignment_weighted": 1.0,
+  "clean_variants": [
+    {
+      "variant": "a>>n>>h",
+      "n_cases": 3042,
+      "length": 3,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>i>>o>>p>>l>>h",
+      "n_cases": 998,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>i>>j>>k>>l>>h",
+      "n_cases": 991,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>r>>s>>w>>u>>h",
+      "n_cases": 740,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>r>>s>>C>>u>>h",
+      "n_cases": 728,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>r>>s>>t>>u>>h",
+      "n_cases": 719,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>r>>s>>B>>u>>h",
+      "n_cases": 704,
+      "length": 6,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>i>>x>>F>>z>>l>>h",
+      "n_cases": 507,
+      "length": 7,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>i>>x>>y>>z>>l>>h",
+      "n_cases": 494,
+      "length": 7,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>v>>d>>e>>E>>g>>h",
+      "n_cases": 202,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>v>>d>>e>>f>>g>>h",
+      "n_cases": 197,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>f>>g>>h",
+      "n_cases": 196,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>E>>g>>h",
+      "n_cases": 196,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>q>>d>>e>>E>>g>>h",
+      "n_cases": 195,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>q>>d>>e>>m>>g>>h",
+      "n_cases": 193,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>q>>d>>e>>A>>g>>h",
+      "n_cases": 185,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>D>>d>>e>>E>>g>>h",
+      "n_cases": 185,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>q>>d>>e>>f>>g>>h",
+      "n_cases": 182,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>v>>d>>e>>A>>g>>h",
+      "n_cases": 181,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>v>>d>>e>>m>>g>>h",
+      "n_cases": 179,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>A>>g>>h",
+      "n_cases": 174,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>c>>d>>e>>m>>g>>h",
+      "n_cases": 165,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>D>>d>>e>>A>>g>>h",
+      "n_cases": 165,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>D>>d>>e>>f>>g>>h",
+      "n_cases": 160,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    },
+    {
+      "variant": "a>>b>>D>>d>>e>>m>>g>>h",
+      "n_cases": 157,
+      "length": 8,
+      "alignment_cost": 0,
+      "fitness": 1.0,
+      "in_model_language": true
+    }
+  ],
+  "discovery_sec": 0.0139,
+  "structure": {
+    "operator_kinds": {
+      "SEQUENCE": 7,
+      "activity": 32,
+      "XOR": 6
+    },
+    "n_loop_operators": 0,
+    "n_parallel_operators": 0,
+    "n_xor_operators": 6,
+    "n_other_operators": 0,
+    "n_tau_leaves": 0,
+    "petri_net_has_cycle": false,
+    "estimated_raw_tree_language_size": 25,
+    "tree_language_note": "enumerated"
+  },
+  "n_anomalous_cases": 665
+}
