@@ -1,6 +1,6 @@
-"""Method C + Petri-net conformance gate (C+PN).
+"""Petri-net gate of RA-Alignment (training and inference).
 
-Purpose: even when the ADM of the W2 Expanded New NBG reports "no anomaly", a repair is accepted
+Purpose: even when the ADM of the (L_N-only) NBG reports "no anomaly", a repair is accepted
 as complete only if the final trace replays exactly on the discovered Petri net
 (initial marking -> visible / invisible transitions -> final marking).
 

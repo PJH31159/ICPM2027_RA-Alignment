@@ -1,13 +1,16 @@
 # RA-Alignment: A Reinforcement Learning Framework for Approximate Conformance Checking
 
-Code for the ICPM 2027 workshop paper *RA-Alignment*. RA-Alignment learns to repair deviating traces with
+Code of the paper *A Reinforcement Learning Framework for Approximate Conformance Checking* (J. Park, J. Ko,
+H.-G. Jo, M. Comuzzi; submitted to an ICPM 2027 workshop). RA-Alignment learns to repair deviating traces with
 Q-learning, using Normal Behavior Graphs (NBGs) built from a bounded set of model traces. The repaired traces are
 compared with Optimal Alignment (PM4Py).
 
 This repository contains five tutorials that run end to end on the **Credit** dataset (the running example of the
-paper), plus the pre-trained Credit model of the paper run.
+paper), the pre-trained Credit model of the paper run, and the 10 representative BPIC 2017 test traces of paper
+Table 3. The implementation of RA-Alignment builds upon the P-BEAR-RL framework
+(see [Original implementation and citation](#original-implementation-and-citation)).
 
-> License: **not decided yet** (see [License and citation](#license-and-citation)).
+> Software license: **not decided yet** (see [License](#license)).
 
 ## Method in one paragraph
 
@@ -28,7 +31,8 @@ src/rpbear/func_rpbear_final.py   RP-BEAR core (environment, Q-learning agent, N
 src/sim.py                   RP-BEAR execution engine (data loading, split, per-case repair)
 src/utils/                   discovery, bounded sampling, L_N-only NBG, Petri-net gate, sequential timing
 src/alignment/               Optimal Alignment repair (PM4Py) and the tau-excluded all-optimal search (ACC)
-data/credit/                 Credit event logs (see Data)
+data/credit/                 Credit event logs (see Data source)
+data/bpic2017/               the 10 BPIC 2017 test traces of paper Table 3
 artifacts/reference/         official files of the paper run (used only for the comparison checks)
 artifacts/pretrained_models/ pre-trained Credit RA-Alignment model of the paper run
 artifacts/MANIFEST.csv       SHA-256, size and origin of every shipped artifact
@@ -50,12 +54,17 @@ python -m venv .venv-rpbear     # RP-BEAR environment: tutorials 2, 4
 
 The tutorials use PM4Py's scipy LP solver (cvxopt is hidden inside the tutorial process), as in the paper runs.
 
-## Data
+## Data source
 
-`data/credit/credit-card_1.00.csv` holds the Credit log with injected deviations: 5,000 cases, of which 420 are
-deviating (column `type_res_trace`). `data/credit/credit-card.csv` is the corresponding normal log. Both files come
-from the benchmark data of P-BEAR-RL (<https://github.com/jonghyeonk/P-BEAR-RL>, `Full_input`). The terms of
-redistribution are still being confirmed with its authors.
+- **Credit** (`data/credit/`): `credit-card_1.00.csv` is the Credit log with injected deviations (5,000 cases, 420
+  deviating; column `type_res_trace`), `credit-card.csv` the corresponding normal log. Both come from the benchmark
+  data of P-BEAR-RL [1] and are published here with the permission of J. Ko (P-BEAR-RL author).
+- **BPIC 2017** (`data/bpic2017/`): 10 traces of the deviation-injected BPIC 2017 log of the P-BEAR-RL benchmark.
+  The original log is *BPI Challenge 2017* (B. van Dongen, 4TU.ResearchData, 2017,
+  <https://doi.org/10.4121/uuid:5f3067df-f10b-45da-b98b-86ae4c7a310b>), distributed under the 4TU General Terms of
+  Use.
+
+The terms of the original data sets apply to the data files; they are separate from the license of the code.
 
 ## Quick start (pre-trained model, no training)
 
@@ -134,20 +143,52 @@ sequential reference run of the same model (210/210 identical traces).
 - the training statistics, the training-run repaired log (its training rows are the repair memory), and the
   train/test split.
 
-The SHA-256 of each file is listed in `artifacts/MANIFEST.csv`.
+The SHA-256 of each file is listed in `artifacts/MANIFEST.csv`. `EXP-068` in file names and metadata is the internal
+label of the paper run.
 
 > **Security note:** pickle files can execute code when they are loaded. Do not load pickle files from untrusted
 > sources. Tutorial 4 loads the agent with an allow-list unpickler, which accepts only the RA-Alignment agent class
 > and plain numpy/pandas objects. It also checks the pre-trained file against its SHA-256 first.
 
-## License and citation
+## BPIC 2017 representative test cases
 
-**License: TODO (not decided).**
+`data/bpic2017/bpic2017_test_10.csv` contains the 10 test cases of paper Table 3 (269 events), with the exact event
+sequences of the official test split. `artifacts/reference/bpic2017_petri_net.pnml` is the reference Petri net
+(Inductive Miner, noise threshold 0.10), and `artifacts/reference/bpic2017_table3_reference.csv` gives, per case,
+the Optimal Alignment repair, the set of optimal repairs used for ACC and the Table 3 values.
 
-- `src/rpbear/func_rpbear_final.py` extends the RP-BEAR implementation of P-BEAR-RL
-  (<https://github.com/jonghyeonk/P-BEAR-RL>; Ko, Wynn, Comuzzi, Maggi, *A reinforcement learning framework for event
-  log anomaly detection and repair*, ICPM 2025). That repository has no license file; the terms of reuse are being
-  confirmed with its authors.
-- PM4Py (AGPL-3.0) is used as a dependency and is not redistributed here.
+These cases are **not a random sample** of the BPIC 2017 test set. They were selected for the comparison because
+exact alignment on the full test set ran out of memory; for these 10 cases it completed. The paper result
+(36/50 = 72.00 %: 10 cases × 5 independent runs; median 19.02 s per case for Optimal Alignment and 3.31 s for
+RA-Alignment) was produced in the research project. **No pre-trained BPIC 2017 model is included**, so this
+result cannot be re-run from this repository.
 
-Citation: **TODO** (after publication).
+## Original implementation and citation
+
+The implementation of RA-Alignment builds upon the P-BEAR-RL framework. The original P-BEAR-RL implementation is
+available at <https://github.com/jonghyeonk/P-BEAR-RL>.
+
+- `src/rpbear/func_rpbear_final.py`: RP-BEAR core (environment, Q-learning agent, NBG discovery), an extended version
+  of the P-BEAR-RL implementation (`func.py`); in this repository only its comments were translated.
+- `src/sim.py`: RP-BEAR execution engine, follows the behaviour of the RP-BEAR run script.
+- Developed for RA-Alignment: bounded sampling, L_N-only NBG, Petri-net gate (`src/utils/`), Optimal Alignment repair
+  and the all-optimal search (`src/alignment/`), and the tutorials.
+
+If you use this code, please cite P-BEAR-RL [1]:
+
+```bibtex
+@inproceedings{ko2025reinforcement,
+  title={A reinforcement learning framework for event log anomaly detection and repair},
+  author={Ko, Jonghyeong and Wynn, Moe Thandar and Comuzzi, Marco and Maggi, Fabrizio Maria},
+  booktitle={2025 7th International Conference on Process Mining (ICPM)},
+  pages={1--8},
+  year={2025},
+  organization={IEEE}
+}
+```
+
+Citation of the RA-Alignment paper: **TODO** (after publication).
+
+## License
+
+**Software license: not decided yet.** PM4Py (AGPL-3.0) is used as a dependency and is not redistributed here.

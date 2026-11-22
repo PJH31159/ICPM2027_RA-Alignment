@@ -79,7 +79,7 @@ def main():
     test_ids = sorted(map(str, types[types == "test"].index))
     (out / f"{name}_train_case_ids.txt").write_text("\n".join(train_ids) + "\n", encoding="utf-8")
     (out / f"{name}_test_case_ids.txt").write_text("\n".join(test_ids) + "\n", encoding="utf-8")
-    stats.update({"method": "RA-Alignment (C+PN, L_N-only NBG + Petri-net gate)", "nbg_edge_set_digest": digest,
+    stats.update({"method": "RA-Alignment (L_N-only NBG + Petri-net gate)", "nbg_edge_set_digest": digest,
                   "new_nbg_input": "generated_only (L_N-only)", "new_nbg_info": info, "pn_gate": pnml.name,
                   "smoke": a.smoke, "wall_sec": round(time.time() - t0, 2), "agent_sha256": C.sha256(out / f"{name}_agent.pkl"),
                   "pythonhashseed": os.environ.get("PYTHONHASHSEED")})

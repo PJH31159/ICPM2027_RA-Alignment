@@ -101,7 +101,7 @@ def main():
         ref_t = C.jload(C.REF / "credit_ra_alignment_exp068_sequential_timing.json")["timing_summary"]
         print(f"   mean time per case: this run {summ['test_case_ms_all_mean']:.1f} ms | reference run "
               f"{ref_t['test_case_ms_all_mean']:.1f} ms (machine dependent)")
-    out = {"method": "RA-Alignment (C+PN, L_N-only NBG + Petri-net gate), frozen Q-table",
+    out = {"method": "RA-Alignment (L_N-only NBG + Petri-net gate), frozen Q-table",
            "model_dir": str(Path(mdir).relative_to(C.ROOT)).replace("\\", "/"), "pretrained": pretrained,
            "agent_sha256": C.sha256(files["agent"]), "nbg_edge_set_digest": digest, "settings": rl,
            "test_cases": len(rows), "accepted_by_petri_net": f"{accepted}/{len(rows)}",
