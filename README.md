@@ -138,8 +138,8 @@ sequential reference run of the same model (210/210 identical traces).
 ## Pre-trained models
 
 The Credit model used by the tutorials is included in this repository (see below). The pre-trained models of all
-paper runs (Table 2) are distributed as assets of the GitHub Release **`models-v1.0`** of this repository (Releases
-page), one zip file per dataset, plus `SHA256SUMS.txt`.
+paper runs (Tables 2 and 3) are distributed as assets of the GitHub Release **`models-v1.0`** of this repository
+(Releases page), one zip file per dataset, plus `SHA256SUMS.txt`.
 
 | Dataset | Release asset | NBG source | Petri-net gate |
 |---|---|---|---|
@@ -150,10 +150,12 @@ page), one zip file per dataset, plus `SHA256SUMS.txt`.
 | Credit | `RA-Alignment_credit.zip` (same model as in this repository) | L_N only | yes |
 | Pub | `RA-Alignment_pub.zip` | L_N only | yes |
 | Road Traffic | `RA-Alignment_road_traffic.zip` | L_N only | yes |
-| BPIC 2017 | not yet available | – | – |
+| BPIC 2017 | `RA-Alignment_bpic2017.zip` (paper Table 3) | clean-log traces + L_N | yes |
 
 - For the acyclic Synthetic-1 models (Small–Wide), L_N is the complete model language. These models were trained
   without the Petri-net gate.
+- For BPIC2017, clean-log traces were additionally included in the NBG construction to improve coverage of valid
+  behavior, since the Petri-net-generated traces alone provided insufficient coverage.
 - **Install:** download a zip, check it against `SHA256SUMS.txt`, and extract it into `artifacts/pretrained_models/`.
   This gives `artifacts/pretrained_models/<dataset>_ra_alignment/` with the same files as the Credit folder.
 - **`MODEL_INFO.json`:** each zip contains this file, which records:
@@ -163,7 +165,10 @@ page), one zip file per dataset, plus `SHA256SUMS.txt`.
   - the SHA-256 of the input logs and of every file.
 - **To use a model other than Credit,** you also need:
   - the dataset log (P-BEAR-RL benchmark data [1], not included here);
-  - its Petri net and L_N, which are not included either.
+  - its Petri net and L_N, which are not included either;
+  - for BPIC 2017, also the clean log, because the NBG is rebuilt from the clean log and L_N (the Petri net is
+    `artifacts/reference/bpic2017_petri_net.pnml`). The BPIC 2017 zip has no training-run repaired log, because that
+    file holds every BPIC 2017 trace, so the repair memory starts empty.
 
 The Credit folder `artifacts/pretrained_models/credit_ra_alignment/` contains:
 
@@ -188,8 +193,9 @@ the Optimal Alignment repair, the set of optimal repairs used for ACC and the Ta
 These cases are **not a random sample** of the BPIC 2017 test set. They were selected for the comparison because
 exact alignment on the full test set ran out of memory; for these 10 cases it completed. The paper result
 (36/50 = 72.00 %: 10 cases × 5 independent runs; median 19.02 s per case for Optimal Alignment and 3.31 s for
-RA-Alignment) was produced in the research project. **No pre-trained BPIC 2017 model is included**, so this
-result cannot be re-run from this repository.
+RA-Alignment) was produced in the research project. The pre-trained model of this result is the Release asset
+`RA-Alignment_bpic2017.zip` (see [Pre-trained models](#pre-trained-models)). Running it needs the BPIC 2017 logs of
+the P-BEAR-RL benchmark, which are not included, and is not covered by the tutorials.
 
 ## Original implementation and citation
 
